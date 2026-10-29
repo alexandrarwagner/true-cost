@@ -38,6 +38,7 @@ jobs:
       - run: npm run format:check
       - run: npm run typecheck
       - run: npm test
+      - run: npm run check:constants
 
   build:
     name: Build
