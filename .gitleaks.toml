@@ -1,0 +1,13 @@
+# Gitleaks config. Extends the default ruleset; allowlists only files that hold names, not values.
+title = "true-cost"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Files that document variable names with empty values, and test fixtures."
+paths = [
+  '''^\.env\.example$''',
+  '''^package-lock\.json$''',
+  '''^tests/.*fixtures.*''',
+]

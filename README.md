@@ -1,0 +1,40 @@
+# True Cost
+
+An international student enters three things, where they're from, which US school, and the
+tuition on their offer, and sees what the degree will really cost in their own currency: every
+cost nobody mentions, when the money is needed, and how much the exchange rate has moved
+totals over past periods of the same length. We never predict rates, every number has a source
+and a date, and AI never invents a figure.
+
+## Status
+
+Build step 2: setup and security. The cost engine, wireframe UI, real adapters and AI features
+follow in steps 3 to 6.
+
+## Quick start
+
+Requires Node 24 (`.nvmrc`) and, for the pre-commit hook, [gitleaks](https://github.com/gitleaks/gitleaks)
+(`brew install gitleaks`).
+
+```bash
+npm ci
+cp .env.example .env.local   # DEMO_MODE=true runs on fixtures with no keys
+npm run dev
+```
+
+## Scripts
+
+| Script                                                        | What it does                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `npm run dev` / `npm run build` / `npm start`                 | Development server; production build and server                                   |
+| `npm run lint` / `npm run typecheck` / `npm run format:check` | Static checks (all run in CI)                                                     |
+| `npm test`                                                    | Unit, property, golden, adapter (mocked HTTP) and AI-contract tests               |
+| `npm run test:e2e`                                            | Playwright flow tests with an axe scan, against the production build in DEMO_MODE |
+| `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)      |
+
+## Documentation
+
+- `docs/data-sources.md`: every source, what was verified, licence and refresh.
+- `docs/decisions/`: Architecture Decision Records.
+- `SECURITY.md`: threat model, protections, how to report a problem.
+- `docs/ARCHITECTURE.md` and `docs/cost-model.md` arrive with the engine in step 3.

@@ -1,0 +1,6 @@
+# Block any commit that stages a secret. Requires the gitleaks binary (brew install gitleaks).
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed (brew install gitleaks). Refusing to commit." >&2
+  exit 1
+fi
+gitleaks git --staged --pre-commit --redact --no-banner

@@ -1,0 +1,68 @@
+{
+  "name": "fx-latest-fixture",
+  "fetchedAt": "2026-10-29T22:00:43Z",
+  "sourceVersion": "Frankfurter v2 blended",
+  "source": "https://api.frankfurter.dev/v2/rates",
+  "rates": [
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "BDT",
+      "rate": 123.97
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "BRL",
+      "rate": 5.3544
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "CAD",
+      "rate": 1.4011
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "CNY",
+      "rate": 6.6635
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "INR",
+      "rate": 95.22
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "KRW",
+      "rate": 1336.11
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "NGN",
+      "rate": 1344.79
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "NPR",
+      "rate": 152.32
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "TWD",
+      "rate": 32.493
+    },
+    {
+      "date": "2026-10-29",
+      "base": "USD",
+      "quote": "VND",
+      "rate": 25790
+    }
+  ]
+}

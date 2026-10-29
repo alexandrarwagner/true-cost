@@ -1,0 +1,38 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/eval/results.json
+/data/snapshots/*.tmp
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# production
+/build
+
+# env files: keep only the example
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# macOS / editors
+.DS_Store
+._*
+.vscode/
+.idea/
+*.swp
+
+# logs
+*.log
+npm-debug.log*
