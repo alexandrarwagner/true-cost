@@ -140,9 +140,18 @@ export interface FxReplay {
   worst10Home: Minor;
   worst: FxWindow;
   best: FxWindow;
-  /** Per-payment baseline amounts in home currency, for the timeline. */
+  /** Cumulative spend after each payment, across windows, for the band chart. */
+  path: FxPathPoint[];
   historyFrom: IsoDate;
   historyTo: IsoDate;
+}
+
+export interface FxPathPoint {
+  date: IsoDate;
+  baseline: Minor;
+  best10: Minor;
+  median: Minor;
+  worst10: Minor;
 }
 
 export interface FxUnsupported {

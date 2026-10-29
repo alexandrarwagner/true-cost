@@ -1,6 +1,7 @@
 import { addDays, daysBetween } from "./calendar";
 import { addMinor, median, percentile, toMinor } from "./money";
 import type {
+  FxPathPoint,
   FxReplay,
   FxUnsupported,
   FxWindow,
@@ -72,12 +73,14 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
 
   const step = Math.max(1, input.windowStepRows ?? 7);
   const windows: FxWindow[] = [];
+  const perWindowCumulative: number[][] = [];
   for (let i = 0; i < input.history.length; i += step) {
     const startRow = input.history[i];
     if (!startRow || !(startRow.rate > 0)) continue;
     const endDate = addDays(startRow.date, span);
     if (endDate > last.date) break;
     let total = 0;
+    const cumulative: number[] = [];
     for (const o of offsets) {
       const idx = lastOnOrBefore(input.history, addDays(startRow.date, o.days));
       const row = input.history[idx];
@@ -87,8 +90,12 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
       }
       const relRate = (todayWithSource.rate * row.rate) / startRow.rate;
       total += toMinor(o.amount as never, relRate, input.minorDigits);
+      cumulative.push(total);
     }
-    if (total >= 0) windows.push({ start: startRow.date, end: endDate, totalHome: total as Minor });
+    if (total >= 0) {
+      windows.push({ start: startRow.date, end: endDate, totalHome: total as Minor });
+      perWindowCumulative.push(cumulative);
+    }
   }
 
   if (windows.length < MIN_WINDOWS)
@@ -100,6 +107,18 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
     };
 
   const totals = windows.map((w) => w.totalHome).sort((a, b) => a - b);
+  let running = 0;
+  const path: FxPathPoint[] = input.schedule.map((e, i) => {
+    running += toMinor(amountDue(e) as never, todayWithSource.rate, input.minorDigits);
+    const column = perWindowCumulative.map((c) => c[i] ?? 0).sort((a, b) => a - b);
+    return {
+      date: e.date,
+      baseline: running as Minor,
+      best10: percentile(column, 0.1) as Minor,
+      median: median(column) as Minor,
+      worst10: percentile(column, 0.9) as Minor,
+    };
+  });
   const worst = windows.reduce((a, b) => (b.totalHome > a.totalHome ? b : a));
   const best = windows.reduce((a, b) => (b.totalHome < a.totalHome ? b : a));
   return {
@@ -112,6 +131,7 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
     worst10Home: percentile(totals, 0.9) as Minor,
     worst,
     best,
+    path,
     historyFrom: first.date,
     historyTo: last.date,
   };
