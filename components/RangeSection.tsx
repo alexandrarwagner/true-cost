@@ -47,7 +47,7 @@ export function RangeSection({ response }: { response: EstimateResponse }) {
         )}
       </p>
 
-      <div className="mt-4 print:hidden" aria-hidden="true">
+      <div className="mt-4 print:hidden" role="img" aria-label={copy.result.chartLabel}>
         <RangeChart path={fx.path} currency={cur} />
       </div>
 

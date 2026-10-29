@@ -191,6 +191,8 @@ export const copy = {
     },
     rangeHeading: "What the exchange rate could do to this",
     rangeTable: "The same range as a table",
+    chartLabel:
+      "Chart of the cumulative cost over time: a band from the best to the worst tenth of past periods, the median, and today's rate. The table below has the same numbers.",
     rangeColumns: {
       date: "After the payment on",
       baseline: "At today's rate",

@@ -38,6 +38,8 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
     );
     expect(overflow).toBe(false);
 
+    // The unfold animates in; scan the settled page, not a half-faded one.
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
       .analyze();

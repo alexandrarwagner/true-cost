@@ -26,7 +26,11 @@ export function RangeChart({ path, currency }: { path: FxPathPoint[]; currency: 
   const fmt = (v: number) => homeShort(Math.round(v * scale) as never, currency);
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+      <ComposedChart
+        data={data}
+        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+        accessibilityLayer={false}
+      >
         <CartesianGrid stroke="#d4d4d4" strokeDasharray="3 3" />
         <XAxis dataKey="date" tickFormatter={monthYear} stroke="#171717" fontSize={12} />
         <YAxis tickFormatter={fmt} stroke="#171717" fontSize={12} width={90} />
