@@ -7,12 +7,15 @@ import type { SchoolSummary } from "@/lib/adapters/types";
 interface Props {
   chosen: SchoolSummary | null;
   onChoose: (school: SchoolSummary | null) => void;
+  aiEnabled?: boolean;
+  botToken?: string;
 }
 
 const field =
   "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
 
-export function SchoolSearch({ chosen, onChoose }: Props) {
+export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: Props) {
+  const [smart, setSmart] = useState<"idle" | "searching" | "none">("idle");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SchoolSummary[]>([]);
   const [status, setStatus] = useState<"idle" | "searching" | "done">("idle");
@@ -39,6 +42,25 @@ export function SchoolSearch({ chosen, onChoose }: Props) {
     }, 250);
     return () => clearTimeout(t);
   }, [query]);
+
+  async function smartSearch() {
+    setSmart("searching");
+    try {
+      const res = await fetch("/api/ai/match", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ q: query.trim(), ...(botToken ? { botToken } : {}) }),
+      });
+      const json: { results?: SchoolSummary[] } = res.ok ? await res.json() : {};
+      if (json.results && json.results.length > 0) {
+        setResults(json.results);
+        setStatus("done");
+        setSmart("idle");
+      } else setSmart("none");
+    } catch {
+      setSmart("none");
+    }
+  }
 
   if (chosen) {
     return (
@@ -86,6 +108,20 @@ export function SchoolSearch({ chosen, onChoose }: Props) {
               : copy.form.schoolNoResults
             : ""}
       </p>
+      {aiEnabled && status === "done" && results.length === 0 && (
+        <p className="mt-1 text-sm">
+          <button
+            type="button"
+            className="underline"
+            onClick={() => void smartSearch()}
+            disabled={smart === "searching"}
+          >
+            {smart === "searching" ? copy.ai.smartSearching : copy.ai.smartSearch}
+          </button>
+          {smart === "none" && <span className="ml-2 text-neutral-700">{copy.ai.smartNone}</span>}
+          <span className="ml-2 text-neutral-700">{copy.ai.smartNote}</span>
+        </p>
+      )}
       {results.length > 0 && (
         <ul id={listId} className="mt-1 divide-y divide-neutral-300 border border-neutral-900">
           {results.map((s) => (

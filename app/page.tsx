@@ -1,6 +1,7 @@
 import { EstimateFlow } from "@/components/EstimateFlow";
 import { copy } from "@/content/copy";
 import { decodeShare } from "@/lib/schema/share";
+import { flags } from "@/lib/server/flags";
 
 // A shared link can be edited: /?c=IN&... prefills the form, decoded on the server.
 export default async function HomePage({
@@ -16,7 +17,7 @@ export default async function HomePage({
     <>
       <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
       <p className="mt-1 mb-6">{copy.tagline}</p>
-      <EstimateFlow initial={initial} />
+      <EstimateFlow initial={initial} aiEnabled={flags().AI_ENABLED} />
     </>
   );
 }

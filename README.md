@@ -8,8 +8,10 @@ and a date, and AI never invents a figure.
 
 ## Status
 
-Build steps 2 to 5 are done: setup and security, the core engine, the wireframe UI and the
-real adapters with snapshot scripts. AI features (step 6) and hardening (step 7) follow.
+Build steps 2 to 6 are done: setup and security, the core engine, the wireframe UI, the real
+adapters with snapshot scripts, and the AI features behind `AI_ENABLED` (letter extraction
+with verbatim quotes, a checked plain-English explanation, and fuzzy school matching that
+still resolves to a real UNITID). Hardening (step 7) follows.
 
 ## Quick start
 

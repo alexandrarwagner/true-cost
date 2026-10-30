@@ -9,7 +9,9 @@ import {
   type EstimateRequest,
   type EstimateRequestInput,
 } from "@/lib/schema/estimate";
+import type { ExtractedField } from "@/lib/schema/ai";
 import { AccurateOptions } from "./AccurateOptions";
+import { LetterPaste } from "./LetterPaste";
 import { SchoolSearch } from "./SchoolSearch";
 
 type Options = NonNullable<EstimateRequestInput["options"]>;
@@ -20,6 +22,8 @@ interface Props {
   onSubmit: (req: EstimateRequest) => void;
   submitting: boolean;
   error: string | null;
+  aiEnabled: boolean;
+  botToken: string | undefined;
 }
 
 const field =
@@ -50,7 +54,7 @@ function degreeFrom(req: EstimateRequest | null): Degree {
   return req.degreeYears === 4 ? "undergrad" : req.degreeYears === 2 ? "masters" : "other";
 }
 
-export function InputForm({ initial, onSubmit, submitting, error }: Props) {
+export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, botToken }: Props) {
   const t = copy.form;
   const terms = nextTerms(new Date());
   const [country, setCountry] = useState(initial?.countryCode ?? "IN");
@@ -89,6 +93,32 @@ export function InputForm({ initial, onSubmit, submitting, error }: Props) {
     }
     if (s.predominantDegree === 3) setDegree("undergrad");
     else if (s.predominantDegree === 4) setDegree("masters");
+  }
+
+  function applyLetter(fields: ExtractedField[]) {
+    const get = (name: ExtractedField["name"]) => fields.find((f) => f.name === name);
+    const tuitionField = get("tuitionPerYear");
+    const fees = get("mandatoryFees");
+    if (tuitionField?.valueNumber !== null && tuitionField?.valueNumber !== undefined) {
+      setTuition(String(tuitionField.valueNumber + (fees?.valueNumber ?? 0)));
+      setTuitionSource("user");
+    }
+    const sch = get("scholarshipPerYear");
+    if (sch?.valueNumber !== null && sch?.valueNumber !== undefined)
+      setOptions((o) => ({ ...o, scholarshipPerYear: sch.valueNumber ?? undefined }));
+    const yrs = get("programmeLengthYears")?.valueNumber;
+    if (yrs === 4) setDegree("undergrad");
+    else if (yrs === 2) setDegree("masters");
+    else if (yrs === 1 || yrs === 3) {
+      setDegree("other");
+      setOtherYears(yrs);
+    }
+    const start = get("startDate")?.valueText;
+    const m = start ? /\b(fall|spring)\s+(20\d\d)\b/i.exec(start) : null;
+    if (m) {
+      const value = `${m[2]}-${m[1]?.toLowerCase()}`;
+      if (terms.some((tm) => `${tm.year}-${tm.season}` === value)) setTerm(value);
+    }
   }
 
   function submit() {
@@ -171,7 +201,12 @@ export function InputForm({ initial, onSubmit, submitting, error }: Props) {
         <label htmlFor="school" className="block">
           {t.school}
         </label>
-        <SchoolSearch chosen={school} onChoose={chooseSchool} />
+        <SchoolSearch
+          chosen={school}
+          onChoose={chooseSchool}
+          aiEnabled={aiEnabled}
+          botToken={botToken}
+        />
       </div>
 
       <div className="mt-4">
@@ -253,6 +288,7 @@ export function InputForm({ initial, onSubmit, submitting, error }: Props) {
       </label>
 
       <AccurateOptions value={options} onChange={setOptions} />
+      {aiEnabled && <LetterPaste botToken={botToken} onApply={applyLetter} />}
 
       <p className="mt-4 text-sm font-medium" role="alert">
         {localError ?? error ?? ""}

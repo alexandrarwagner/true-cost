@@ -5,10 +5,18 @@ import { copy } from "@/content/copy";
 import { ApiErrorSchema } from "@/lib/schema/api";
 import type { EstimateRequest } from "@/lib/schema/estimate";
 import type { EstimateResponse } from "@/services/estimate";
+import { BotCheck } from "./BotCheck";
 import { InputForm } from "./InputForm";
 import { ResultView } from "./ResultView";
 
-export function EstimateFlow({ initial }: { initial: EstimateRequest | null }) {
+export function EstimateFlow({
+  initial,
+  aiEnabled,
+}: {
+  initial: EstimateRequest | null;
+  aiEnabled: boolean;
+}) {
+  const [botToken, setBotToken] = useState<string | undefined>(undefined);
   const [result, setResult] = useState<EstimateResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,10 +55,13 @@ export function EstimateFlow({ initial }: { initial: EstimateRequest | null }) {
         onSubmit={(r) => void submit(r)}
         submitting={submitting}
         error={error}
+        aiEnabled={aiEnabled}
+        botToken={botToken}
       />
+      {aiEnabled && <BotCheck onToken={setBotToken} />}
       {result && (
         <div ref={resultRef} tabIndex={-1} className="mt-10 focus:outline-none" aria-live="polite">
-          <ResultView response={result} />
+          <ResultView response={result} aiEnabled={aiEnabled} botToken={botToken} />
         </div>
       )}
     </div>

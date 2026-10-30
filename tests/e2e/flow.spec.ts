@@ -96,3 +96,44 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("AI features (DEMO_MODE mock)", () => {
+  test("reading a pasted letter shows quoted figures and applies only the ticked ones", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page
+      .getByLabel("Letter text")
+      .fill(
+        "Welcome to the 2-year MS program starting Fall 2027. Tuition is $30,500 per year and mandatory fees are $1,200. Estimated living expenses: $18,000. Scholarship: $5,000 per year.",
+      );
+    await page.getByRole("button", { name: "Read my letter" }).click();
+    await expect(page.getByRole("heading", { name: "Here's what the letter says" })).toBeVisible();
+    await expect(page.getByText("From the letter:").first()).toBeVisible();
+    await page.getByRole("button", { name: "Use the ticked figures" }).click();
+    await expect(page.getByLabel(/Tuition per year \(US dollars\)/)).toHaveValue("31700");
+    await expect(page.getByLabel(/Scholarship or assistantship/)).toHaveValue("5000");
+    await expect(page.getByLabel("Master's, 2 years")).toBeChecked();
+    await expect(page.getByLabel("Start term")).toHaveValue("2027-fall");
+  });
+
+  test("the plain-English explanation starts as a template and can be replaced on request", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await expect(page.getByRole("heading", { name: "In plain English" })).toBeVisible();
+    await expect(page.getByText("Standard wording from the numbers on this page.")).toBeVisible();
+    await page.getByRole("button", { name: "Explain this result" }).click();
+    await expect(page.getByText(/This is not a prediction/)).toBeVisible();
+  });
+
+  test("a smarter search resolves a nickname to a real school", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Which school?").fill("nyu");
+    await expect(page.getByText("No schools found. Try a different spelling.")).toBeVisible();
+    await page.getByRole("button", { name: "Try a smarter search" }).click();
+    await page.getByRole("button", { name: /New York University/ }).click();
+    await expect(page.getByLabel(/Tuition per year/)).not.toHaveValue("");
+  });
+});

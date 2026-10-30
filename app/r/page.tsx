@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ResultView } from "@/components/ResultView";
 import { copy } from "@/content/copy";
 import { decodeShare } from "@/lib/schema/share";
+import { flags } from "@/lib/server/flags";
 import { buildSources } from "@/lib/server/sources";
 import { runEstimate } from "@/services/estimate";
 
@@ -42,7 +43,7 @@ export default async function SharedResultPage({
           {copy.result.edit}
         </Link>
       </p>
-      <ResultView response={response} />
+      <ResultView response={response} aiEnabled={flags().AI_ENABLED} />
     </>
   );
 }
