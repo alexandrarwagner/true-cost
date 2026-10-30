@@ -10,6 +10,20 @@ date, or the user. Verified on 29 October 2026 by calling each service; re-verif
 | Exchange rates, today and history                           | Frankfurter v2 blended feed, `https://api.frankfurter.dev/v2/rates`               | No key; rate-limited against abuse, no quotas                                                                                             | Today's rate at runtime (cached minutes); history snapshotted | MIT code; blended rates stated free for commercial use. Read the licence page before launch. |
 | One-off fees                                                | `data/constants.ts`                                                               | Hand-curated with `source`, `url`, `checkedOn`                                                                                            | CI fails if any constant is older than 180 days               | Various public sources                                                                       |
 
+## Snapshots and refresh
+
+| Snapshot                    | Script                       | Needs              | What it holds                                          |
+| --------------------------- | ---------------------------- | ------------------ | ------------------------------------------------------ |
+| `fx-{CUR}.json` (ten files) | `npm run snapshot:fx`        | nothing            | Daily USD rates from 2010 to today per launch currency |
+| `scorecard-costs.json`      | `npm run snapshot:scorecard` | `DATA_GOV_API_KEY` | Cost fields for every school with out-of-state tuition |
+| `hud-fmr.json`              | `npm run snapshot:hud`       | `HUD_API_TOKEN`    | FMR by metro and county for every state, FY2027        |
+
+Each file carries `name`, `fetchedAt` and `sourceVersion`; `/api/health` flags any older
+than 180 days. `.github/workflows/refresh-snapshots.yml` runs weekly and opens a pull request
+with the diff; nothing overwrites data on `main` without review. At runtime, school search and
+today's rate are live; cost fields and rent read the snapshot first and fall back to a live
+call when a key is configured.
+
 ## College Scorecard: what was verified
 
 All field names used by the app returned values for Purdue (UNITID 243780):
@@ -31,7 +45,13 @@ All field names used by the app returned values for Purdue (UNITID 243780):
   `fmr/statedata/{state}`, `fmr/data/{entityid}?year=`. `entityid` is a county FIPS or CBSA
   code taken from the list endpoints. No ZIP endpoint is documented.
 - Auth is `Authorization: Bearer <token>`; an unauthenticated call returns 401.
-- Rate limits are not published. Response field names could not be checked without a token.
+- Rate limits are not published. Response field names could not be checked without a token:
+  `lib/adapters/hud.ts` reads both documented naming variants (`metro_name`/`county_name`,
+  `code`/`fips_code`, `Efficiency` to `Four-Bedroom`) and parses anything else to "no data".
+  First task once a token exists: run `npm run snapshot:hud -- --only IN` and check the count.
+- Areas are matched to the school by city name against metro and county names. When nothing
+  matches, a state-wide typical (median) rent is used and labelled as an estimate. ZIP-level
+  Small Area FMRs are not read yet; HUD publishes them as a spreadsheet.
 - FMR is the 40th-percentile gross rent for a standard-quality unit. FY2027 uses 2020 to 2024
   ACS data. Small Area FMRs (ZIP level) exist for some metros and are published as a
   spreadsheet, which the snapshot script reads.

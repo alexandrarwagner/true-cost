@@ -101,7 +101,10 @@ export async function runEstimate(
   const started = Date.now();
   const [school, rent, fxToday, fxHistory] = await Promise.allSettled([
     sources.schools.costs(req.school.unitId, signal()),
-    sources.rent.forArea(req.school.zip, req.school.state, signal()),
+    sources.rent.forArea(
+      { zip: req.school.zip, state: req.school.state, city: req.school.city },
+      signal(),
+    ),
     sources.fx.latest(req.homeCurrency, signal()),
     req.homeCurrency === "USD"
       ? Promise.resolve([])
@@ -109,8 +112,9 @@ export async function runEstimate(
   ]);
 
   const degraded: DegradedSource[] = [];
-  if (school.status === "rejected") degraded.push("school");
-  if (rent.status === "rejected") degraded.push("rent");
+  // A source that fails or comes back empty is degraded either way: the line becomes an estimate.
+  if (school.status === "rejected" || settled(school) === null) degraded.push("school");
+  if (rent.status === "rejected" || settled(rent) === null) degraded.push("rent");
   if (fxToday.status === "rejected" || settled(fxToday) === null) degraded.push("fx_today");
   if (fxHistory.status === "rejected") degraded.push("fx_history");
 

@@ -1,0 +1,92 @@
+import { http, HttpResponse } from "msw";
+import { describe, expect, it } from "vitest";
+import { rowToCosts, rowToSummary, SCORECARD_URL, scorecardSource } from "@/lib/adapters/scorecard";
+import { server } from "./msw";
+
+const purdue = {
+  id: 243780,
+  "school.name": "Purdue University-Main Campus",
+  "school.city": "West Lafayette",
+  "school.state": "IN",
+  "school.zip": "47907-2040",
+  "school.degrees_awarded.predominant": 3,
+  "latest.cost.tuition.out_of_state": 28794,
+  "latest.cost.roomboard.oncampus": 12820,
+  "latest.cost.otherexpense.oncampus": 2340,
+  "latest.cost.booksupply": 1090,
+  "latest.cost.roomboard.offcampus": null,
+};
+const ok = (results: unknown[]) =>
+  HttpResponse.json({ metadata: { total: results.length, page: 0, per_page: 100 }, results });
+const sig = () => AbortSignal.timeout(2000);
+
+describe("scorecard adapter", () => {
+  it("maps rows to summaries and costs, dropping nulls", () => {
+    expect(rowToSummary(purdue)).toEqual({
+      unitId: 243780,
+      name: "Purdue University-Main Campus",
+      city: "West Lafayette",
+      state: "IN",
+      zip: "47907",
+      tuitionOutOfStateUsd: 2879400,
+      predominantDegree: 3,
+    });
+    const costs = rowToCosts(purdue, { kind: "school", name: "x", date: "2026-10-30" });
+    expect(costs).toMatchObject({ roomBoardOnCampusUsd: 1282000, booksSupplyUsd: 109000 });
+    expect(costs.roomBoardOffCampusUsd).toBeUndefined();
+  });
+
+  it("searches with the key in a header and caches the result", async () => {
+    let calls = 0;
+    let seen: Request | undefined;
+    server.use(
+      http.get(SCORECARD_URL, ({ request }) => {
+        calls++;
+        seen = request;
+        return ok([purdue]);
+      }),
+    );
+    const src = scorecardSource("k-test");
+    const first = await src.search("purdue", sig());
+    const second = await src.search("Purdue ", sig());
+    expect(first[0]?.unitId).toBe(243780);
+    expect(second).toEqual(first);
+    expect(calls).toBe(1);
+    const u = new URL(seen?.url ?? "");
+    expect(u.searchParams.get("school.name")).toBe("purdue");
+    expect(u.searchParams.has("api_key")).toBe(false);
+    expect(seen?.headers.get("x-api-key")).toBe("k-test");
+  });
+
+  it("throws without a key and on a 429, and returns null for an unknown school", async () => {
+    await expect(scorecardSource(undefined).search("x", sig())).rejects.toMatchObject({
+      kind: "blocked_host",
+    });
+    server.use(
+      http.get(SCORECARD_URL, ({ request }) =>
+        new URL(request.url).searchParams.get("id") === "1"
+          ? ok([])
+          : new HttpResponse(null, { status: 429 }),
+      ),
+    );
+    await expect(scorecardSource("k").search("rate", sig())).rejects.toMatchObject({
+      kind: "http",
+      status: 429,
+    });
+    expect(await scorecardSource("k").costs(1, sig())).toBeNull();
+  });
+
+  it("fetches costs live when the school is not in the snapshot", async () => {
+    server.use(http.get(SCORECARD_URL, () => ok([purdue])));
+    const r = await scorecardSource("k", { now: () => new Date("2026-10-30T00:00:00Z") }).costs(
+      243780,
+      sig(),
+    );
+    expect(r?.summary.name).toBe("Purdue University-Main Campus");
+    expect(r?.costs.source).toMatchObject({
+      kind: "school",
+      name: "College Scorecard",
+      date: "2026-10-30",
+    });
+  });
+});

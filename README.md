@@ -8,8 +8,8 @@ and a date, and AI never invents a figure.
 
 ## Status
 
-Build step 2: setup and security. The cost engine, wireframe UI, real adapters and AI features
-follow in steps 3 to 6.
+Build steps 2 to 5 are done: setup and security, the core engine, the wireframe UI and the
+real adapters with snapshot scripts. AI features (step 6) and hardening (step 7) follow.
 
 ## Quick start
 
@@ -31,6 +31,14 @@ npm run dev
 | `npm test`                                                    | Unit, property, golden, adapter (mocked HTTP) and AI-contract tests               |
 | `npm run test:e2e`                                            | Playwright flow tests with an axe scan, against the production build in DEMO_MODE |
 | `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)      |
+
+## Keys
+
+Without `DEMO_MODE`, school search needs `DATA_GOV_API_KEY` (free at api.data.gov); cost
+fields and rent come from the snapshots in `data/snapshots/`, falling back to live calls when
+the key or `HUD_API_TOKEN` is set. Exchange rates need no key. The AI features (step 6) need
+`ANTHROPIC_API_KEY`. In production, Upstash and Turnstile are required too (see
+`.env.example`).
 
 ## Documentation
 

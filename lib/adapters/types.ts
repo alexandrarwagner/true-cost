@@ -22,8 +22,14 @@ export interface SchoolSource {
   ): Promise<{ summary: SchoolSummary; costs: SchoolCosts } | null>;
 }
 
+export interface AreaQuery {
+  zip: string;
+  state: string;
+  city: string;
+}
+
 export interface RentSource {
-  forArea(zip: string, state: string, signal: AbortSignal): Promise<AreaRent | null>;
+  forArea(area: AreaQuery, signal: AbortSignal): Promise<AreaRent | null>;
 }
 
 export interface FxSource {

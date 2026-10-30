@@ -1,12 +1,20 @@
 import "server-only";
+import { frankfurterSource } from "@/lib/adapters/frankfurter";
+import { hudSource } from "@/lib/adapters/hud";
 import { mockSources } from "@/lib/adapters/mock/sources";
+import { scorecardSource } from "@/lib/adapters/scorecard";
 import type { DataSources } from "@/lib/adapters/types";
 import { getEnv } from "./env";
-import { DataUnavailableError } from "./errors";
 
-/** Picks fixture-backed or real sources. Real adapters arrive in build step 5. */
+let real: DataSources | undefined;
+
+/** Fixture-backed sources in DEMO_MODE; otherwise the real adapters, built once. */
 export function buildSources(): DataSources {
   const env = getEnv();
   if (env.isDemo) return mockSources;
-  throw new DataUnavailableError("sources", "real_adapters_not_built_yet");
+  if (!real) {
+    const schools = scorecardSource(env.scorecard.apiKey);
+    real = { schools, rent: hudSource(env.hud.token), fx: frankfurterSource(), demo: false };
+  }
+  return real;
 }

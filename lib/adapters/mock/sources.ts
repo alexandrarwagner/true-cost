@@ -84,7 +84,7 @@ export const mockSchools: SchoolSource = {
 };
 
 export const mockRent: RentSource = {
-  async forArea(_zip, state) {
+  async forArea({ state }) {
     const area = hudSample.areas.find((a) => a.state === state.toUpperCase());
     if (!area) return null;
     const m = area.monthly as Record<string, number>;

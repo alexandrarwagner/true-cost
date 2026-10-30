@@ -45,10 +45,11 @@ flowchart LR
   formatting. Pure TypeScript, no I/O, no framework. `computeEstimate(input, context)` is the one
   entry point; everything the data layer fetched arrives as arguments. Unit, property and golden
   tests live here.
-- `lib/adapters/`: one module per source behind an interface, each with a fixture-backed mock
-  used in `DEMO_MODE` and tests (step 5).
+- `lib/adapters/`: one module per source behind an interface (`scorecard`, `hud`,
+  `frankfurter`), each reading `data/snapshots` first and falling back to a live call through
+  the allowlisted HTTP client, with a fixture-backed mock used in `DEMO_MODE` and tests.
 - `services/`: `runEstimate()` gathers data with `Promise.allSettled`, so a failed source becomes
-  a labelled estimate rather than an error (step 5).
+  a labelled estimate rather than an error, listed in the response as `degraded`.
 - `app/`: routes that validate input with zod and call services; components that render.
 - `lib/server/`: env, flags, rate limiting (two tiers), outbound HTTP allowlist, errors, logs,
   snapshot freshness.

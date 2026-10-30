@@ -1,0 +1,53 @@
+name: Refresh data snapshots
+
+# Weekly. Pulls fresh snapshots and opens a pull request with the diff; nothing lands on main
+# without review. FX needs no key; Scorecard and HUD run only when their secrets are set.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Snapshot exchange-rate history
+        run: npm run snapshot:fx
+      - name: Snapshot College Scorecard costs
+        if: ${{ secrets.DATA_GOV_API_KEY != '' }}
+        env:
+          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+        run: npm run snapshot:scorecard
+      - name: Snapshot HUD Fair Market Rents
+        if: ${{ secrets.HUD_API_TOKEN != '' }}
+        env:
+          HUD_API_TOKEN: ${{ secrets.HUD_API_TOKEN }}
+        run: npm run snapshot:hud
+      - name: Open a pull request if anything changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- data/snapshots; then
+            echo "No snapshot changes."
+            exit 0
+          fi
+          branch="chore/refresh-snapshots-$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add data/snapshots
+          git commit -m "chore: refresh data snapshots $(date -u +%Y-%m-%d)"
+          git push -u origin "$branch"
+          gh pr create --title "chore: refresh data snapshots $(date -u +%Y-%m-%d)" \
+            --body "Automated snapshot refresh. Review the diff in data/snapshots before merging." \
+            --base main --head "$branch"
