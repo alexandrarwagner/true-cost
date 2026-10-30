@@ -8,6 +8,18 @@ export type Minor = number & { readonly __brand: "Minor" };
 export type IsoDate = string;
 
 export type Frequency = "one_off" | "per_year" | "per_semester" | "per_month";
+/** When an item is billed. The schedule is driven by this, not by item ids. */
+export type Billing =
+  | "pre_arrival"
+  | "arrival"
+  | "departure"
+  | "semester"
+  | "year_start"
+  | "winter_break"
+  | "monthly"
+  | "summer";
+/** Restrict a recurring item to some academic years. */
+export type YearScope = "all" | "non_final" | "final";
 export type Phase = "pre_arrival" | "arrival" | "ongoing" | "departure";
 export type Confidence = "user" | "school" | "government" | "estimate";
 export type Category = "tuition" | "housing" | "living" | "one_off" | "money_moving";
@@ -29,6 +41,11 @@ export interface LineItem {
   range?: { low: Cents; high: Cents };
   frequency: Frequency;
   phase: Phase;
+  billing: Billing;
+  /** Which academic years a recurring item applies to; defaults to all. */
+  yearScope?: YearScope;
+  /** Paid now but credited against another item's first or last bill (deposits). */
+  creditAgainst?: { itemId: string; occurrence: "first" | "last" };
   source: Source;
   /** Marks a risk shown but not added, e.g. deposit deductions. */
   riskOnly?: boolean;

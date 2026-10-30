@@ -27,17 +27,19 @@ export interface EstimateContext extends CostModelData {
 }
 
 export function occurrencesOverDegree(item: LineItem, years: number): number {
+  const scope = item.yearScope ?? "all";
+  const yearsInScope = scope === "all" ? years : scope === "final" ? 1 : Math.max(0, years - 1);
   switch (item.frequency) {
     case "one_off":
       return 1;
     case "per_year":
-      return years;
+      return yearsInScope;
     case "per_semester":
-      return years * SEMESTERS_PER_YEAR;
+      return yearsInScope * SEMESTERS_PER_YEAR;
     case "per_month":
-      return item.id === "summerRent"
-        ? years * SUMMER_MONTHS_PER_YEAR
-        : years * ACADEMIC_MONTHS_PER_YEAR;
+      return item.billing === "summer"
+        ? yearsInScope * SUMMER_MONTHS_PER_YEAR
+        : yearsInScope * ACADEMIC_MONTHS_PER_YEAR;
   }
 }
 

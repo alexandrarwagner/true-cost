@@ -10,12 +10,14 @@ import {
   type EstimateRequestInput,
 } from "@/lib/schema/estimate";
 import type { ExtractedField } from "@/lib/schema/ai";
+import { applyLetterFields, type Degree } from "@/lib/ui/letterApply";
+import { nextTerms, termValue } from "@/lib/ui/terms";
 import { AccurateOptions } from "./AccurateOptions";
+import { ProgrammeFields } from "./ProgrammeFields";
 import { LetterPaste } from "./LetterPaste";
 import { SchoolSearch } from "./SchoolSearch";
 
 type Options = NonNullable<EstimateRequestInput["options"]>;
-type Degree = "undergrad" | "masters" | "other" | null;
 
 interface Props {
   initial: EstimateRequest | null;
@@ -31,25 +33,7 @@ const field =
 const button =
   "border border-neutral-900 bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900 disabled:opacity-60";
 
-// Default is the next fall (the brief's rule); the spring before it is offered when still ahead.
-function nextTerms(now: Date): Array<{ year: number; season: "fall" | "spring" }> {
-  const y = now.getUTCFullYear();
-  const m = now.getUTCMonth() + 1;
-  const nextFall = { year: m <= 7 ? y : y + 1, season: "fall" as const };
-  const seq: Array<{ year: number; season: "fall" | "spring" }> = [nextFall];
-  let cur: { year: number; season: "fall" | "spring" } = nextFall;
-  for (let i = 0; i < 3; i++) {
-    cur =
-      cur.season === "fall"
-        ? { year: cur.year + 1, season: "spring" }
-        : { year: cur.year, season: "fall" };
-    seq.push(cur);
-  }
-  if (m >= 8) seq.push({ year: y + 1, season: "spring" });
-  return seq;
-}
-
-function degreeFrom(req: EstimateRequest | null): Degree {
+function degreeFrom(req: EstimateRequest | null): Degree | null {
   if (!req) return null;
   return req.degreeYears === 4 ? "undergrad" : req.degreeYears === 2 ? "masters" : "other";
 }
@@ -66,14 +50,16 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
   const [tuitionSource, setTuitionSource] = useState<"school" | "user">(
     initial?.tuitionSource ?? "user",
   );
-  const [degree, setDegree] = useState<Degree>(degreeFrom(initial));
+  const [degree, setDegree] = useState<Degree | null>(degreeFrom(initial));
   const [otherYears, setOtherYears] = useState<1 | 2 | 3 | 4>(
     initial && initial.degreeYears !== 2 && initial.degreeYears !== 4 ? initial.degreeYears : 1,
   );
   const [term, setTerm] = useState(
     initial
       ? `${initial.startTerm.year}-${initial.startTerm.season}`
-      : `${terms[0]?.year}-${terms[0]?.season}`,
+      : terms[0]
+        ? termValue(terms[0])
+        : "",
   );
   const [options, setOptions] = useState<Options>(initial?.options ?? {});
   const [localError, setLocalError] = useState<string | null>(null);
@@ -96,29 +82,18 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
   }
 
   function applyLetter(fields: ExtractedField[]) {
-    const get = (name: ExtractedField["name"]) => fields.find((f) => f.name === name);
-    const tuitionField = get("tuitionPerYear");
-    const fees = get("mandatoryFees");
-    if (tuitionField?.valueNumber !== null && tuitionField?.valueNumber !== undefined) {
-      setTuition(String(tuitionField.valueNumber + (fees?.valueNumber ?? 0)));
+    const patch = applyLetterFields(fields, terms);
+    if (patch.tuitionDollars !== undefined) {
+      setTuition(String(patch.tuitionDollars));
       setTuitionSource("user");
     }
-    const sch = get("scholarshipPerYear");
-    if (sch?.valueNumber !== null && sch?.valueNumber !== undefined)
-      setOptions((o) => ({ ...o, scholarshipPerYear: sch.valueNumber ?? undefined }));
-    const yrs = get("programmeLengthYears")?.valueNumber;
-    if (yrs === 4) setDegree("undergrad");
-    else if (yrs === 2) setDegree("masters");
-    else if (yrs === 1 || yrs === 3) {
-      setDegree("other");
-      setOtherYears(yrs);
+    if (patch.scholarshipDollars !== undefined) {
+      const scholarshipPerYear = patch.scholarshipDollars;
+      setOptions((o) => ({ ...o, scholarshipPerYear }));
     }
-    const start = get("startDate")?.valueText;
-    const m = start ? /\b(fall|spring)\s+(20\d\d)\b/i.exec(start) : null;
-    if (m) {
-      const value = `${m[2]}-${m[1]?.toLowerCase()}`;
-      if (terms.some((tm) => `${tm.year}-${tm.season}` === value)) setTerm(value);
-    }
+    if (patch.degree) setDegree(patch.degree);
+    if (patch.otherYears) setOtherYears(patch.otherYears);
+    if (patch.term) setTerm(termValue(patch.term));
   }
 
   function submit() {
@@ -231,61 +206,15 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
         </p>
       </div>
 
-      <fieldset className="mt-4">
-        <legend>{t.degree}</legend>
-        <div className="mt-1 flex flex-wrap gap-x-6 gap-y-2">
-          {(
-            [
-              ["undergrad", t.degreeUndergrad],
-              ["masters", t.degreeMasters],
-              ["other", t.degreeOther],
-            ] as const
-          ).map(([k, label]) => (
-            <label key={k} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="degree"
-                className="h-4 w-4"
-                checked={degree === k}
-                onChange={() => setDegree(k)}
-              />
-              {label}
-            </label>
-          ))}
-          {degree === "other" && (
-            <label className="flex items-center gap-2">
-              {t.degreeOtherYears}
-              <select
-                className="border border-neutral-900 px-2 py-1"
-                value={otherYears}
-                onChange={(e) => setOtherYears(Number(e.target.value) as 1 | 2 | 3 | 4)}
-              >
-                {[1, 2, 3, 4].map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </div>
-      </fieldset>
-
-      <label className="mt-4 block sm:w-1/2">
-        {t.startTerm}
-        <select
-          id="startTerm"
-          className={field}
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-        >
-          {terms.map((tm) => (
-            <option key={`${tm.year}-${tm.season}`} value={`${tm.year}-${tm.season}`}>
-              {tm.season === "fall" ? t.fall : t.spring} {tm.year}
-            </option>
-          ))}
-        </select>
-      </label>
+      <ProgrammeFields
+        degree={degree}
+        onDegree={setDegree}
+        otherYears={otherYears}
+        onOtherYears={setOtherYears}
+        term={term}
+        onTerm={setTerm}
+        terms={terms}
+      />
 
       <AccurateOptions value={options} onChange={setOptions} />
       {aiEnabled && <LetterPaste botToken={botToken} onApply={applyLetter} />}

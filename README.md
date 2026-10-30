@@ -42,6 +42,33 @@ the key or `HUD_API_TOKEN` is set. Exchange rates need no key. The AI features (
 `ANTHROPIC_API_KEY`. In production, Upstash and Turnstile are required too (see
 `.env.example`).
 
+## Deployment (Vercel)
+
+1. Import the repository. The build is `next build`; no extra configuration.
+2. **Preview** environment: `DEMO_MODE=true`, no keys. Every pull request gets a working preview
+   on fixtures.
+3. **Production** environment: `DEMO_MODE=false`, `DATA_GOV_API_KEY`, the Upstash pair,
+   `ANTHROPIC_API_KEY` with the Turnstile pair, and `HUD_API_TOKEN` if rent should fall back to
+   live calls. Use different keys for preview and production. The server refuses to start with a
+   required variable missing and names it.
+4. Add `DATA_GOV_API_KEY` and `HUD_API_TOKEN` as GitHub Actions secrets so the weekly snapshot
+   refresh covers all three sources.
+5. `GET /api/health` reports flags, configured services (booleans) and snapshot freshness.
+
+## Manual checklist
+
+Things only an account owner can do, in the order they matter:
+
+- [ ] api.data.gov key, then `npm run snapshot:scorecard` and commit the result.
+- [ ] HUD User token, then `npm run snapshot:hud -- --only IN`; if zero areas parse, adjust the
+      field names in `lib/adapters/hud.ts` (see docs/data-sources.md).
+- [ ] Anthropic key with a spend limit and an alert set in the console; paste one real offer
+      letter and check the extraction.
+- [ ] Upstash Redis database and Cloudflare Turnstile site for production.
+- [ ] GitHub: secret scanning and push protection on; branch protection on `main`.
+- [ ] Read Frankfurter's licence page and confirm the commercial-use wording (ADR 002).
+- [ ] Review every estimate in `data/constants.ts` and update `checkedOn`.
+
 ## Documentation
 
 - `docs/data-sources.md`: every source, what was verified, licence and refresh.

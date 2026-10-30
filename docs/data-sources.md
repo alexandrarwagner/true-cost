@@ -24,6 +24,14 @@ with the diff; nothing overwrites data on `main` without review. At runtime, sch
 today's rate are live; cost fields and rent read the snapshot first and fall back to a live
 call when a key is configured.
 
+## Licences and attribution
+
+- College Scorecard and HUD data are US government works in the public domain. The site footer
+  reads "Powered by College Scorecard Data" on pages that show school figures.
+- Frankfurter's code is MIT; its site states blended rates are free for commercial use. The
+  licence page is a pre-launch read (ADR 002).
+- No FRED content is used anywhere (ADR 002).
+
 ## College Scorecard: what was verified
 
 All field names used by the app returned values for Purdue (UNITID 243780):

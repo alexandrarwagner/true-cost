@@ -30,11 +30,10 @@ export function Unfold({ response }: { response: EstimateResponse }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map(([key, amount], i) => (
+          {rows.map(([key, amount]) => (
             <tr
               key={key}
               className={`unfold-row border-t border-neutral-300 ${key === "total" ? "border-t-2 border-neutral-900 font-semibold" : ""}`}
-              style={{ animationDelay: `${i * 350}ms` }}
             >
               <th scope="row" className="py-2 pr-4 font-normal">
                 {copy.result.unfoldRows[key]}

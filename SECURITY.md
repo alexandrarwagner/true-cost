@@ -52,7 +52,9 @@ acknowledgement within a few days.
 ## Headers and platform
 
 - `proxy.ts` sets a per-request Content-Security-Policy with a nonce: `default-src 'self'`,
-  scripts and frames from `challenges.cloudflare.com` only, `frame-ancestors 'none'`.
+  scripts nonce-only plus `challenges.cloudflare.com`, frames from that host only,
+  `frame-ancestors 'none'`. `style-src` allows inline styles because the chart library sets
+  element sizes inline; scripts remain strictly nonced, which is where the XSS risk lives.
 - `next.config.ts` sets HSTS, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, a `Permissions-Policy` denying camera,
   microphone and geolocation, and `X-Frame-Options: DENY` on every response.

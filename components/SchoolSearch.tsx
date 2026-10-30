@@ -102,7 +102,7 @@ export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: 
             setStatus("idle");
           }
         }}
-        aria-controls={listId}
+        aria-controls={results.length > 0 ? listId : undefined}
         aria-describedby={`${listId}-status`}
       />
       <p

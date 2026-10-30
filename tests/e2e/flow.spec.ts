@@ -145,3 +145,30 @@ test.describe("AI features (DEMO_MODE mock)", () => {
     await expect(page.getByLabel(/Tuition per year/)).not.toHaveValue("");
   });
 });
+
+test.describe("motion and print", () => {
+  test("with reduced motion the unfold rows are fully visible at once", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await expect(page.getByRole("heading", { name: "How it adds up" })).toBeVisible();
+    const opacities = await page.$$eval(".unfold-row", (rows) =>
+      rows.map((r) => getComputedStyle(r).opacity),
+    );
+    expect(opacities.length).toBe(6);
+    expect(opacities.every((o) => o === "1")).toBe(true);
+  });
+
+  test("the chart's table alternative carries the same columns for screen readers and print", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByText("The same range as a table").click();
+    await expect(page.getByRole("columnheader", { name: "At today's rate" })).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: "Worst 10% of past periods" }),
+    ).toBeVisible();
+    await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
+  });
+});
