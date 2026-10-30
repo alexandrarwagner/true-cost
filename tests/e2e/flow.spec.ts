@@ -98,6 +98,14 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
 });
 
 test.describe("AI features (DEMO_MODE mock)", () => {
+  // The AI routes allow 5 calls a minute per IP, which is right for production and too few
+  // for parallel test workers sharing one address. Each test gets its own bucket.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.99.${process.pid % 250}.${n}` });
+  });
+
   test("reading a pasted letter shows quoted figures and applies only the ticked ones", async ({
     page,
   }) => {

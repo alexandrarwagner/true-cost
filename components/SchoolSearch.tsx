@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { copy } from "@/content/copy";
 import type { SchoolSummary } from "@/lib/adapters/types";
+import { ApiErrorSchema } from "@/lib/schema/api";
 
 interface Props {
   chosen: SchoolSummary | null;
@@ -16,6 +17,7 @@ const field =
 
 export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: Props) {
   const [smart, setSmart] = useState<"idle" | "searching" | "none">("idle");
+  const [smartError, setSmartError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SchoolSummary[]>([]);
   const [status, setStatus] = useState<"idle" | "searching" | "done">("idle");
@@ -45,15 +47,23 @@ export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: 
 
   async function smartSearch() {
     setSmart("searching");
+    setSmartError(null);
     try {
       const res = await fetch("/api/ai/match", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ q: query.trim(), ...(botToken ? { botToken } : {}) }),
       });
-      const json: { results?: SchoolSummary[] } = res.ok ? await res.json() : {};
-      if (json.results && json.results.length > 0) {
-        setResults(json.results);
+      const json: unknown = await res.json();
+      if (!res.ok) {
+        const err = ApiErrorSchema.safeParse(json);
+        setSmartError(err.success ? err.data.message : copy.errors.INTERNAL);
+        setSmart("none");
+        return;
+      }
+      const results = (json as { results?: SchoolSummary[] }).results;
+      if (results && results.length > 0) {
+        setResults(results);
         setStatus("done");
         setSmart("idle");
       } else setSmart("none");
@@ -118,7 +128,9 @@ export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: 
           >
             {smart === "searching" ? copy.ai.smartSearching : copy.ai.smartSearch}
           </button>
-          {smart === "none" && <span className="ml-2 text-neutral-700">{copy.ai.smartNone}</span>}
+          {smart === "none" && (
+            <span className="ml-2 text-neutral-700">{smartError ?? copy.ai.smartNone}</span>
+          )}
           <span className="ml-2 text-neutral-700">{copy.ai.smartNote}</span>
         </p>
       )}
