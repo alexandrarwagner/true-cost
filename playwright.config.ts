@@ -21,6 +21,6 @@ export default defineConfig({
     command: "npm run start",
     port,
     reuseExistingServer: !process.env.CI,
-    env: { DEMO_MODE: "true", NODE_ENV: "production" },
+    env: { DEMO_MODE: "true", COMPARE_ENABLED: "true", NODE_ENV: "production" },
   },
 });

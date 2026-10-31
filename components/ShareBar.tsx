@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { copy } from "@/content/copy";
-import type { EstimateResponse } from "@/services/estimate";
 
-export function ShareBar({ response }: { response: EstimateResponse }) {
+export function ShareBar({ shareQuery }: { shareQuery: string }) {
   const [copied, setCopied] = useState(false);
-  const path = `/r?${response.shareQuery}`;
+  const path = `/r?${shareQuery}`;
   const btn =
     "border border-neutral-900 bg-white px-3 py-1 text-sm hover:bg-neutral-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
   return (

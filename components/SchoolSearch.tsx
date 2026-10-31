@@ -6,6 +6,8 @@ import type { SchoolSummary } from "@/lib/adapters/types";
 import { ApiErrorSchema } from "@/lib/schema/api";
 
 interface Props {
+  /** Input id, matched by the caller's label. */
+  id?: string;
   chosen: SchoolSummary | null;
   onChoose: (school: SchoolSummary | null) => void;
   aiEnabled?: boolean;
@@ -15,7 +17,13 @@ interface Props {
 const field =
   "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
 
-export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: Props) {
+export function SchoolSearch({
+  id = "school",
+  chosen,
+  onChoose,
+  aiEnabled = false,
+  botToken,
+}: Props) {
   const [smart, setSmart] = useState<"idle" | "searching" | "none">("idle");
   const [smartError, setSmartError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -89,7 +97,7 @@ export function SchoolSearch({ chosen, onChoose, aiEnabled = false, botToken }: 
   return (
     <div>
       <input
-        id="school"
+        id={id}
         type="text"
         autoComplete="off"
         className={field}

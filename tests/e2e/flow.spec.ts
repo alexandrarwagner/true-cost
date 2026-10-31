@@ -172,3 +172,52 @@ test.describe("motion and print", () => {
     await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
   });
 });
+
+test.describe("Compare schools (COMPARE_ENABLED)", () => {
+  test("a second school gives a side-by-side table, a comparison link and the first school's full result", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Add a school to compare" }).click();
+    await page.getByLabel("School 2", { exact: true }).fill("new york");
+    await page.getByRole("button", { name: /^New York University/ }).click();
+    await expect(page.getByLabel(/Tuition per year at school 2/)).toHaveValue("65622");
+    await page.getByRole("button", { name: "Show the true cost" }).click();
+
+    await expect(page.getByRole("heading", { name: "Side by side" })).toBeVisible();
+    const table = page.getByRole("table").first();
+    await expect(table.getByRole("link", { name: "Purdue University-Main Campus" })).toBeVisible();
+    await expect(table.getByRole("link", { name: "New York University" })).toBeVisible();
+    await expect(table.getByText("Lowest", { exact: true })).toHaveCount(1);
+    await expect(
+      page.getByRole("heading", { name: "Full breakdown for Purdue University-Main Campus" }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/s2=193900/);
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(false);
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
+      .analyze();
+    const serious = axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
+  });
+
+  test("a shared comparison link renders on the server without JavaScript", async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto(
+      "/r?c=IN&cur=INR&s=243780&sn=Purdue+University-Main+Campus&sc=West+Lafayette&st=IN&sz=47907&t=28794&ts=school&y=2&sy=2027&ss=fall&s2=193900&sn2=New+York+University&sc2=New+York&st2=NY&sz2=10012&t2=65622&ts2=school",
+    );
+    await expect(page.getByRole("heading", { name: "Side by side" })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Total over the programme/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit the inputs" })).toHaveAttribute(
+      "href",
+      /s2=193900/,
+    );
+    await ctx.close();
+  });
+});

@@ -14,21 +14,27 @@ export function ResultView({
   response,
   aiEnabled = false,
   botToken,
+  heading = copy.result.heading,
+  shareQuery = response.shareQuery,
 }: {
   response: EstimateResponse;
   aiEnabled?: boolean;
   botToken?: string;
+  /** Overridden when the result sits under a comparison. */
+  heading?: string;
+  /** The link to share: the comparison's when there is one. */
+  shareQuery?: string;
 }) {
   return (
     <article className="space-y-8">
-      <h2 className="text-xl font-semibold">{copy.result.heading}</h2>
+      <h2 className="text-xl font-semibold">{heading}</h2>
       <Headline response={response} />
       <Explanation response={response} aiEnabled={aiEnabled} botToken={botToken} />
       <Unfold response={response} />
       <RangeSection response={response} />
       <Timeline response={response} />
       <Sources response={response} />
-      <ShareBar response={response} />
+      <ShareBar shareQuery={shareQuery} />
     </article>
   );
 }

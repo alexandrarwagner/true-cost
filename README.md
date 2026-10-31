@@ -8,10 +8,12 @@ and a date, and AI never invents a figure.
 
 ## Status
 
-Build steps 2 to 6 are done: setup and security, the core engine, the wireframe UI, the real
-adapters with snapshot scripts, and the AI features behind `AI_ENABLED` (letter extraction
-with verbatim quotes, a checked plain-English explanation, and fuzzy school matching that
-still resolves to a real UNITID). Hardening (step 7) follows.
+Every build step is done: setup and security, the core engine, the wireframe UI, the real
+adapters with snapshot scripts, the AI features behind `AI_ENABLED` (letter extraction with
+verbatim quotes, a checked plain-English explanation, and fuzzy school matching that still
+resolves to a real UNITID), hardening, and the stretch goal behind `COMPARE_ENABLED`: up to
+three schools side by side in the student's currency, with a shareable link that renders
+without JavaScript. Comparison is off by default until its copy has been reviewed.
 
 ## Quick start
 

@@ -1,16 +1,38 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CompareView } from "@/components/CompareView";
 import { ResultView } from "@/components/ResultView";
 import { copy } from "@/content/copy";
-import { decodeShare } from "@/lib/schema/share";
+import { decodeCompareShare, decodeShare } from "@/lib/schema/share";
 import { flags } from "@/lib/server/flags";
 import { buildSources } from "@/lib/server/sources";
+import { runCompare } from "@/services/compare";
 import { runEstimate } from "@/services/estimate";
 
 export const metadata: Metadata = { title: `${copy.result.heading} · ${copy.siteName}` };
 
+function Frame({
+  title,
+  shareQuery,
+  children,
+}: React.PropsWithChildren<{ title: string; shareQuery: string }>) {
+  return (
+    <>
+      <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
+      <p className="mt-1 mb-6">
+        {title} ·{" "}
+        <Link href={`/?${shareQuery}`} className="underline print:hidden">
+          {copy.result.edit}
+        </Link>
+      </p>
+      {children}
+    </>
+  );
+}
+
 // A shared result, rendered on the server from the inputs in the URL. Works without JavaScript:
-// the chart is replaced by its table and the slider is simply absent.
+// the chart is replaced by its table and the slider is simply absent. A comparison link (s2, s3)
+// renders the side-by-side table when COMPARE_ENABLED, and the first school alone otherwise.
 export default async function SharedResultPage({
   searchParams,
 }: {
@@ -19,6 +41,17 @@ export default async function SharedResultPage({
   const raw = await searchParams;
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(raw)) if (typeof v === "string") params.set(k, v);
+  const { AI_ENABLED, COMPARE_ENABLED } = flags();
+  const compare = COMPARE_ENABLED ? decodeCompareShare(params) : null;
+  if (compare) {
+    const response = await runCompare(compare, buildSources());
+    const names = compare.schools.map((s) => s.school.name).join(" · ");
+    return (
+      <Frame title={names} shareQuery={response.shareQuery}>
+        <CompareView response={response} aiEnabled={AI_ENABLED} />
+      </Frame>
+    );
+  }
   const req = decodeShare(params);
   if (!req) {
     return (
@@ -35,15 +68,8 @@ export default async function SharedResultPage({
   }
   const response = await runEstimate(req, buildSources());
   return (
-    <>
-      <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
-      <p className="mt-1 mb-6">
-        {req.school.name} ·{" "}
-        <Link href={`/?${response.shareQuery}`} className="underline print:hidden">
-          {copy.result.edit}
-        </Link>
-      </p>
-      <ResultView response={response} aiEnabled={flags().AI_ENABLED} />
-    </>
+    <Frame title={req.school.name} shareQuery={response.shareQuery}>
+      <ResultView response={response} aiEnabled={AI_ENABLED} />
+    </Frame>
   );
 }

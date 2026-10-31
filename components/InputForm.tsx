@@ -2,8 +2,14 @@
 
 import { useState } from "react";
 import { copy } from "@/content/copy";
-import { COUNTRIES, countryByCode } from "@/data/countries";
+import { countryByCode } from "@/data/countries";
 import type { SchoolSummary } from "@/lib/adapters/types";
+import {
+  CompareRequestSchema,
+  toCompareRequest,
+  type CompareRequest,
+  type CompareSchool,
+} from "@/lib/schema/compare";
 import {
   EstimateRequestSchema,
   type EstimateRequest,
@@ -13,18 +19,24 @@ import type { ExtractedField } from "@/lib/schema/ai";
 import { applyLetterFields, type Degree } from "@/lib/ui/letterApply";
 import { nextTerms, termValue } from "@/lib/ui/terms";
 import { AccurateOptions } from "./AccurateOptions";
+import { ComparePicker, slotsFrom, type CompareSlot } from "./ComparePicker";
 import { ProgrammeFields } from "./ProgrammeFields";
 import { LetterPaste } from "./LetterPaste";
+import { OriginFields } from "./OriginFields";
 import { SchoolSearch } from "./SchoolSearch";
 
 type Options = NonNullable<EstimateRequestInput["options"]>;
 
 interface Props {
   initial: EstimateRequest | null;
+  /** Extra schools from a shared comparison link; empty unless COMPARE_ENABLED. */
+  initialExtras: CompareSchool[];
   onSubmit: (req: EstimateRequest) => void;
+  onCompare: (req: CompareRequest) => void;
   submitting: boolean;
   error: string | null;
   aiEnabled: boolean;
+  compareEnabled: boolean;
   botToken: string | undefined;
 }
 
@@ -38,7 +50,17 @@ function degreeFrom(req: EstimateRequest | null): Degree | null {
   return req.degreeYears === 4 ? "undergrad" : req.degreeYears === 2 ? "masters" : "other";
 }
 
-export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, botToken }: Props) {
+export function InputForm({
+  initial,
+  initialExtras,
+  onSubmit,
+  onCompare,
+  submitting,
+  error,
+  aiEnabled,
+  compareEnabled,
+  botToken,
+}: Props) {
   const t = copy.form;
   const terms = nextTerms(new Date());
   const [country, setCountry] = useState(initial?.countryCode ?? "IN");
@@ -62,6 +84,7 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
         : "",
   );
   const [options, setOptions] = useState<Options>(initial?.options ?? {});
+  const [slots, setSlots] = useState<CompareSlot[]>(slotsFrom(initialExtras));
   const [localError, setLocalError] = useState<string | null>(null);
 
   function chooseCountry(code: string) {
@@ -120,7 +143,23 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
     };
     const parsed = EstimateRequestSchema.safeParse(candidate);
     if (!parsed.success) return setLocalError(copy.errors.INVALID_INPUT);
-    onSubmit(parsed.data);
+    const extras = compareEnabled ? slots.filter((s) => s.school !== null) : [];
+    if (extras.length === 0) return onSubmit(parsed.data);
+    const compare = CompareRequestSchema.safeParse(
+      toCompareRequest(
+        parsed.data,
+        extras.map((s) => {
+          const { unitId, name, city, state, zip } = s.school as SchoolSummary;
+          return {
+            school: { unitId, name, city, state, zip },
+            tuitionPerYear: Number(s.tuition),
+            tuitionSource: s.tuitionSource,
+          };
+        }),
+      ),
+    );
+    if (!compare.success) return setLocalError(copy.errors.INVALID_INPUT);
+    onCompare(compare.data);
   }
 
   return (
@@ -135,42 +174,12 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
       <h2 className="text-xl font-semibold">{t.heading}</h2>
       <p className="mt-1 text-neutral-700">{t.intro}</p>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          {t.country}
-          <select
-            id="country"
-            className={field}
-            value={country}
-            onChange={(e) => chooseCountry(e.target.value)}
-          >
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          {t.currency}
-          <select
-            id="currency"
-            className={field}
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            aria-describedby="currency-hint"
-          >
-            {[...COUNTRIES.map((c) => c.currency), "USD"].map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <span id="currency-hint" className="mt-1 block text-sm text-neutral-700">
-            {t.currencyHint}
-          </span>
-        </label>
-      </div>
+      <OriginFields
+        country={country}
+        onCountry={chooseCountry}
+        currency={currency}
+        onCurrency={setCurrency}
+      />
 
       <div className="mt-4">
         <label htmlFor="school" className="block">
@@ -218,6 +227,14 @@ export function InputForm({ initial, onSubmit, submitting, error, aiEnabled, bot
 
       <AccurateOptions value={options} onChange={setOptions} />
       {aiEnabled && <LetterPaste botToken={botToken} onApply={applyLetter} />}
+      {compareEnabled && (
+        <ComparePicker
+          slots={slots}
+          onChange={setSlots}
+          aiEnabled={aiEnabled}
+          botToken={botToken}
+        />
+      )}
 
       <p className="mt-4 text-sm font-medium" role="alert">
         {localError ?? error ?? ""}

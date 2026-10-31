@@ -267,6 +267,33 @@ export const copy = {
     byTemplate: "Standard wording from the numbers on this page.",
     botNote: "A quick bot check protects these features.",
   },
+  compare: {
+    pickerHeading: "Compare with other schools (optional)",
+    pickerIntro: "Add up to two more schools to see them side by side in your own money.",
+    add: "Add a school to compare",
+    remove: "Remove",
+    schoolLabel: (n: number) => `School ${n}`,
+    tuitionLabel: (n: number) => `Tuition per year at school ${n} (US dollars)`,
+    heading: "Side by side",
+    intro:
+      "Same country, programme length, start term and options for every school. Tap a school's name for its full breakdown.",
+    scrollHint: "Scroll sideways to see every school.",
+    lowest: "Lowest",
+    rows: {
+      tuitionPerYear: "Tuition per year",
+      total: "Total over the programme (US dollars)",
+      today: "At today's rate",
+      range: "Best tenth to worst tenth of past periods",
+      hidden: "Hidden costs on top of tuition",
+      housing: "Housing (US dollars)",
+      living: "Living costs (US dollars)",
+      oneOff: "One-off costs (US dollars)",
+      moneyMoving: "Moving the money (US dollars)",
+    },
+    rangeUnavailable: "Not available",
+    fullResult: (name: string) => `Full breakdown for ${name}`,
+    columnNote: (name: string, note: string) => `${name}: ${note}`,
+  },
   privacy: {
     title: "Privacy",
     sections: [

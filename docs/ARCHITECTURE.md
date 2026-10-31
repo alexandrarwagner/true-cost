@@ -7,10 +7,11 @@ rule on `lib/core`.
 flowchart LR
   subgraph app["app/ (thin)"]
     UI[page.tsx + components]
-    Routes[api/estimate, api/schools/search, api/fx/latest, api/ai/*]
+    Routes[api/estimate, api/compare, api/schools/search, api/fx/latest, api/ai/*]
   end
   subgraph services["services/"]
     Run[runEstimate]
+    Cmp[runCompare]
     Search[schoolSearch]
   end
   subgraph adapters["lib/adapters/"]
@@ -32,6 +33,7 @@ flowchart LR
     Snap[snapshots/*.json]
   end
   UI --> Routes --> Run
+  Routes --> Cmp --> Run
   Run --> SC & HUD & FX
   Run --> Est
   Est --> Model & Sched & Replay & Money
