@@ -40,8 +40,21 @@ function inScope(item: LineItem, isFinal: boolean): boolean {
   return scope === "all" || (scope === "final") === isFinal;
 }
 
+/** Batch payments into the latest batch date on or before each one (the first for earlier ones). */
+function batched(list: Pending[], batchDates: readonly string[]): Pending[] {
+  const byBatch = new Map<string, Pending>();
+  for (const p of list) {
+    const date = [...batchDates].reverse().find((d) => d <= p.date) ?? batchDates[0] ?? p.date;
+    const hit = byBatch.get(date);
+    if (hit) hit.amount = addCents(hit.amount, p.amount);
+    else byBatch.set(date, { ...p, date });
+  }
+  return [...byBatch.values()];
+}
+
 /** Expand one item into dated payments, before credits. */
 function occurrences(item: LineItem, input: EstimateInput): Pending[] {
+  const perSemester = input.options.transferCadence === "semester";
   const years = academicYears(input.startTerm, input.degreeYears);
   const start = startDate(input.startTerm);
   const end = programmeEnd(input.startTerm, input.degreeYears);
@@ -96,27 +109,28 @@ function occurrences(item: LineItem, input: EstimateInput): Pending[] {
           });
       return out;
     case "monthly":
-      for (const y of years)
-        if (inScope(item, y.isFinal))
-          y.livingMonths.forEach((date, m) =>
-            out.push({
-              date,
-              phase: firstPhase(y.index, m),
-              amount: item.amountUsd,
-              itemId: item.id,
-            }),
-          );
+      for (const y of years) {
+        if (!inScope(item, y.isFinal)) continue;
+        const months = y.livingMonths.map((date, m) => ({
+          date,
+          phase: firstPhase(y.index, m),
+          amount: item.amountUsd,
+          itemId: item.id,
+        }));
+        out.push(...(perSemester ? batched(months, y.semesterDates) : months));
+      }
       return out;
     case "summer":
-      for (const y of years)
-        if (inScope(item, y.isFinal))
-          for (const date of y.summerMonths)
-            out.push({
-              date,
-              phase: y.isFinal ? "departure" : "ongoing",
-              amount: item.amountUsd,
-              itemId: item.id,
-            });
+      for (const y of years) {
+        if (!inScope(item, y.isFinal)) continue;
+        const months = y.summerMonths.map((date) => ({
+          date,
+          phase: y.isFinal ? ("departure" as const) : ("ongoing" as const),
+          amount: item.amountUsd,
+          itemId: item.id,
+        }));
+        out.push(...(perSemester ? batched(months, y.summerMonths.slice(0, 1)) : months));
+      }
       return out;
   }
 }

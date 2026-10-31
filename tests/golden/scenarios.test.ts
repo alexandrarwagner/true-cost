@@ -1,15 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { computeEstimate } from "@/lib/core/estimate";
+import { SAVINGS_MIN_USD } from "@/data/constants";
+import { computeEstimate, type EstimateContext } from "@/lib/core/estimate";
+import { rankLevers } from "@/lib/core/levers";
 import { formatLakhCrore, formatMoney } from "@/lib/core/format";
 import { usd } from "@/lib/core/money";
-import type { Estimate } from "@/lib/core/types";
+import type { Estimate, EstimateInput } from "@/lib/core/types";
 import { INR_HISTORY, KRW_HISTORY } from "../fixtures/fxHistory";
 import { baseInput, LAFAYETTE_RENT, NYC_RENT, NYU, PURDUE, TODAY } from "../fixtures/inputs";
 
 // Golden scenarios: fixed inputs whose totals are snapshotted, so any change to the model shows
 // up in review. Update the snapshots deliberately (vitest -u) and explain why in the commit.
 
-function summary(e: Estimate, currency: "INR" | "KRW" | "USD") {
+interface Run {
+  e: Estimate;
+  ctx: EstimateContext;
+}
+const run = (input: EstimateInput, ctx: EstimateContext): Run => ({
+  e: computeEstimate(input, ctx),
+  ctx,
+});
+
+function summary({ e, ctx }: Run, currency: "INR" | "KRW" | "USD") {
   const t = e.totals;
   const fmt = (n: number) => (n / 100).toFixed(2);
   const home = (m: number) =>
@@ -42,6 +53,10 @@ function summary(e: Estimate, currency: "INR" | "KRW" | "USD") {
           }
         : { unsupported: e.fx.reasonId },
     notes: e.noteIds,
+    // Step 2: the levers that apply, ranked, each a re-run of the engine (never added up).
+    levers: rankLevers(e.input, e, ctx, { thresholdUsd: SAVINGS_MIN_USD }).map((l) =>
+      l.hasFigure ? `${l.id} $${fmt(l.savingUsd)} (${l.confidence})` : `${l.id} tip`,
+    ),
   };
 }
 
@@ -58,8 +73,8 @@ const krw = {
 
 describe("golden scenarios", () => {
   it("1. Indian master's student, large public university, on campus", () => {
-    const e = computeEstimate(baseInput(), { today: TODAY, school: PURDUE, fx: inr });
-    expect(summary(e, "INR")).toMatchInlineSnapshot(`
+    const r = run(baseInput(), { today: TODAY, school: PURDUE, fx: inr });
+    expect(summary(r, "INR")).toMatchInlineSnapshot(`
       {
         "firstPayment": "2027-05-17",
         "fx": {
@@ -70,6 +85,11 @@ describe("golden scenarios", () => {
           "worst10": "₹1.1 crore",
         },
         "lastPayment": "2029-05-22",
+        "levers": [
+          "flights-fewer $4090.00 (estimate)",
+          "transfer-markup $1039.83 (estimate)",
+          "insurance-waiver tip",
+        ],
         "notes": [
           "transfer_assumption",
         ],
@@ -88,7 +108,7 @@ describe("golden scenarios", () => {
   });
 
   it("2. Indian master's student, NYU, off campus sharing a 2-bedroom, 12-month lease", () => {
-    const e = computeEstimate(
+    const r = run(
       baseInput({
         school: {
           unitId: 193900,
@@ -105,7 +125,7 @@ describe("golden scenarios", () => {
       }),
       { today: TODAY, school: NYU, rent: NYC_RENT, fx: inr },
     );
-    expect(summary(e, "INR")).toMatchInlineSnapshot(`
+    expect(summary(r, "INR")).toMatchInlineSnapshot(`
       {
         "firstPayment": "2027-05-17",
         "fx": {
@@ -116,6 +136,14 @@ describe("golden scenarios", () => {
           "worst10": "₹2.05 crore",
         },
         "lastPayment": "2029-07-01",
+        "levers": [
+          "roommates-2 $13020.00 (government)",
+          "lease-12-vs-9 $6269.60 (estimate)",
+          "flights-fewer $4032.00 (estimate)",
+          "housing-oncampus $1622.00 (school)",
+          "transfer-markup $580.78 (estimate)",
+          "insurance-waiver tip",
+        ],
         "notes": [],
         "payments": 30,
         "totalsUsd": {
@@ -132,7 +160,7 @@ describe("golden scenarios", () => {
   });
 
   it("3. Korean undergraduate, four years, on campus, scholarship, two trips home", () => {
-    const e = computeEstimate(
+    const r = run(
       baseInput({
         countryCode: "KR",
         homeCurrency: "KRW",
@@ -141,7 +169,7 @@ describe("golden scenarios", () => {
       }),
       { today: TODAY, school: PURDUE, rent: LAFAYETTE_RENT, fx: krw },
     );
-    expect(summary(e, "KRW")).toMatchInlineSnapshot(`
+    expect(summary(r, "KRW")).toMatchInlineSnapshot(`
       {
         "firstPayment": "2027-05-17",
         "fx": {
@@ -152,6 +180,11 @@ describe("golden scenarios", () => {
           "worst10": "₩266,553,183",
         },
         "lastPayment": "2031-05-22",
+        "levers": [
+          "flights-fewer $7308.00 (estimate)",
+          "transfer-markup $1778.71 (estimate)",
+          "insurance-waiver tip",
+        ],
         "notes": [
           "scholarship_applied",
           "transfer_assumption",
@@ -171,7 +204,7 @@ describe("golden scenarios", () => {
   });
 
   it("4. One-year programme with no school data, paying from a US dollar account", () => {
-    const e = computeEstimate(
+    const r = run(
       baseInput({
         degreeYears: 1,
         startTerm: { year: 2027, season: "spring" },
@@ -179,13 +212,17 @@ describe("golden scenarios", () => {
       }),
       { today: TODAY, fx: inr },
     );
-    expect(summary(e, "USD")).toMatchInlineSnapshot(`
+    expect(summary(r, "USD")).toMatchInlineSnapshot(`
       {
         "firstPayment": "2026-10-12",
         "fx": {
           "unsupported": "pay_from_usd",
         },
         "lastPayment": "2027-10-22",
+        "levers": [
+          "flights-fewer $2000.00 (estimate)",
+          "insurance-waiver tip",
+        ],
         "notes": [
           "no_school_housing_figure",
           "pay_from_usd",
@@ -205,7 +242,7 @@ describe("golden scenarios", () => {
   });
 
   it("5. Family of three (two F-2 dependants), off campus, own rent known", () => {
-    const e = computeEstimate(
+    const r = run(
       baseInput({
         options: {
           dependants: 2,
@@ -215,7 +252,7 @@ describe("golden scenarios", () => {
       }),
       { today: TODAY, school: PURDUE, rent: LAFAYETTE_RENT, fx: inr },
     );
-    expect(summary(e, "INR")).toMatchInlineSnapshot(`
+    expect(summary(r, "INR")).toMatchInlineSnapshot(`
       {
         "firstPayment": "2027-05-17",
         "fx": {
@@ -226,6 +263,12 @@ describe("golden scenarios", () => {
           "worst10": "₹1.36 crore",
         },
         "lastPayment": "2029-05-22",
+        "levers": [
+          "flights-fewer $4060.00 (estimate)",
+          "transfer-markup $1281.63 (estimate)",
+          "transfers-fewer $270.00 (estimate)",
+          "insurance-waiver tip",
+        ],
         "notes": [
           "transfer_assumption",
         ],

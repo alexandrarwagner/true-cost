@@ -77,12 +77,21 @@ export interface TransferOptions {
   fixedFeeUsd: Cents;
 }
 
+/** How often living costs are sent: every month, or batched at each semester start. */
+export type TransferCadence = "monthly" | "semester";
+
 export interface EstimateOptions {
   housing?: HousingOptions;
   scholarshipPerYearUsd?: Cents;
-  insurance?: { kind: "school_plan" | "waiver"; premiumPerYearUsd?: Cents };
+  insurance?: {
+    kind: "school_plan" | "waiver";
+    premiumPerYearUsd?: Cents;
+    /** What the user's own cover costs, so the waiver lever can price the switch. */
+    ownPremiumPerYearUsd?: Cents;
+  };
   flights?: { tripsHomePerYear: number; oneWayUsd?: Cents };
   transfer?: TransferOptions;
+  transferCadence?: TransferCadence;
   /** Paying from a US dollar account: no exchange-rate risk and no transfer markup. */
   payFromUsd?: boolean;
   dependants?: number;
@@ -107,6 +116,14 @@ export interface EstimateInput {
   startTerm: { year: number; season: Season };
   options: EstimateOptions;
 }
+
+/** Hand-checked facts about a school that no API provides (data/school-flags.json). */
+export interface SchoolFlag {
+  waiverAllowed: boolean;
+  sourceUrl: string;
+  checkedOn: IsoDate;
+}
+export type SchoolFlags = Record<string, SchoolFlag>;
 
 /** What the data layer knows about the school. Any field may be missing. */
 export interface SchoolCosts {

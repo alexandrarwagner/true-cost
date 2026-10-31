@@ -319,6 +319,25 @@ export const COLD_STATES = new Set([
   "WV",
 ]);
 
+/**
+ * Reference markup for the "compare your transfer markup" lever (step 2). A lever shows only
+ * when the user's markup is above this. Placeholder pending the owner's source.
+ */
+export const TRANSFER_REFERENCE = {
+  id: "transferReferenceMarkup",
+  markupBps: 50,
+  confidence: "estimate" as Confidence,
+  source: {
+    kind: "estimate",
+    name: "Illustrative reference markup, pending review; we recommend no provider",
+    date: CHECKED,
+  } satisfies Source,
+  checkedOn: CHECKED,
+};
+
+/** A lever shows only when it saves more than this over the whole degree. Policy, not data. */
+export const SAVINGS_MIN_USD: Cents = c(250);
+
 export const ALL_CONSTANTS: Constant[] = [
   ...Object.values(FEES),
   ...Object.values(FLIGHT_ONE_WAY_BY_REGION),

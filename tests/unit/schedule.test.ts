@@ -78,3 +78,28 @@ describe("buildSchedule", () => {
     ).toBe(true);
   });
 });
+
+describe("transfer cadence", () => {
+  it("batches monthly living costs into one transfer per semester and summer, same total", () => {
+    const monthly = baseInput({
+      options: {
+        housing: { kind: "off_campus", bedrooms: 1, roommates: 0, twelveMonthLease: true },
+      },
+    });
+    const batched = {
+      ...monthly,
+      options: { ...monthly.options, transferCadence: "semester" as const },
+    };
+    const { items } = buildLineItems(monthly, { school: PURDUE, rent: LAFAYETTE_RENT }, TODAY);
+    const a = buildSchedule(items, monthly, { transfer, payFromUsd: false });
+    const b = buildSchedule(items, batched, { transfer, payFromUsd: false });
+    const total = (evs: typeof a) => evs.reduce((s, e) => s + e.amountUsd, 0);
+    expect(total(a)).toBe(total(b));
+    expect(b.length).toBeLessThan(a.length);
+    const rentDates = b.filter((e) => e.itemIds.includes("rent")).map((e) => e.date);
+    expect(rentDates).toEqual(["2027-08-15", "2028-01-15", "2028-08-15", "2029-01-15"]);
+    expect(b.filter((e) => e.itemIds.includes("summerRent"))).toHaveLength(1);
+    const fees = (evs: typeof a) => evs.reduce((s, e) => s + e.transferFeeUsd, 0);
+    expect(fees(b)).toBe(fees(a) - (a.length - b.length) * transfer.fixedFeeUsd);
+  });
+});
