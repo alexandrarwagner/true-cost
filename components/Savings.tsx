@@ -61,7 +61,7 @@ export function Savings({
   const rest = s.levers.slice(SHOWN);
 
   return (
-    <section aria-labelledby="savings-heading">
+    <section id="save" aria-labelledby="savings-heading" className="scroll-mt-24">
       <h3 id="savings-heading" className="text-lg font-semibold">
         {t.heading}
       </h3>

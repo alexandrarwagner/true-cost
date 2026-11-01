@@ -69,7 +69,11 @@ export default async function SharedResultPage({
   const response = await runEstimate(req, req.example ? exampleSources() : buildSources());
   return (
     <Frame title={req.school.name} shareQuery={response.shareQuery}>
-      <ResultView response={response} aiEnabled={AI_ENABLED} />
+      <ResultView
+        editHref={`/?${response.shareQuery}`}
+        response={response}
+        aiEnabled={AI_ENABLED}
+      />
     </Frame>
   );
 }

@@ -96,10 +96,52 @@ export const copy = {
     departure: "When you leave",
   },
   confidence: {
-    user: "Your input",
-    school: "School-reported",
+    user: "Your number",
+    school: "School figure",
     government: "Government data",
     estimate: "Our estimate",
+  },
+  tree: {
+    heading: "Tuition is where it starts.",
+    intro: (tuition: string, years: number) =>
+      `${tuition} a year for ${years} ${years === 1 ? "year" : "years"}, at today's rate.`,
+    narrate: {
+      start: "Starting with tuition…",
+      adding: "Adding housing, health insurance, living costs, one-off costs and moving money…",
+      done: (total: string) => `Your degree: about ${total}.`,
+    },
+    aboutLabel: "Your degree: about",
+    hiddenPill: (pct: number) => `Hidden costs: ${pct}% on top of tuition`,
+  },
+  nav: {
+    label: "Your result",
+    breakdown: "Breakdown",
+    where: "Where it goes",
+    fx: "Exchange rate",
+    save: "Saving tips",
+    how: "How we work it out",
+    share: "Share",
+    edit: "Edit",
+    summary: (total: string, years: number) =>
+      `${total} · ${years} ${years === 1 ? "year" : "years"}`,
+  },
+  customCosts: {
+    heading: "Know a cost we missed?",
+    intro: "Add it and we'll include it in your total, the charts and your family's PDF.",
+    what: "What is it",
+    placeholder: "e.g. Laptop, winter coat",
+    amount: "Amount",
+    currency: "Currency",
+    frequency: "How often",
+    oneTime: "One time",
+    monthly: "Monthly",
+    perMonth: "a month",
+    add: "Add",
+    remove: (label: string) => `Remove ${label}`,
+    invalid: "Give it a short name and an amount above zero.",
+    privacy: "Don't add personal details: this goes in your share link.",
+    max: "You can add up to ten.",
+    list: "Costs you added",
   },
   fx: {
     notPrediction:
@@ -206,6 +248,7 @@ export const copy = {
   },
   result: {
     heading: "Your true cost",
+    aboutHeading: "About this estimate",
     demoBadge: "Demo data",
     demoNote: "Running on sample data: school figures are real, rent and rate history are samples.",
     degraded: {

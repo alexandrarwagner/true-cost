@@ -11,7 +11,8 @@ export function SiteHeader() {
         <Link href="/" aria-label={copy.siteName}>
           <Wordmark />
         </Link>
-        <nav aria-label={t.nav}>
+        <div id="header-slot" className="peer flex min-w-0 flex-1 justify-end overflow-hidden" />
+        <nav aria-label={t.nav} className="peer-[:not(:empty)]:hidden">
           <ul className="flex items-center gap-4">
             <li className="hidden sm:block">
               <Link href="/#how" className="underline-offset-4 hover:underline">

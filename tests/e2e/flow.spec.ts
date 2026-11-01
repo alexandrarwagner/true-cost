@@ -21,12 +21,19 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
     await threeInputs(page);
     await page.getByRole("button", { name: "Show me" }).click();
 
-    await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tuition is where it starts." })).toBeVisible();
+    await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
     await expect(page.getByText(/Your degree could cost between/)).toBeVisible();
     await expect(page.getByText(/Hidden costs: \d+% on top of tuition/)).toBeVisible();
     await expect(page.getByText("Demo data", { exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "How it adds up" })).toBeVisible();
-    await expect(page.getByRole("row", { name: /^Total/ })).toBeVisible();
+    // The result nav takes over the header, with the section in view marked current.
+    const nav = page.getByRole("navigation", { name: "Your result" });
+    await page.evaluate(() => document.getElementById("breakdown")?.scrollIntoView());
+    await expect(nav.getByRole("link", { name: "Breakdown" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    await expect(nav.getByRole("link", { name: "Exchange rate" })).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "What the exchange rate could do to this" }),
     ).toBeVisible();
@@ -158,12 +165,14 @@ test.describe("motion and print", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await threeInputs(page);
     await page.getByRole("button", { name: "Show me" }).click();
-    await expect(page.getByRole("heading", { name: "How it adds up" })).toBeVisible();
-    const opacities = await page.$$eval(".unfold-row", (rows) =>
+    await expect(page.getByRole("heading", { name: "Tuition is where it starts." })).toBeVisible();
+    const opacities = await page.$$eval(".tree-stage", (rows) =>
       rows.map((r) => getComputedStyle(r).opacity),
     );
-    expect(opacities.length).toBe(7);
+    expect(opacities.length).toBe(4);
     expect(opacities.every((o) => o === "1")).toBe(true);
+    // Reduced motion also means the status line and the total show their final text at once.
+    await expect(page.getByRole("status").filter({ hasText: /^Your degree: about/ })).toBeVisible();
   });
 
   test("the chart's table alternative carries the same columns for screen readers and print", async ({
@@ -177,6 +186,37 @@ test.describe("motion and print", () => {
       page.getByRole("columnheader", { name: "Worst 10% of past periods" }),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
+  });
+});
+
+test.describe("Know a cost we missed?", () => {
+  // Three estimate calls per test; keep them out of the shared rate-limit bucket.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.97.${process.pid % 250}.${n}` });
+  });
+
+  test("an added cost joins the total and the share link, and can be removed", async ({ page }) => {
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Show me" }).click();
+    const usdTotal = page.getByText(/in total over the programme\./).first();
+    const before = (await usdTotal.textContent()) ?? "";
+    await page.getByLabel("What is it").fill("Laptop");
+    await page.getByLabel("Amount").fill("1200");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByRole("list", { name: "Costs you added" })).toContainText(
+      "Laptop: $1,200",
+    );
+    await expect(usdTotal).not.toHaveText(before);
+    const dollars = (s: string) => Number((s.match(/\$([\d,]+)/)?.[1] ?? "0").replace(/,/g, ""));
+    // The laptop plus the transfer costs of sending $1,200 from home: a true re-run, not a sum.
+    const after = dollars((await usdTotal.textContent()) ?? "");
+    expect(after).toBeGreaterThanOrEqual(dollars(before) + 1200);
+    expect(after).toBeLessThan(dollars(before) + 1300);
+    await expect(page).toHaveURL(/customCosts/);
+    await page.getByRole("button", { name: "Remove Laptop" }).click();
+    await expect(usdTotal).toHaveText(before);
   });
 });
 
@@ -219,6 +259,17 @@ test.describe("page shell", () => {
     await expect(page.getByRole("contentinfo")).toContainText("Not a prediction");
     await page.getByRole("banner").getByRole("link", { name: "Get my estimate" }).click();
     await expect(page).toHaveURL(/#estimate$/);
+    // The result page, with its nav, tree and tables, must reflow at 320px too (WCAG 1.4.10).
+    await page.goto(
+      "/?c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1",
+    );
+    await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
+    await page.getByText("The same range as a table").click();
+    const after = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      document.documentElement.clientWidth,
+    ]);
+    expect(after[0]).toBeLessThanOrEqual(after[1] ?? 320);
   });
 });
 

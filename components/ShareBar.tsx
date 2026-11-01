@@ -10,6 +10,7 @@ export function ShareBar({ shareQuery }: { shareQuery: string }) {
     "border border-neutral-900 bg-white px-3 py-1 text-sm hover:bg-neutral-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
   return (
     <section
+      id="share"
       aria-labelledby="share-heading"
       className="border-t border-neutral-300 pt-4 print:hidden"
     >
@@ -18,7 +19,7 @@ export function ShareBar({ shareQuery }: { shareQuery: string }) {
       </h3>
       <p className="text-sm text-neutral-700">{copy.result.shareHint}</p>
       <p className="mt-2 flex flex-wrap items-center gap-3">
-        <a href={path} className="underline">
+        <a href={path} className="underline break-all">
           {path.length > 60 ? `${path.slice(0, 60)}…` : path}
         </a>
         <button

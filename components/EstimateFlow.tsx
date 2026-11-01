@@ -9,6 +9,7 @@ import type { EstimateRequest } from "@/lib/schema/estimate";
 import type { CompareResponse } from "@/services/compare";
 import type { EstimateResponse } from "@/services/estimate";
 import { exampleRequest } from "@/lib/ui/example";
+import type { CustomCostInput } from "./CustomCosts";
 import { BotCheck } from "./BotCheck";
 import { CompareView } from "./CompareView";
 import { EmptyTree } from "./EmptyTree";
@@ -80,6 +81,17 @@ export function EstimateFlow({
     }
   }
 
+  /** The user's own added costs re-run the estimate and become part of the form's inputs. */
+  function changeCustomCosts(costs: CustomCostInput[]) {
+    if (!lastReq) return;
+    const options = { ...lastReq.options };
+    if (costs.length > 0) options.customCosts = costs;
+    else delete options.customCosts;
+    const req = { ...lastReq, options };
+    setForm((f) => ({ key: f.key + 1, initial: req }));
+    void post("/api/estimate", req, "single", false);
+  }
+
   function showExample() {
     const req = exampleRequest();
     setForm((f) => ({ key: f.key + 1, initial: req }));
@@ -111,6 +123,7 @@ export function EstimateFlow({
               aiEnabled={aiEnabled}
               botToken={botToken}
               busy={submitting}
+              onCustomCosts={changeCustomCosts}
               onToggleLevers={(ids: LeverId[]) => {
                 if (lastReq)
                   void post("/api/estimate", { ...lastReq, levers: ids }, "single", false);

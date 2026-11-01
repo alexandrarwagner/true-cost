@@ -41,7 +41,11 @@ export function Explanation({ response, aiEnabled, botToken }: Props) {
   }
 
   return (
-    <section aria-labelledby="explain-heading" className="border border-neutral-300 p-4">
+    <section
+      id="where"
+      aria-labelledby="explain-heading"
+      className="scroll-mt-24 border border-neutral-300 p-4"
+    >
       <h3 id="explain-heading" className="font-medium">
         {copy.ai.explainHeading}
       </h3>

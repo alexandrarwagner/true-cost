@@ -23,10 +23,13 @@ export function RangeSection({ response }: { response: EstimateResponse }) {
     );
   }
   return (
-    <section aria-labelledby="range-heading">
+    <section id="fx" aria-labelledby="range-heading" className="scroll-mt-24">
       <h3 id="range-heading" className="text-lg font-semibold">
         {copy.result.rangeHeading}
       </h3>
+      <p className="mt-2 text-xl font-medium">
+        {copy.fx.rangeLine(homeShort(fx.best10Home, cur), homeShort(fx.worst10Home, cur))}
+      </p>
       <p className="mt-2">
         {copy.result.rangeSummary(
           homeShort(fx.medianHome, cur),

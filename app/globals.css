@@ -99,6 +99,24 @@ body {
   }
 }
 
+/* The tree reveals in stages: tuition, the branches, the cost cards, the total. Content is
+   visible by default; the animation runs from hidden (fill-mode backwards). Reduced motion
+   removes it through the rule above. */
+@keyframes tree-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tree-stage {
+  animation: tree-in 500ms ease-out backwards;
+  animation-delay: calc(var(--stage, 0) * 450ms);
+}
+
 /* The unfold: rows appear in sequence. Switched off by the reduced-motion rule above. */
 @keyframes unfold-in {
   from {
