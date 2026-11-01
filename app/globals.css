@@ -88,6 +88,25 @@ body {
   background: var(--color-page);
 }
 
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  a {
+    text-decoration: none;
+  }
+}
+
+/* Stacked rows on phones: each cell shows its column name (BreakdownItem). */
+@media (max-width: 639px) {
+  td[data-label]::before,
+  th[data-label]::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -21,7 +21,13 @@ const ORDER: Category[] = [
  * accessible form), or as circles whose area matches the share. Flat fills, no gradients;
  * the name is always printed with the colour.
  */
-export function Shares({ response }: { response: EstimateResponse }) {
+export function Shares({
+  response,
+  breakdownHref,
+}: {
+  response: EstimateResponse;
+  breakdownHref: string;
+}) {
   const t = copy.shares;
   const { estimate: e, currency: cur } = response;
   const [chart, setChart] = useState(false);
@@ -102,7 +108,12 @@ export function Shares({ response }: { response: EstimateResponse }) {
             {rows.map((r) => (
               <li key={r.category}>
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                  <span className="font-semibold">{copy.categories[r.category]}</span>
+                  <a
+                    href={`${breakdownHref}#${r.category}`}
+                    className="font-semibold hover:underline"
+                  >
+                    {copy.categories[r.category]}
+                  </a>
                   <span className="text-sm text-dark-muted tabular-nums">{r.fullLabel}</span>
                 </div>
                 <div className="mt-1 h-3 w-full rounded-pill bg-white/10">

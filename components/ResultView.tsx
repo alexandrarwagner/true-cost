@@ -48,6 +48,7 @@ export function ResultView({
   const total = inHome
     ? homeShort(homeFromUsd(e.totals.total, rate, cur), cur)
     : usdFmt(e.totals.total);
+  const breakdownHref = `/estimate/breakdown?${shareQuery}`;
   const runKey = `${response.savings?.active.join(",") ?? ""}|${e.input.options.customCosts?.length ?? 0}`;
   const customCosts: CustomCostInput[] = (e.input.options.customCosts ?? []).map((c) => ({
     label: c.label,
@@ -57,9 +58,13 @@ export function ResultView({
   }));
   return (
     <article className="space-y-10">
-      <ResultNav summary={copy.nav.summary(total, e.input.degreeYears)} editHref={editHref} />
+      <ResultNav
+        summary={copy.nav.summary(total, e.input.degreeYears)}
+        editHref={editHref}
+        breakdownHref={breakdownHref}
+      />
       <h2 className="sr-only">{heading}</h2>
-      <Tree key={runKey} response={response} />
+      <Tree key={runKey} response={response} breakdownHref={breakdownHref} />
       <Headline response={response} />
       {onCustomCosts && (
         <CustomCosts
@@ -69,7 +74,7 @@ export function ResultView({
           onChange={onCustomCosts}
         />
       )}
-      <Shares response={response} />
+      <Shares response={response} breakdownHref={breakdownHref} />
       <RangeSection response={response} />
       <Savings response={response} onToggle={onToggleLevers} busy={busy} />
       <Explanation response={response} aiEnabled={aiEnabled} botToken={botToken} />

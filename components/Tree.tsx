@@ -23,7 +23,14 @@ function leading(items: LineItem[], years: number): { confidence: Confidence; na
  * The tuition tree: tuition on top, each hidden cost branching from it, then the total. The
  * stages reveal one after another (globals.css); reduced motion shows everything at once.
  */
-export function Tree({ response }: { response: EstimateResponse }) {
+export function Tree({
+  response,
+  breakdownHref,
+}: {
+  response: EstimateResponse;
+  /** Every figure links to its section of the full calculation. */
+  breakdownHref: string;
+}) {
   const { estimate: e, currency: cur } = response;
   const t = copy.tree;
   const rate = e.fx.today?.rate;
@@ -67,7 +74,11 @@ export function Tree({ response }: { response: EstimateResponse }) {
               <span className="mx-1">·</span>
               {copy.categories.tuition}
             </p>
-            <p className="display mt-1 text-3xl tabular-nums">{money(totals.tuition)}</p>
+            <p className="display mt-1 text-3xl tabular-nums">
+              <a href={`${breakdownHref}#tuition`} className="hover:underline">
+                {money(totals.tuition)}
+              </a>
+            </p>
           </div>
         </li>
         <li className="tree-stage hidden md:block" style={stage(1)} aria-hidden="true">
@@ -98,7 +109,11 @@ export function Tree({ response }: { response: EstimateResponse }) {
               return (
                 <li key={c} className="rounded-card bg-card p-4 text-center shadow-card">
                   <CategoryChip category={c} />
-                  <p className="display mt-2 text-2xl tabular-nums">{money(totals[c])}</p>
+                  <p className="display mt-2 text-2xl tabular-nums">
+                    <a href={`${breakdownHref}#${c}`} className="hover:underline">
+                      {money(totals[c])}
+                    </a>
+                  </p>
                   {inHome && (
                     <p className="text-sm text-muted tabular-nums">{usdFmt(totals[c] as never)}</p>
                   )}
@@ -130,6 +145,14 @@ export function Tree({ response }: { response: EstimateResponse }) {
             </p>
             <p className="mt-3 inline-block rounded-pill bg-cat-housing px-3 py-1 text-sm font-semibold text-ink">
               {t.hiddenPill(e.totals.hiddenPercentOfTuition)}
+            </p>
+            <p className="mt-4 print:hidden">
+              <a
+                href={breakdownHref}
+                className="inline-block rounded-pill border border-dark-muted px-4 py-2 text-sm text-white hover:bg-white/10"
+              >
+                {copy.breakdown.seeFull}
+              </a>
             </p>
           </div>
         </li>

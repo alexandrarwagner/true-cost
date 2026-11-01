@@ -294,6 +294,49 @@ test.describe("example mode", () => {
   });
 });
 
+test.describe("the full calculation", () => {
+  const share =
+    "c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1";
+
+  test("opens from a share link without JavaScript, matches the result's subtotals, prints cleanly and passes axe", async ({
+    browser,
+    page,
+  }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const noJs = await ctx.newPage();
+    await noJs.goto(`/estimate/breakdown?${share}`);
+    await expect(noJs.getByRole("heading", { name: "Your full calculation" })).toBeVisible();
+    await expect(noJs.getByRole("heading", { name: "What you told us" })).toBeVisible();
+    // Formula sentences come from the derivations: the tuition line names its term.
+    await expect(noJs.getByText(/tuition a year/).first()).toBeVisible();
+    await expect(noJs.getByText(/× 2 years over 2 years = \$/).first()).toBeVisible();
+    await ctx.close();
+
+    // The result page's figures link to the page, and each category subtotal matches.
+    await page.goto(`/?${share}`);
+    const tree = page.locator("#breakdown");
+    const housingOnResult =
+      (await tree.getByRole("link", { name: /^₹/ }).nth(1).textContent()) ?? "";
+    await tree.getByRole("link", { name: "See the full calculation" }).click();
+    await expect(page).toHaveURL(/\/estimate\/breakdown\?/);
+    const housingHeading = page.locator("#housing-heading");
+    await expect(housingHeading).toContainText(housingOnResult.trim());
+
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
+      .analyze();
+    const serious = axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
+
+    await page.emulateMedia({ media: "print" });
+    await expect(page.getByRole("banner")).toBeHidden();
+    await expect(page.getByRole("link", { name: "Report a mistake" })).toBeHidden();
+    await expect(
+      page.getByRole("heading", { name: "How the exchange-rate range is made" }),
+    ).toBeVisible();
+  });
+});
+
 test.describe("page shell", () => {
   test("no horizontal scroll at 320px, and the header links to the form and the methodology", async ({
     page,

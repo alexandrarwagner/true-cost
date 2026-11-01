@@ -11,13 +11,15 @@ interface Props {
   /** "₹1.27 crore · 2 years", shown on wide screens. */
   summary: string;
   editHref: string;
+  /** The full-calculation page; the Breakdown tab goes there. */
+  breakdownHref: string;
 }
 
 /**
  * After a result: section links, the total and "Edit", in the header's slot (a portal). The
  * section in view gets the plum pill. Without JavaScript the header keeps its default links.
  */
-export function ResultNav({ summary, editHref }: Props) {
+export function ResultNav({ summary, editHref, breakdownHref }: Props) {
   // The header's slot exists only in the browser; on the server there is nothing to portal into.
   const slot = useSyncExternalStore(
     () => () => {},
@@ -51,7 +53,7 @@ export function ResultNav({ summary, editHref }: Props) {
         {SECTIONS.map((id) => (
           <li key={id} className="shrink-0">
             <a
-              href={`#${id}`}
+              href={id === "breakdown" ? breakdownHref : `#${id}`}
               aria-current={current === id ? "true" : undefined}
               className={`inline-block rounded-pill px-3 py-1.5 text-sm whitespace-nowrap ${
                 current === id ? "bg-dark text-white" : "hover:bg-page"
