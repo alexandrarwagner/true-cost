@@ -82,7 +82,10 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
 
   test("the form is keyboard reachable and asks for the programme length", async ({ page }) => {
     await page.goto("/");
-    await page.keyboard.press("Tab"); // skip link
+    // The skip link comes first; activating it jumps past the header to the form.
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
+    await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
     await expect(page.getByLabel("Where are you from?")).toBeFocused();
     await page.getByLabel("Which school?").fill("purdue");
@@ -170,6 +173,26 @@ test.describe("motion and print", () => {
       page.getByRole("columnheader", { name: "Worst 10% of past periods" }),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
+  });
+});
+
+test.describe("page shell", () => {
+  test("no horizontal scroll at 320px, and the header links to the form and the methodology", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto("/");
+    const widths = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      document.documentElement.clientWidth,
+    ]);
+    expect(widths[0]).toBeLessThanOrEqual(widths[1] ?? 320);
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "Get my estimate" }),
+    ).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toContainText("Not a prediction");
+    await page.getByRole("banner").getByRole("link", { name: "Get my estimate" }).click();
+    await expect(page).toHaveURL(/#estimate$/);
   });
 });
 

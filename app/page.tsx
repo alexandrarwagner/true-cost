@@ -27,7 +27,7 @@ export default async function HomePage({
       ? { kind: "single" as const, data: await runEstimate(initial, buildSources()) }
       : null;
   return (
-    <>
+    <div className="mx-auto max-w-3xl">
       <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
       <p className="mt-1 mb-6">{copy.tagline}</p>
       <EstimateFlow
@@ -37,6 +37,6 @@ export default async function HomePage({
         aiEnabled={AI_ENABLED}
         compareEnabled={COMPARE_ENABLED}
       />
-    </>
+    </div>
   );
 }

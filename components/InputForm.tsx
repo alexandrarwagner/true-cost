@@ -164,6 +164,7 @@ export function InputForm({
 
   return (
     <form
+      id="estimate"
       className="print:hidden"
       noValidate
       onSubmit={(e) => {

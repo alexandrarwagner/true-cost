@@ -6,6 +6,13 @@ import type { ErrorCode } from "@/lib/schema/api";
 export const copy = {
   siteName: "True Cost",
   tagline: "What studying in the US will really cost you, in your own money.",
+  shell: {
+    nav: "Site",
+    skip: "Skip to main content",
+    how: "How we work it out",
+    cta: "Get my estimate",
+    footerLine: "Free. Not a prediction. Every number shows its source.",
+  },
   disclaimer:
     "This is an estimate, not financial advice. We don't predict exchange rates and we don't recommend any bank or transfer service.",
   errors: {

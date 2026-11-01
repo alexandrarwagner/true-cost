@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { copy } from "@/content/copy";
+import { archivo, notoBengali } from "./fonts";
 import "./globals.css";
 
 // Every page renders per request so the CSP nonce from proxy.ts is fresh and applied.
@@ -14,25 +16,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="flex min-h-full flex-col bg-white font-sans text-neutral-900">
+    <html lang="en" className={`h-full ${archivo.variable} ${notoBengali.variable}`}>
+      <body className="flex min-h-full flex-col bg-page font-sans text-ink">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:border focus:border-neutral-900 focus:bg-white focus:p-2"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-30 focus:rounded-field focus:bg-card focus:p-2 focus:outline focus:outline-2 focus:outline-brand"
         >
-          Skip to main content
+          {copy.shell.skip}
         </a>
-        <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+        <SiteHeader />
+        <main id="main" className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
-        <footer className="mx-auto w-full max-w-3xl border-t border-neutral-300 px-4 py-4 text-sm">
-          <p>{copy.disclaimer}</p>
-          <p className="mt-1">
-            <Link href="/privacy" className="underline">
-              {copy.privacy.title}
-            </Link>
-          </p>
-        </footer>
+        <SiteFooter />
       </body>
     </html>
   );
