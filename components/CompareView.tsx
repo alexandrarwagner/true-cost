@@ -39,6 +39,7 @@ export function CompareView({
         ] as Array<[keyof typeof t.rows, Cell]>)),
     ["hidden", (c) => `${c.estimate.totals.hiddenPercentOfTuition}%`],
     ["housing", (c) => usdFmt(c.estimate.totals.housing)],
+    ["healthInsurance", (c) => usdFmt(c.estimate.totals.healthInsurance)],
     ["living", (c) => usdFmt(c.estimate.totals.living)],
     ["oneOff", (c) => usdFmt(c.estimate.totals.oneOff)],
     ["moneyMoving", (c) => usdFmt(c.estimate.totals.moneyMoving)],

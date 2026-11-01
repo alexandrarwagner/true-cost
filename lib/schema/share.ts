@@ -48,7 +48,11 @@ export function encodeShare(req: EstimateRequest): URLSearchParams {
   return p;
 }
 
+/** Longer links are refused outright: custom-cost labels travel in them, so this bounds abuse. */
+export const MAX_SHARE_QUERY = 2000;
+
 export function decodeShare(params: URLSearchParams): EstimateRequest | null {
+  if (params.toString().length > MAX_SHARE_QUERY) return null;
   let options: unknown = {};
   const o = params.get("o");
   if (o) {

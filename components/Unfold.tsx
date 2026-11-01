@@ -11,6 +11,7 @@ export function Unfold({ response }: { response: EstimateResponse }) {
   const rows: Array<[keyof typeof copy.result.unfoldRows, number]> = [
     ["tuition", t.tuition],
     ["housing", t.housing],
+    ["health_insurance", t.healthInsurance],
     ["living", t.living],
     ["one_off", t.oneOff],
     ["money_moving", t.moneyMoving],

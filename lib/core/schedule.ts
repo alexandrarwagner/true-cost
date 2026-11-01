@@ -8,7 +8,15 @@ import {
   startDate,
 } from "./calendar";
 import { addCents, bps, cents, mulCents } from "./money";
-import type { Cents, EstimateInput, LineItem, PaymentEvent, Phase, TransferOptions } from "./types";
+import type {
+  Cents,
+  EstimateInput,
+  LineItem,
+  MoneyMoving,
+  PaymentEvent,
+  Phase,
+  TransferOptions,
+} from "./types";
 
 // Lays the line items out in time by their `billing`, applies deposit credits, merges
 // same-day payments into one transfer, and prices each transfer.
@@ -181,4 +189,25 @@ export function buildSchedule(
     });
   }
   return events;
+}
+
+/** How the money-moving total was built: markup on every transfer plus a fixed fee per transfer. */
+export function moneyMovingOf(
+  schedule: PaymentEvent[],
+  transfer: TransferOptions,
+  payFromUsd: boolean,
+): MoneyMoving {
+  const transfers = payFromUsd ? 0 : schedule.length;
+  const markupUsd = payFromUsd
+    ? (0 as Cents)
+    : addCents(...schedule.map((e) => bps(e.amountUsd, transfer.markupBps)));
+  const feesUsd = mulCents(transfer.fixedFeeUsd, transfers);
+  return {
+    transfers,
+    markupBps: transfer.markupBps,
+    fixedFeeUsd: transfer.fixedFeeUsd,
+    markupUsd,
+    feesUsd,
+    totalUsd: addCents(...schedule.map((e) => e.transferFeeUsd)),
+  };
 }

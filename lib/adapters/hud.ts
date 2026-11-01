@@ -171,6 +171,7 @@ export function hudSource(token: string | undefined): RentSource {
       const snap = readSnapshot("hud-fmr.json", HudSnapshot);
       let areas = snap?.byState[st];
       let source: Source = {
+        id: "hud",
         kind: "government",
         name: `HUD Fair Market Rents FY${snap?.fiscalYear ?? HUD_FY}`,
         url: "https://www.huduser.gov/portal/datasets/fmr.html",

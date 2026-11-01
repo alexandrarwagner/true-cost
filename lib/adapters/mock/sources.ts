@@ -18,12 +18,14 @@ import { syntheticHistory } from "./syntheticFx";
 type ScorecardRow = Record<string, string | number | boolean | null>;
 
 const SCORECARD_SOURCE: Source = {
+  id: "scorecard",
   kind: "school",
   name: "College Scorecard (fixture)",
   url: scorecard.source,
   date: scorecard.fetchedAt.slice(0, 10),
 };
 const HUD_SOURCE: Source = {
+  id: "hud",
   kind: "estimate",
   name: "Rent sample in HUD FMR shape (fixture)",
   date: hudSample.fetchedAt.slice(0, 10),

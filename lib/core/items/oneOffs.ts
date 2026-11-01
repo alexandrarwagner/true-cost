@@ -1,5 +1,5 @@
-import { COLD_STATES, ESTIMATES, FEES } from "@/data/constants";
-import { mulCents } from "../money";
+import { COLD_STATES, ESTIMATES, FEES, type Constant } from "@/data/constants";
+import { countTerm, derive, usdTerm } from "../derive";
 import { empty, fromConstant, type ItemContext, type ItemGroup } from "./common";
 
 /** Government fees before departure, settling-in costs on arrival, and leaving costs. */
@@ -10,11 +10,16 @@ export function oneOffItems(ctx: ItemContext): ItemGroup {
   const furnished =
     (o.housing?.kind ?? "on_campus") === "on_campus" || o.housing?.furnished === true;
 
+  const perApplicant = (k: Constant) =>
+    derive("product", [
+      usdTerm("fee_per_applicant", k.amountUsd, k.source.id),
+      countTerm("applicants", 1 + dependants),
+    ]);
   g.items.push(
     fromConstant(FEES.visaApplicationMrv, {
       id: "visaApplication",
       category: "one_off",
-      amountUsd: mulCents(FEES.visaApplicationMrv.amountUsd, 1 + dependants),
+      ...perApplicant(FEES.visaApplicationMrv),
       frequency: "one_off",
       phase: "pre_arrival",
       billing: "pre_arrival",
@@ -33,7 +38,7 @@ export function oneOffItems(ctx: ItemContext): ItemGroup {
     fromConstant(FEES.visaIntegrityFee, {
       id: "visaIntegrityFee",
       category: "one_off",
-      amountUsd: mulCents(FEES.visaIntegrityFee.amountUsd, 1 + dependants),
+      ...perApplicant(FEES.visaIntegrityFee),
       frequency: "one_off",
       phase: "pre_arrival",
       billing: "pre_arrival",

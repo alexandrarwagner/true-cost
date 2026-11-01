@@ -141,6 +141,7 @@ export function scorecardSource(
       const fromSnap = snap?.schools.find((r) => r.id === unitId);
       let row: ScorecardRow | undefined = fromSnap;
       let source: Source = {
+        id: "scorecard",
         kind: "school",
         name: "College Scorecard",
         url: "https://collegescorecard.ed.gov/data/",

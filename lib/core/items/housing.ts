@@ -1,7 +1,8 @@
 import { ESTIMATES } from "@/data/constants";
+import { derive, usdTerm } from "../derive";
 import { mulCents } from "../money";
-import type { Cents, Source } from "../types";
-import { empty, fromConstant, type ItemContext, type ItemGroup } from "./common";
+import type { Cents, Derivation, Source } from "../types";
+import { empty, fromConstant, given, type ItemContext, type ItemGroup } from "./common";
 
 /** On-campus room and meals, or off-campus rent with everything that comes with a lease. */
 export function housingItems(ctx: ItemContext): ItemGroup {
@@ -18,11 +19,14 @@ export function housingItems(ctx: ItemContext): ItemGroup {
       g.items.push({
         id: "roomAndBoard",
         category: "housing",
-        amountUsd: ctx.school.roomBoardOnCampusUsd,
+        ...given(
+          "school_room_and_board_figure",
+          ctx.school.roomBoardOnCampusUsd,
+          ctx.school.source,
+        ),
         frequency: "per_year",
         phase: "ongoing",
         billing: "year_start",
-        source: ctx.school.source,
       });
     } else {
       g.items.push(
@@ -40,23 +44,47 @@ export function housingItems(ctx: ItemContext): ItemGroup {
   }
 
   let rent: Cents;
+  let rentDerivation: Derivation;
   let rentSource: Source;
   if (housing.monthlyRentUsd !== undefined) {
-    rent = housing.monthlyRentUsd;
+    const d = derive("given", [usdTerm("your_monthly_rent", housing.monthlyRentUsd, "user")]);
+    rent = d.amountUsd;
+    rentDerivation = d.derivation;
     rentSource = ctx.user;
   } else if (ctx.rent) {
-    rent = mulCents(ctx.rent.monthlyByBedrooms[housing.bedrooms], 1 / (housing.roommates + 1));
+    const d = derive("quotient", [
+      usdTerm(
+        "area_rent_for_bedrooms",
+        ctx.rent.monthlyByBedrooms[housing.bedrooms],
+        ctx.rent.source.id,
+      ),
+      { label: "people_sharing", value: housing.roommates + 1, unit: "people" },
+    ]);
+    rent = d.amountUsd;
+    rentDerivation = d.derivation;
     rentSource = ctx.rent.source;
   } else {
-    rent = ESTIMATES.rentPerMonthFallback.amountUsd;
-    rentSource = ESTIMATES.rentPerMonthFallback.source;
+    const k = ESTIMATES.rentPerMonthFallback;
+    const d = derive("given", [usdTerm(k.id, k.amountUsd, k.source.id)]);
+    rent = d.amountUsd;
+    rentDerivation = d.derivation;
+    rentSource = k.source;
     g.noteIds.push("no_area_rent");
   }
+  /** Items that equal one month's rent by rule. */
+  const ruleSource = (name: string): Source => ({
+    id: "rule",
+    kind: "estimate",
+    name,
+    date: ctx.today,
+  });
+  const oneMonthsRent = (label: string) => derive("given", [usdTerm(label, rent, "rule")]);
 
   g.items.push({
     id: "rent",
     category: "housing",
     amountUsd: rent,
+    derivation: rentDerivation,
     frequency: "per_month",
     phase: "ongoing",
     billing: "monthly",
@@ -79,32 +107,38 @@ export function housingItems(ctx: ItemContext): ItemGroup {
       billing: "monthly",
     }),
   );
+  const deposit = oneMonthsRent("one_months_rent");
   g.items.push({
     id: "securityDeposit",
     category: "housing",
-    amountUsd: rent,
+    amountUsd: deposit.amountUsd,
+    derivation: deposit.derivation,
     frequency: "one_off",
     phase: "arrival",
     billing: "arrival",
-    source: { kind: "estimate", name: "One month's rent", date: ctx.today },
+    source: ruleSource("One month's rent"),
     noteId: "deposit_rules_vary",
   });
+  const risk = derive("given", [usdTerm("deposit_deductions_risk", 0 as Cents, "rule")]);
   g.items.push({
     id: "depositDeductions",
     category: "housing",
-    amountUsd: 0 as Cents,
+    amountUsd: risk.amountUsd,
+    derivation: risk.derivation,
     range: { low: 0 as Cents, high: rent },
     frequency: "one_off",
     phase: "departure",
     billing: "departure",
-    source: { kind: "estimate", name: "Risk, not a cost", date: ctx.today },
+    source: ruleSource("Risk, not a cost"),
     riskOnly: true,
   });
   if (housing.lastMonthUpfront) {
+    const d = oneMonthsRent("last_months_rent");
     g.items.push({
       id: "lastMonthRentUpfront",
       category: "housing",
-      amountUsd: rent,
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
       frequency: "one_off",
       phase: "arrival",
       billing: "arrival",
@@ -114,11 +148,13 @@ export function housingItems(ctx: ItemContext): ItemGroup {
     });
   }
   if (housing.twelveMonthLease) {
+    const d = oneMonthsRent("monthly_rent");
     if (years > 1)
       g.items.push({
         id: "summerRent",
         category: "housing",
-        amountUsd: rent,
+        amountUsd: d.amountUsd,
+        derivation: d.derivation,
         frequency: "per_month",
         phase: "ongoing",
         billing: "summer",
@@ -129,7 +165,8 @@ export function housingItems(ctx: ItemContext): ItemGroup {
     g.items.push({
       id: "overlapRent",
       category: "housing",
-      amountUsd: rent,
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
       frequency: "per_month",
       phase: "departure",
       billing: "summer",
@@ -141,10 +178,15 @@ export function housingItems(ctx: ItemContext): ItemGroup {
   if (housing.tempAccommodationNights && housing.tempAccommodationNights > 0) {
     const k = ESTIMATES.tempAccommodationPerNight;
     const n = housing.tempAccommodationNights;
+    const d = derive("product", [
+      usdTerm("per_night", k.amountUsd, k.source.id),
+      { label: "nights", value: n, unit: "nights" },
+    ]);
     g.items.push({
       id: "tempAccommodation",
       category: "one_off",
-      amountUsd: mulCents(k.amountUsd, n),
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
       range: { low: mulCents(k.range.low, n), high: mulCents(k.range.high, n) },
       frequency: "one_off",
       phase: "arrival",

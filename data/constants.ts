@@ -23,18 +23,21 @@ const c = (n: number): Cents => Math.round(n * 100) as Cents;
 const CHECKED: IsoDate = "2026-10-29";
 
 const BU_ISSO: Source = {
+  id: "constants",
   kind: "government",
   name: "Boston University ISSO, citing US Dept. of State and ICE",
   url: "https://www.bu.edu/isso/2026/05/19/visa-integrity-fee/",
   date: "2026-05-19",
 };
 const ICE_I901: Source = {
+  id: "constants",
   kind: "government",
   name: "ICE SEVIS I-901 fee page",
   url: "https://www.ice.gov/sevis/i901",
   date: "2024-12-10",
 };
 const ESTIMATE: Source = {
+  id: "constants",
   kind: "estimate",
   name: "True Cost estimate, pending review",
   date: CHECKED,
@@ -275,6 +278,7 @@ export const TRANSFER_DEFAULT = {
   markupBps: 150,
   fixedFeeUsd: c(15),
   source: {
+    id: "constants",
     kind: "estimate",
     name: "Illustrative assumption; enter your provider's markup and fee",
     date: CHECKED,
@@ -328,6 +332,7 @@ export const TRANSFER_REFERENCE = {
   markupBps: 50,
   confidence: "estimate" as Confidence,
   source: {
+    id: "constants",
     kind: "estimate",
     name: "Illustrative reference markup, pending review; we recommend no provider",
     date: CHECKED,

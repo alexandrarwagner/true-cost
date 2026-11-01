@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computeEstimate, computeTotals, degreeTotal } from "@/lib/core/estimate";
+import { derive, usdTerm } from "@/lib/core/derive";
 import { usd } from "@/lib/core/money";
 import { baseInput, LAFAYETTE_RENT, PURDUE, TODAY } from "../fixtures/inputs";
 import { INR_HISTORY } from "../fixtures/fxHistory";
@@ -15,7 +16,12 @@ describe("computeEstimate", () => {
     const e = computeEstimate(baseInput(), { today: TODAY, school: PURDUE, fx });
     const { totals } = e;
     expect(totals.total).toBe(
-      totals.tuition + totals.housing + totals.living + totals.oneOff + totals.moneyMoving,
+      totals.tuition +
+        totals.housing +
+        totals.healthInsurance +
+        totals.living +
+        totals.oneOff +
+        totals.moneyMoving,
     );
     expect(totals.tuition).toBe(usd(28794 * 2));
     expect(totals.hiddenPercentOfTuition).toBeGreaterThan(30);
@@ -65,13 +71,15 @@ describe("computeEstimate", () => {
   });
 
   it("degreeTotal multiplies by the right number of occurrences", () => {
-    const src = { kind: "estimate" as const, name: "x", date: TODAY };
+    const src = { id: "rule" as const, kind: "estimate" as const, name: "x", date: TODAY };
+    const derivation = derive("given", [usdTerm("x", usd(100))]).derivation;
     expect(
       degreeTotal(
         {
           id: "rent",
           category: "housing",
           amountUsd: usd(100),
+          derivation,
           frequency: "per_month",
           phase: "ongoing",
           billing: "monthly",
@@ -86,6 +94,7 @@ describe("computeEstimate", () => {
           id: "summerRent",
           category: "housing",
           amountUsd: usd(100),
+          derivation,
           frequency: "per_month",
           phase: "ongoing",
           billing: "summer",
@@ -100,6 +109,7 @@ describe("computeEstimate", () => {
           id: "x",
           category: "housing",
           amountUsd: usd(100),
+          derivation,
           frequency: "one_off",
           phase: "arrival",
           billing: "arrival",

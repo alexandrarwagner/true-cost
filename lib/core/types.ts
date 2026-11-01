@@ -22,9 +22,14 @@ export type Billing =
 export type YearScope = "all" | "non_final" | "final";
 export type Phase = "pre_arrival" | "arrival" | "ongoing" | "departure";
 export type Confidence = "user" | "school" | "government" | "estimate";
-export type Category = "tuition" | "housing" | "living" | "one_off" | "money_moving";
+export type Category =
+  "tuition" | "housing" | "health_insurance" | "living" | "one_off" | "money_moving";
+
+/** Where a figure comes from, as registered in data/sources.ts. */
+export type SourceId = "user" | "scorecard" | "hud" | "frankfurter" | "constants" | "rule" | "deal";
 
 export interface Source {
+  id: SourceId;
   kind: Confidence;
   /** Short name, e.g. "College Scorecard", "HUD FMR FY2027", "Your input". */
   name: string;
@@ -33,10 +38,35 @@ export interface Source {
   date: IsoDate;
 }
 
+// A derivation is how an amount was computed, built by the same code that computed it, so the
+// breakdown page can print the formula with the user's own numbers and never disagree with
+// the total (ADR 015).
+export type FormulaId =
+  | "given" // one money term, as a source or the user states it
+  | "product" // money × count × count…
+  | "quotient" // money ÷ people
+  | "difference" // money − money, floored at zero
+  | "deducted"; // money − a deal's saving per occurrence, floored at zero
+export type TermUnit = "usd" | "count" | "people" | "months" | "nights" | "home" | "rate";
+export interface Term {
+  /** Copy key for the breakdown page, e.g. "hud_rent", "people_sharing". */
+  label: string;
+  value: number;
+  unit: TermUnit;
+  sourceId?: SourceId;
+}
+export interface Derivation {
+  formula: FormulaId;
+  terms: Term[];
+  /** Per occurrence; equals the item's amountUsd by construction. */
+  result: Cents;
+}
+
 export interface LineItem {
   id: string;
   category: Category;
   amountUsd: Cents;
+  derivation: Derivation;
   /** Shown when the figure is an estimate: the band we are reasonably sure of. */
   range?: { low: Cents; high: Cents };
   frequency: Frequency;
@@ -80,8 +110,20 @@ export interface TransferOptions {
 /** How often living costs are sent: every month, or batched at each semester start. */
 export type TransferCadence = "monthly" | "semester";
 
+/** A cost the user adds themselves ("Know a cost we missed?"). Converted to USD on entry. */
+export interface CustomCost {
+  /** 1–40 characters of plain text, rendered as text only. */
+  label: string;
+  amountUsd: Cents;
+  frequency: "one_off" | "monthly";
+  /** Present when the amount was entered in the home currency. */
+  converted?: { amountHome: number; currency: string; rate: number; date: IsoDate };
+}
+
 export interface EstimateOptions {
   housing?: HousingOptions;
+  /** Up to ten user-added costs. */
+  customCosts?: CustomCost[];
   scholarshipPerYearUsd?: Cents;
   insurance?: {
     kind: "school_plan" | "waiver";
@@ -207,6 +249,7 @@ export interface FxUnsupported {
 export interface Totals {
   tuition: Cents;
   housing: Cents;
+  healthInsurance: Cents;
   living: Cents;
   oneOff: Cents;
   moneyMoving: Cents;
@@ -215,10 +258,21 @@ export interface Totals {
   hiddenPercentOfTuition: number;
 }
 
+/** How the money-moving total was built, for the breakdown page. */
+export interface MoneyMoving {
+  transfers: number;
+  markupBps: number;
+  fixedFeeUsd: Cents;
+  markupUsd: Cents;
+  feesUsd: Cents;
+  totalUsd: Cents;
+}
+
 export interface Estimate {
   input: EstimateInput;
   items: LineItem[];
   totals: Totals;
+  moneyMoving: MoneyMoving;
   schedule: PaymentEvent[];
   fx: FxReplay | FxUnsupported;
   /** Unique sources behind the figures, for the "where each number comes from" list. */

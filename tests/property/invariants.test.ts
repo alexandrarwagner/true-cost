@@ -1,5 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { SOURCE_IDS } from "@/data/sources";
+import { evaluate } from "@/lib/core/derive";
 import { computeEstimate } from "@/lib/core/estimate";
 import { toCents, toMinor, usd } from "@/lib/core/money";
 import type { Cents, DegreeYears, EstimateInput } from "@/lib/core/types";
@@ -62,6 +64,7 @@ describe("estimate invariants", () => {
         for (const v of [
           e.totals.tuition,
           e.totals.housing,
+          e.totals.healthInsurance,
           e.totals.living,
           e.totals.oneOff,
           e.totals.moneyMoving,
@@ -69,6 +72,12 @@ describe("estimate invariants", () => {
           expect(v).toBeGreaterThanOrEqual(0);
         const scheduled = e.schedule.reduce((s, ev) => s + ev.amountUsd, 0);
         expect(scheduled).toBe(e.totals.total - e.totals.moneyMoving);
+        // Every amount is reproduced by its own derivation, and every source is registered.
+        for (const item of e.items) {
+          expect(evaluate(item.derivation.formula, item.derivation.terms)).toBe(item.amountUsd);
+          expect(SOURCE_IDS).toContain(item.source.id);
+        }
+        expect(e.moneyMoving.totalUsd).toBe(e.totals.moneyMoving);
         if (e.fx.kind === "replay") {
           expect(e.fx.best.totalHome).toBeLessThanOrEqual(e.fx.medianHome);
           expect(e.fx.medianHome).toBeLessThanOrEqual(e.fx.worst.totalHome);

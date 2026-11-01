@@ -1,4 +1,5 @@
 import { FLIGHT_ONE_WAY_BY_REGION, REGION_BY_COUNTRY } from "@/data/constants";
+import { countTerm, derive, usdTerm } from "../derive";
 import { mulCents } from "../money";
 import { empty, type ItemContext, type ItemGroup } from "./common";
 
@@ -13,11 +14,18 @@ export function travelItems(ctx: ItemContext): ItemGroup {
   const source = known !== undefined ? ctx.user : k.source;
   const range = known !== undefined ? undefined : k.range;
   const trips = Math.max(0, o.flights?.tripsHomePerYear ?? 1);
+  const fare = usdTerm(
+    known !== undefined ? "your_one_way_fare" : "one_way_fare_by_region",
+    oneWay,
+    source.id,
+  );
+  const single = derive("given", [fare]);
 
   g.items.push({
     id: "flightToSchool",
     category: "one_off",
-    amountUsd: oneWay,
+    amountUsd: single.amountUsd,
+    derivation: single.derivation,
     ...(range ? { range } : {}),
     frequency: "one_off",
     phase: "pre_arrival",
@@ -25,10 +33,16 @@ export function travelItems(ctx: ItemContext): ItemGroup {
     source,
   });
   if (trips > 0) {
+    const d = derive("product", [
+      fare,
+      countTerm("flights_per_trip", 2),
+      countTerm("trips_per_year", trips),
+    ]);
     g.items.push({
       id: "flightsHome",
       category: "one_off",
-      amountUsd: mulCents(oneWay, 2 * trips),
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
       ...(range
         ? { range: { low: mulCents(range.low, 2 * trips), high: mulCents(range.high, 2 * trips) } }
         : {}),
@@ -41,7 +55,8 @@ export function travelItems(ctx: ItemContext): ItemGroup {
   g.items.push({
     id: "finalFlight",
     category: "one_off",
-    amountUsd: oneWay,
+    amountUsd: single.amountUsd,
+    derivation: single.derivation,
     ...(range ? { range } : {}),
     frequency: "one_off",
     phase: "departure",

@@ -1,6 +1,7 @@
 import { occurrencesOverDegree } from "./calendar";
+import { derive, usdTerm } from "./derive";
 import { cents } from "./money";
-import type { Cents, EstimateInput, LineItem } from "./types";
+import type { EstimateInput, LineItem } from "./types";
 
 // A deduction takes a stated amount off one cost line over the degree (a student deal switched
 // on). It is spread evenly over the line's occurrences and can never push the line below zero,
@@ -17,7 +18,15 @@ export function applyDeductions(items: LineItem[], input: EstimateInput): LineIt
     const occurrences = occurrencesOverDegree(item, input.degreeYears);
     if (occurrences === 0) return item;
     const perOccurrence = cents(overDegree / occurrences);
-    const amountUsd = Math.max(0, item.amountUsd - perOccurrence) as Cents;
-    return { ...item, amountUsd, noteId: item.noteId ?? "deal_applied" };
+    const d = derive("deducted", [
+      usdTerm("before_deal", item.amountUsd, item.source.id),
+      usdTerm("deal_saving_per_occurrence", perOccurrence, "deal"),
+    ]);
+    return {
+      ...item,
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
+      noteId: item.noteId ?? "deal_applied",
+    };
   });
 }

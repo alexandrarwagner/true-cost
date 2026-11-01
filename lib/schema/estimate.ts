@@ -24,8 +24,23 @@ export const HousingSchema = z.strictObject({
   tempAccommodationNights: z.number().int().min(0).max(60).optional(),
 });
 
+export const MAX_CUSTOM_COSTS = 10;
+/** "Know a cost we missed?": a plain-text label, an amount in dollars or the home currency. */
+export const CustomCostSchema = z.strictObject({
+  label: z
+    .string()
+    .trim()
+    .min(1)
+    .max(40)
+    .regex(/^[^\p{Cc}]+$/u, "No control characters"),
+  amount: z.number().min(0).max(10_000_000),
+  currency: z.enum(["USD", "home"]),
+  frequency: z.enum(["one_off", "monthly"]),
+});
+
 export const OptionsSchema = z.strictObject({
   housing: HousingSchema.optional(),
+  customCosts: z.array(CustomCostSchema).max(MAX_CUSTOM_COSTS).optional(),
   scholarshipPerYear: dollars(300_000).optional(),
   insurance: z
     .strictObject({

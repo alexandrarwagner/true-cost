@@ -1,5 +1,6 @@
 import type { AreaRent, EstimateInput, LineItem, SchoolCosts, Source } from "./types";
 import type { ItemContext, ItemGroup } from "./items/common";
+import { customItems } from "./items/custom";
 import { housingItems } from "./items/housing";
 import { livingItems } from "./items/living";
 import { oneOffItems } from "./items/oneOffs";
@@ -26,7 +27,7 @@ export function buildLineItems(
   data: CostModelData,
   today: string,
 ): CostModelResult {
-  const user: Source = { kind: "user", name: "Your input", date: today };
+  const user: Source = { id: "user", kind: "user", name: "Your input", date: today };
   const ctx: ItemContext = {
     input,
     today,
@@ -40,6 +41,7 @@ export function buildLineItems(
     housingItems(ctx),
     travelItems(ctx),
     oneOffItems(ctx),
+    customItems(ctx),
   ];
   return {
     items: groups.flatMap((g) => g.items),

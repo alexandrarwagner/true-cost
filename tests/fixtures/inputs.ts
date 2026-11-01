@@ -10,6 +10,7 @@ export const PURDUE: SchoolCosts = {
   otherExpenseOffCampusUsd: usd(2340),
   booksSupplyUsd: usd(1090),
   source: {
+    id: "scorecard",
     kind: "school",
     name: "College Scorecard",
     url: "https://collegescorecard.ed.gov",
@@ -22,6 +23,7 @@ export const LAFAYETTE_RENT: AreaRent = {
   areaName: "Lafayette-West Lafayette, IN",
   smallArea: false,
   source: {
+    id: "hud",
     kind: "government",
     name: "HUD FMR FY2027",
     url: "https://www.huduser.gov",
@@ -34,6 +36,7 @@ export const NYC_RENT: AreaRent = {
   areaName: "New York, NY",
   smallArea: true,
   source: {
+    id: "hud",
     kind: "government",
     name: "HUD FMR FY2027",
     url: "https://www.huduser.gov",
@@ -47,6 +50,7 @@ export const NYU: SchoolCosts = {
   otherExpenseOffCampusUsd: usd(3200),
   booksSupplyUsd: usd(900),
   source: {
+    id: "scorecard",
     kind: "school",
     name: "College Scorecard",
     url: "https://collegescorecard.ed.gov",
@@ -67,6 +71,7 @@ export function baseInput(over: Partial<EstimateInput> = {}): EstimateInput {
     },
     tuitionPerYearUsd: usd(28794),
     tuitionSource: {
+      id: "scorecard",
       kind: "school",
       name: "College Scorecard",
       url: "https://collegescorecard.ed.gov",

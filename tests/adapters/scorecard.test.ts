@@ -31,7 +31,12 @@ describe("scorecard adapter", () => {
       tuitionOutOfStateUsd: 2879400,
       predominantDegree: 3,
     });
-    const costs = rowToCosts(purdue, { kind: "school", name: "x", date: "2026-10-30" });
+    const costs = rowToCosts(purdue, {
+      id: "scorecard",
+      kind: "school",
+      name: "x",
+      date: "2026-10-30",
+    });
     expect(costs).toMatchObject({ roomBoardOnCampusUsd: 1282000, booksSupplyUsd: 109000 });
     expect(costs.roomBoardOffCampusUsd).toBeUndefined();
   });

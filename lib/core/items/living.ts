@@ -1,9 +1,10 @@
 import { ESTIMATES } from "@/data/constants";
+import { countTerm, derive, usdTerm } from "../derive";
 import { mulCents } from "../money";
 import type { Cents } from "../types";
-import { empty, fromConstant, type ItemContext, type ItemGroup } from "./common";
+import { empty, fromConstant, given, type ItemContext, type ItemGroup } from "./common";
 
-/** Books, personal expenses and health insurance, school figures first. */
+/** Books and personal expenses (school figures first), and health insurance as its own category. */
 export function livingItems(ctx: ItemContext): ItemGroup {
   const g = empty();
   const o = ctx.input.options;
@@ -14,11 +15,10 @@ export function livingItems(ctx: ItemContext): ItemGroup {
     g.items.push({
       id: "books",
       category: "living",
-      amountUsd: ctx.school.booksSupplyUsd,
+      ...given("school_books_figure", ctx.school.booksSupplyUsd, ctx.school.source),
       frequency: "per_year",
       phase: "ongoing",
       billing: "semester",
-      source: ctx.school.source,
     });
   } else {
     g.items.push(
@@ -39,11 +39,10 @@ export function livingItems(ctx: ItemContext): ItemGroup {
     g.items.push({
       id: "otherExpenses",
       category: "living",
-      amountUsd: other,
+      ...given("school_other_expenses_figure", other, ctx.school.source),
       frequency: "per_year",
       phase: "ongoing",
       billing: "year_start",
-      source: ctx.school.source,
     });
   } else {
     g.items.push(
@@ -60,29 +59,27 @@ export function livingItems(ctx: ItemContext): ItemGroup {
   if (o.insurance?.premiumPerYearUsd !== undefined) {
     g.items.push({
       id: "healthInsurance",
-      category: "living",
-      amountUsd: o.insurance.premiumPerYearUsd,
+      category: "health_insurance",
+      ...given("premium_per_year", o.insurance.premiumPerYearUsd, ctx.user),
       frequency: "per_year",
       phase: "ongoing",
       billing: "year_start",
-      source: ctx.user,
     });
   } else if (o.insurance?.kind === "waiver") {
     g.items.push({
       id: "healthInsurance",
-      category: "living",
-      amountUsd: 0 as Cents,
+      category: "health_insurance",
+      ...given("waived_premium", 0 as Cents, ctx.user),
       frequency: "per_year",
       phase: "ongoing",
       billing: "year_start",
-      source: ctx.user,
       noteId: "insurance_waived",
     });
   } else {
     g.items.push(
       fromConstant(ESTIMATES.healthInsurancePerYear, {
         id: "healthInsurance",
-        category: "living",
+        category: "health_insurance",
         frequency: "per_year",
         phase: "ongoing",
         billing: "year_start",
@@ -91,10 +88,15 @@ export function livingItems(ctx: ItemContext): ItemGroup {
   }
   if (dependants > 0) {
     const k = ESTIMATES.dependantInsurancePerYear;
+    const d = derive("product", [
+      usdTerm("premium_per_dependant", k.amountUsd, k.source.id),
+      countTerm("dependants", dependants),
+    ]);
     g.items.push({
       id: "dependantInsurance",
-      category: "living",
-      amountUsd: mulCents(k.amountUsd, dependants),
+      category: "health_insurance",
+      amountUsd: d.amountUsd,
+      derivation: d.derivation,
       range: { low: mulCents(k.range.low, dependants), high: mulCents(k.range.high, dependants) },
       frequency: "per_year",
       phase: "ongoing",

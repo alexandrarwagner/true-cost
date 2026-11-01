@@ -155,7 +155,7 @@ test.describe("motion and print", () => {
     const opacities = await page.$$eval(".unfold-row", (rows) =>
       rows.map((r) => getComputedStyle(r).opacity),
     );
-    expect(opacities.length).toBe(6);
+    expect(opacities.length).toBe(7);
     expect(opacities.every((o) => o === "1")).toBe(true);
   });
 

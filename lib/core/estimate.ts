@@ -3,7 +3,7 @@ import { buildLineItems, type CostModelData } from "./costModel";
 import { applyDeductions } from "./deductions";
 import { replay } from "./fxReplay";
 import { addCents, mulCents } from "./money";
-import { buildSchedule, transferOptionsFor } from "./schedule";
+import { buildSchedule, moneyMovingOf, transferOptionsFor } from "./schedule";
 import type {
   Category,
   Cents,
@@ -38,18 +38,27 @@ export function computeTotals(items: LineItem[], years: number, moneyMoving: Cen
   const by: Record<Category, Cents> = {
     tuition: 0 as Cents,
     housing: 0 as Cents,
+    health_insurance: 0 as Cents,
     living: 0 as Cents,
     one_off: 0 as Cents,
     money_moving: moneyMoving,
   };
   for (const item of items)
     by[item.category] = addCents(by[item.category], degreeTotal(item, years));
-  const total = addCents(by.tuition, by.housing, by.living, by.one_off, by.money_moving);
+  const total = addCents(
+    by.tuition,
+    by.housing,
+    by.health_insurance,
+    by.living,
+    by.one_off,
+    by.money_moving,
+  );
   const hiddenPercentOfTuition =
     by.tuition > 0 ? Math.round(((total - by.tuition) / by.tuition) * 100) : 0;
   return {
     tuition: by.tuition,
     housing: by.housing,
+    healthInsurance: by.health_insurance,
     living: by.living,
     oneOff: by.one_off,
     moneyMoving: by.money_moving,
@@ -69,12 +78,10 @@ export function computeEstimate(input: EstimateInput, ctx: EstimateContext): Est
   const payFromUsd = input.options.payFromUsd === true;
   const built = buildLineItems(input, { school: ctx.school, rent: ctx.rent }, ctx.today);
   const model = { ...built, items: applyDeductions(built.items, input) };
-  const schedule = buildSchedule(model.items, input, {
-    transfer: transferOptionsFor(input),
-    payFromUsd,
-  });
-  const moneyMoving = addCents(...schedule.map((e) => e.transferFeeUsd));
-  const totals = computeTotals(model.items, input.degreeYears, moneyMoving);
+  const transfer = transferOptionsFor(input);
+  const schedule = buildSchedule(model.items, input, { transfer, payFromUsd });
+  const moneyMoving = moneyMovingOf(schedule, transfer, payFromUsd);
+  const totals = computeTotals(model.items, input.degreeYears, moneyMoving.totalUsd);
 
   const extraSources: Source[] = [];
   let fx: Estimate["fx"];
@@ -89,7 +96,12 @@ export function computeEstimate(input: EstimateInput, ctx: EstimateContext): Est
       asOf: ctx.today,
       payFromUsd,
     });
-    extraSources.push({ kind: "government", name: ctx.fx.today.source, date: ctx.fx.today.date });
+    extraSources.push({
+      id: "frankfurter",
+      kind: "government",
+      name: ctx.fx.today.source,
+      date: ctx.fx.today.date,
+    });
   }
   const noteIds = [...model.noteIds];
   if (payFromUsd) noteIds.push("pay_from_usd");
@@ -99,6 +111,7 @@ export function computeEstimate(input: EstimateInput, ctx: EstimateContext): Est
     input,
     items: model.items,
     totals,
+    moneyMoving,
     schedule,
     fx,
     sources: uniqueSources(model.items, extraSources),

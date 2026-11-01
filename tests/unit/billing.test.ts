@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildLineItems } from "@/lib/core/costModel";
 import { occurrencesOverDegree } from "@/lib/core/estimate";
+import { derive, usdTerm } from "@/lib/core/derive";
 import { usd } from "@/lib/core/money";
 import { buildSchedule } from "@/lib/core/schedule";
 import { baseInput, LAFAYETTE_RENT, PURDUE, TODAY } from "../fixtures/inputs";
@@ -58,7 +59,7 @@ describe("billing-driven schedule", () => {
   });
 
   it("year scope limits occurrences: summer rent counts the non-final years, overlap rent the final one", () => {
-    const src = { kind: "estimate" as const, name: "x", date: TODAY };
+    const src = { id: "rule" as const, kind: "estimate" as const, name: "x", date: TODAY };
     const base = {
       category: "housing" as const,
       amountUsd: usd(100),
@@ -66,6 +67,7 @@ describe("billing-driven schedule", () => {
       phase: "ongoing" as const,
       billing: "summer" as const,
       source: src,
+      derivation: derive("given", [usdTerm("x", usd(100))]).derivation,
     };
     expect(occurrencesOverDegree({ id: "summerRent", ...base, yearScope: "non_final" }, 2)).toBe(2);
     expect(occurrencesOverDegree({ id: "overlapRent", ...base, yearScope: "final" }, 2)).toBe(2);

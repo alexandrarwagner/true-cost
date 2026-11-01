@@ -72,10 +72,12 @@ export const copy = {
     transfer_assumption:
       "Transfer costs use an illustrative markup and fee. Enter your provider's real numbers to make this exact.",
     deal_applied: "Lowered by a student deal you switched on.",
+    custom_cost: "A cost you added yourself.",
   } as Record<string, string>,
   categories: {
     tuition: "Tuition",
     housing: "Housing",
+    health_insurance: "Health insurance",
     living: "Living costs",
     one_off: "One-off costs",
     money_moving: "Moving the money",
@@ -188,6 +190,7 @@ export const copy = {
     unfoldRows: {
       tuition: "Tuition",
       housing: "plus housing",
+      health_insurance: "plus health insurance",
       living: "plus living costs",
       one_off: "plus one-off costs",
       money_moving: "plus moving the money",
@@ -288,6 +291,7 @@ export const copy = {
       range: "Best tenth to worst tenth of past periods",
       hidden: "Hidden costs on top of tuition",
       housing: "Housing (US dollars)",
+      healthInsurance: "Health insurance (US dollars)",
       living: "Living costs (US dollars)",
       oneOff: "One-off costs (US dollars)",
       moneyMoving: "Moving the money (US dollars)",

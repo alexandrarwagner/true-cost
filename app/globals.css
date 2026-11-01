@@ -41,6 +41,9 @@
 .unfold-row:nth-child(6) {
   animation-delay: 1750ms;
 }
+.unfold-row:nth-child(7) {
+  animation-delay: 2100ms;
+}
 
 @media print {
   nav,
