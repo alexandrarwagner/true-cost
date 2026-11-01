@@ -354,6 +354,13 @@ test.describe("page shell", () => {
     await expect(page.getByRole("contentinfo")).toContainText("Not a prediction");
     await page.getByRole("banner").getByRole("link", { name: "Get my estimate" }).click();
     await expect(page).toHaveURL(/#estimate$/);
+    // The methodology table is always on the page, generated from the source registry. Its
+    // header link shows from the sm breakpoint up; phones reach it through the result nav.
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.getByRole("banner").getByRole("link", { name: "How we work it out" }).click();
+    await expect(page).toHaveURL(/#how$/);
+    await expect(page.getByRole("heading", { name: "How we work it out." })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Exchange rate.*Frankfurter/ })).toBeVisible();
     // The result page, with its nav, tree and tables, must reflow at 320px too (WCAG 1.4.10).
     await page.goto(
       "/?c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1",

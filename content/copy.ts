@@ -7,6 +7,28 @@ export const copy = {
   siteName: "Tuition+",
   tagline: "What studying in the US will really cost you, in your own money.",
   opensInNewTab: "opens in a new tab",
+  methodology: {
+    heading: "How we work it out.",
+    intro:
+      "Six costs, added up in dollars, then turned into your currency at today's rate. Every line on your result links to its own calculation.",
+    columns: { cost: "Cost", how: "How we work it out", source: "Source", type: "Type" },
+    fxRow: "Exchange rate",
+    rows: {
+      tuition:
+        "Your tuition per year, times the number of years. You type it in from your offer letter, or we pre-fill the school's published figure.",
+      housing:
+        "On campus: the school's published room and meals figure. Off campus: typical rent near your school for ten months a year, split by roommates, plus the summer months only on a 12-month lease. A deposit of one month's rent.",
+      health_insurance:
+        "The school plan's premium per year if you know it, otherwise a typical premium. Your own cover instead, where the school allows a waiver.",
+      living:
+        "Books and personal expenses from the school's own cost-of-attendance figures, plus groceries when you live off campus. Anything you add yourself.",
+      one_off:
+        "Things you pay once: the visa application, the SEVIS fee, flights by region, settling in, and shipping home.",
+      money_moving:
+        "The markup and fixed fee each time money is sent, from your provider's numbers or a clearly labelled assumption.",
+      fx: "Today's rate turns dollars into your currency. The range replays every past period of your programme's length on your payment dates. We never predict where it goes next.",
+    } as Record<string, string>,
+  },
   /** Term labels in derivations (lib/core/items) → words on the full-calculation page. */
   terms: {
     tuition_per_year: "tuition a year",

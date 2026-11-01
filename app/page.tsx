@@ -1,5 +1,6 @@
 import { EstimateFlow } from "@/components/EstimateFlow";
 import { Hero } from "@/components/Hero";
+import { Methodology } from "@/components/Methodology";
 import { toEstimateRequests } from "@/lib/schema/compare";
 import { decodeCompareShare, decodeShare } from "@/lib/schema/share";
 import { flags } from "@/lib/server/flags";
@@ -39,6 +40,7 @@ export default async function HomePage({
         aiEnabled={AI_ENABLED}
         compareEnabled={COMPARE_ENABLED}
       />
+      <Methodology />
     </div>
   );
 }

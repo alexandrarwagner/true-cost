@@ -9,7 +9,7 @@ export function Sources({ response }: { response: EstimateResponse }) {
   const { estimate: e } = response;
   const years = e.input.degreeYears;
   return (
-    <section id="how" aria-labelledby="sources-heading" className="scroll-mt-24">
+    <section id="sources" aria-labelledby="sources-heading" className="scroll-mt-24">
       <h3 id="sources-heading" className="text-lg font-semibold">
         {copy.result.sourcesHeading}
       </h3>
