@@ -265,6 +265,7 @@ test.describe("page shell", () => {
     );
     await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
     await page.getByText("The same range as a table").click();
+    await page.evaluate(() => document.fonts.ready);
     const after = await page.evaluate(() => [
       document.documentElement.scrollWidth,
       document.documentElement.clientWidth,

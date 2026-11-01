@@ -120,7 +120,7 @@ export function Tree({ response }: { response: EstimateResponse }) {
         <li className="tree-stage mx-auto mt-4 max-w-lg" style={stage(3)}>
           <div className="rounded-card-lg bg-dark px-6 py-7 text-center text-white">
             <p className="text-dark-muted">{t.aboutLabel}</p>
-            <p className="display mt-1 text-display text-cat-living tabular-nums">
+            <p className="display mt-1 text-4xl text-cat-living tabular-nums sm:text-display">
               <CountUp value={countUp.value} format={countUp.format} />
             </p>
             <p className="mt-2 text-dark-muted tabular-nums">
