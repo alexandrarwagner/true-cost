@@ -77,8 +77,27 @@ export function AccurateOptions({ value, onChange }: Props) {
             onChange={(e) =>
               set({
                 insurance: {
+                  ...(value.insurance ?? {}),
                   kind: value.insurance?.kind ?? "school_plan",
                   premiumPerYear: num(e.target.value),
+                },
+              })
+            }
+          />
+        </label>
+        <label className="mt-2 block sm:w-1/2">
+          {t.insuranceOwnPremium}
+          <input
+            type="number"
+            min={0}
+            className={field}
+            value={value.insurance?.ownPremiumPerYear ?? ""}
+            onChange={(e) =>
+              set({
+                insurance: {
+                  ...(value.insurance ?? {}),
+                  kind: value.insurance?.kind ?? "school_plan",
+                  ownPremiumPerYear: num(e.target.value),
                 },
               })
             }

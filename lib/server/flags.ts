@@ -6,10 +6,16 @@ import { getEnv } from "./env";
 export interface Flags {
   AI_ENABLED: boolean;
   COMPARE_ENABLED: boolean;
+  SAVINGS_ENABLED: boolean;
   DEMO_MODE: boolean;
 }
 
 export function flags(): Flags {
   const env = getEnv();
-  return { AI_ENABLED: env.ai.enabled, COMPARE_ENABLED: env.compareEnabled, DEMO_MODE: env.isDemo };
+  return {
+    AI_ENABLED: env.ai.enabled,
+    COMPARE_ENABLED: env.compareEnabled,
+    SAVINGS_ENABLED: env.savingsEnabled,
+    DEMO_MODE: env.isDemo,
+  };
 }

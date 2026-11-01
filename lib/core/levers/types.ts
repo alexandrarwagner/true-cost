@@ -4,15 +4,17 @@ import type { Cents, Confidence, Estimate, EstimateInput, Minor, SchoolFlags } f
 // A lever is a counterfactual: change one thing in the user's inputs, re-run the engine, show
 // the difference. Levers never add up; a combined figure is its own scenario (ADR 013).
 
-export type LeverId =
-  | "housing-oncampus"
-  | "roommates-1"
-  | "roommates-2"
-  | "lease-12-vs-9"
-  | "insurance-waiver"
-  | "transfers-fewer"
-  | "transfer-markup"
-  | "flights-fewer";
+export const LEVER_IDS = [
+  "housing-oncampus",
+  "roommates-1",
+  "roommates-2",
+  "lease-12-vs-9",
+  "insurance-waiver",
+  "transfers-fewer",
+  "transfer-markup",
+  "flights-fewer",
+] as const;
+export type LeverId = (typeof LEVER_IDS)[number];
 
 export interface LeverContext extends EstimateContext {
   schoolFlags?: SchoolFlags;

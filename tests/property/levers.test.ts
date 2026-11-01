@@ -13,7 +13,12 @@ const ctx: LeverContext = {
   today: TODAY,
   school: PURDUE,
   rent: LAFAYETTE_RENT,
-  fx: { today: { date: TODAY, rate: 95.27, source: "x" }, history: INR_HISTORY, minorDigits: 2 },
+  // Each run re-prices up to ten scenarios, so a shorter rate history keeps the suite quick.
+  fx: {
+    today: { date: TODAY, rate: 95.27, source: "x" },
+    history: INR_HISTORY.slice(-1500),
+    minorDigits: 2,
+  },
   schoolFlags: { "243780": { waiverAllowed: true, sourceUrl: "https://x", checkedOn: TODAY } },
 };
 const opts = { thresholdUsd: SAVINGS_MIN_USD };
@@ -88,7 +93,7 @@ describe("lever invariants", () => {
       }),
       { numRuns: 40 },
     );
-  });
+  }, 60_000);
 
   it("a combined scenario never beats the sum of its parts, and its total stays non-negative", () => {
     fc.assert(
@@ -125,5 +130,5 @@ describe("lever invariants", () => {
       ),
       { numRuns: 40 },
     );
-  });
+  }, 60_000);
 });

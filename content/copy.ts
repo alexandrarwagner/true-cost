@@ -154,6 +154,7 @@ export const copy = {
     insuranceSchool: "School plan",
     insuranceWaiver: "Waiver (I have my own cover)",
     insurancePremium: "Premium per year, if known (USD)",
+    insuranceOwnPremium: "What your own cover would cost per year, if known (USD)",
     tripsHome: "Trips home per year",
     oneWayFare: "One-way fare, if known (USD)",
     transfer: "How will you send money?",
@@ -293,6 +294,53 @@ export const copy = {
     rangeUnavailable: "Not available",
     fullResult: (name: string) => `Full breakdown for ${name}`,
     columnNote: (name: string, note: string) => `${name}: ${note}`,
+  },
+  savings: {
+    heading: "Ways to lower this number",
+    intro:
+      "Each one is worked out from your own inputs. Turn one on to see your total change. They overlap, so with several on we work out one new total rather than adding them up.",
+    tryIt: (title: string) => `Try it: ${title}`,
+    saving: (home: string, usd: string) => `could save about ${home} (${usd}) over your degree`,
+    savingUsd: (usd: string) => `could save about ${usd} over your degree`,
+    tip: "Worth checking",
+    showMore: (n: number) => `Show ${n} more`,
+    unavailable: (title: string) => `Not available while "${title}" is on.`,
+    nowLine: (now: string, was: string) =>
+      `With what you switched on, the total is ${now}, down from ${was}.`,
+    announce: (now: string, was: string) => `Total now ${now}, was ${was}.`,
+    titles: {
+      "housing-oncampus": "Live on campus",
+      "roommates-1": "Share with one roommate",
+      "roommates-2": "Share with two roommates",
+      "lease-12-vs-9": "Skip rent over the summer",
+      "insurance-waiver": "Use your own health cover",
+      "transfers-fewer": "Send money once a semester",
+      "transfer-markup": "Compare your transfer markup",
+      "flights-fewer": "One fewer trip home a year",
+    } as Record<string, string>,
+    waiverCheckTitle: "Check whether your school lets you waive its health plan",
+    notes: {
+      housing_oncampus: "Room and meals on campus, using the school's published figure.",
+      roommates_1: "The area's rent for the same place, split two ways.",
+      roommates_2: "The area's rent for the same place, split three ways.",
+      lease_12_vs_9:
+        "If you can find a 9- or 10-month lease, or someone to sublet to over the summer. Not every landlord offers one.",
+      insurance_waiver_unknown:
+        "Some schools accept your own cover if it meets their rules. We don't know this school's policy yet.",
+      insurance_waiver_enter_premium:
+        'This school allows waivers. Enter what your own cover costs, under "Make it more accurate", to see the figure.',
+      insurance_waiver_figure: "This school allows waivers. Based on the premium you entered.",
+      transfers_fewer:
+        "Fewer transfers means fewer fixed fees. You'd hold more money at once, which is a trade-off.",
+      flights_fewer: "If you're able to. Fares here are estimates.",
+    } as Record<string, string>,
+    markupNote: (yours: string, reference: string) =>
+      `You're paying ${yours}% over the mid-market rate. Some services charge about ${reference}%. We don't recommend any provider.`,
+    uncertainty: {
+      heading: "Reduce the uncertainty",
+      body: (band: string) =>
+        `Paying from a US dollar account doesn't lower the total, but it removes the exchange-rate range: ${band} becomes one figure. Some transfer services offer fixed-rate scheduled payments.`,
+    },
   },
   privacy: {
     title: "Privacy",

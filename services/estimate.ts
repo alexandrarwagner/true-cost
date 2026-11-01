@@ -7,7 +7,10 @@ import type { Cents, Estimate, EstimateInput, Source } from "@/lib/core/types";
 import type { EstimateRequest } from "@/lib/schema/estimate";
 import { encodeShare } from "@/lib/schema/share";
 import { ValidationError } from "@/lib/server/errors";
+import { getEnv } from "@/lib/server/env";
 import { log } from "@/lib/server/log";
+import { schoolFlags } from "@/lib/server/schoolFlags";
+import { withSavings, type SavingsResult } from "./levers";
 
 export type DegradedSource = "school" | "rent" | "fx_today" | "fx_history";
 
@@ -25,6 +28,8 @@ export interface EstimateResponse {
   degraded: DegradedSource[];
   generatedAt: string;
   shareQuery: string;
+  /** Present when SAVINGS_ENABLED. The estimate above already has `savings.active` applied. */
+  savings?: SavingsResult;
 }
 
 const SOURCE_TIMEOUT_MS = 5000;
@@ -57,6 +62,7 @@ export function toEstimateInput(req: EstimateRequest, today: string): EstimateIn
             insurance: {
               kind: o.insurance.kind,
               premiumPerYearUsd: money(o.insurance.premiumPerYear),
+              ownPremiumPerYearUsd: money(o.insurance.ownPremiumPerYear),
             },
           }
         : {}),
@@ -71,6 +77,7 @@ export function toEstimateInput(req: EstimateRequest, today: string): EstimateIn
       ...(o.transfer
         ? { transfer: { markupBps: o.transfer.markupBps, fixedFeeUsd: usd(o.transfer.fixedFee) } }
         : {}),
+      ...(o.transferCadence !== undefined ? { transferCadence: o.transferCadence } : {}),
       ...(o.payFromUsd !== undefined ? { payFromUsd: o.payFromUsd } : {}),
       ...(o.dependants !== undefined ? { dependants: o.dependants } : {}),
       ...(o.enrolmentDeposit !== undefined ? { enrolmentDepositUsd: usd(o.enrolmentDeposit) } : {}),
@@ -129,7 +136,9 @@ export async function runEstimate(
     ...(rentData ? { rent: rentData } : {}),
     ...(todayRate ? { fx: { today: todayRate, history, minorDigits: cur.minorDigits } } : {}),
   };
-  const estimate = computeEstimate(toEstimateInput(req, today), ctx);
+  const input = toEstimateInput(req, today);
+  const saved = getEnv().savingsEnabled ? withSavings(input, ctx, req.levers, schoolFlags()) : null;
+  const estimate = saved ? saved.estimate : computeEstimate(input, ctx);
 
   log.info("estimate", {
     ms: Date.now() - started,
@@ -150,6 +159,7 @@ export async function runEstimate(
     demo: sources.demo,
     degraded,
     generatedAt: now.toISOString(),
-    shareQuery: encodeShare(req).toString(),
+    shareQuery: encodeShare(saved ? { ...req, levers: saved.savings.active } : req).toString(),
+    ...(saved ? { savings: saved.savings } : {}),
   };
 }

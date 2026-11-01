@@ -22,6 +22,11 @@ const RawEnvSchema = z.object({
   DEMO_MODE: flag(false),
   AI_ENABLED: flag(true),
   COMPARE_ENABLED: flag(false),
+  // Unset means "follow DEMO_MODE": on for previews, off in production until the copy is reviewed.
+  SAVINGS_ENABLED: z
+    .enum(["true", "false", "1", "0"])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true" || v === "1")),
 
   DATA_GOV_API_KEY: optionalString,
   HUD_API_TOKEN: optionalString,
@@ -46,6 +51,7 @@ export interface AppEnv {
   isDemo: boolean;
   logLevel: RawEnv["LOG_LEVEL"];
   compareEnabled: boolean;
+  savingsEnabled: boolean;
   scorecard: { enabled: boolean; apiKey?: string };
   hud: { token?: string };
   ai: { enabled: boolean; apiKey?: string; model: string };
@@ -108,6 +114,7 @@ function buildEnv(raw: RawEnv): AppEnv {
     isDemo,
     logLevel: raw.LOG_LEVEL,
     compareEnabled: raw.COMPARE_ENABLED,
+    savingsEnabled: raw.SAVINGS_ENABLED ?? isDemo,
     scorecard: { enabled: scorecardConfigured || isDemo, apiKey: raw.DATA_GOV_API_KEY },
     hud: { token: raw.HUD_API_TOKEN },
     ai: {

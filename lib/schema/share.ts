@@ -44,6 +44,7 @@ export function encodeShare(req: EstimateRequest): URLSearchParams {
   p.set("sy", String(req.startTerm.year));
   p.set("ss", req.startTerm.season);
   if (Object.keys(req.options).length > 0) p.set("o", JSON.stringify(req.options));
+  if (req.levers.length > 0) p.set("lv", req.levers.join(","));
   return p;
 }
 
@@ -64,6 +65,7 @@ export function decodeShare(params: URLSearchParams): EstimateRequest | null {
     degreeYears: Number(params.get("y")),
     startTerm: { year: Number(params.get("sy")), season: params.get("ss") ?? "" },
     options,
+    levers: (params.get("lv") ?? "").split(",").filter(Boolean),
   };
   const parsed = EstimateRequestSchema.safeParse(candidate);
   return parsed.success ? parsed.data : null;

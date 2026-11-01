@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { copy } from "@/content/copy";
 import { ApiErrorSchema } from "@/lib/schema/api";
+import type { LeverId } from "@/lib/core/levers";
 import type { CompareRequest, CompareSchool } from "@/lib/schema/compare";
 import type { EstimateRequest } from "@/lib/schema/estimate";
 import type { CompareResponse } from "@/services/compare";
@@ -12,27 +13,37 @@ import { CompareView } from "./CompareView";
 import { InputForm } from "./InputForm";
 import { ResultView } from "./ResultView";
 
-type Result =
+export type FlowResult =
   { kind: "single"; data: EstimateResponse } | { kind: "compare"; data: CompareResponse };
+type Result = FlowResult;
 
 export function EstimateFlow({
   initial,
   initialExtras,
+  initialResult,
   aiEnabled,
   compareEnabled,
 }: {
   initial: EstimateRequest | null;
   initialExtras: CompareSchool[];
+  /** The shared link's result, computed on the server, so a reload shows it at once. */
+  initialResult: FlowResult | null;
   aiEnabled: boolean;
   compareEnabled: boolean;
 }) {
   const [botToken, setBotToken] = useState<string | undefined>(undefined);
-  const [result, setResult] = useState<Result | null>(null);
+  const [result, setResult] = useState<Result | null>(initialResult);
+  const [lastReq, setLastReq] = useState<EstimateRequest | null>(initial);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  async function post(path: string, body: EstimateRequest | CompareRequest, kind: Result["kind"]) {
+  async function post(
+    path: string,
+    body: EstimateRequest | CompareRequest,
+    kind: Result["kind"],
+    focus = true,
+  ) {
     setSubmitting(true);
     setError(null);
     try {
@@ -52,8 +63,9 @@ export function EstimateFlow({
           ? { kind, data: json as EstimateResponse }
           : { kind, data: json as CompareResponse };
       setResult(next);
+      if (kind === "single") setLastReq(body as EstimateRequest);
       window.history.replaceState(null, "", `/?${next.data.shareQuery}`);
-      requestAnimationFrame(() => resultRef.current?.focus());
+      if (focus) requestAnimationFrame(() => resultRef.current?.focus());
     } catch {
       setError(copy.errors.DATA_UNAVAILABLE);
     } finally {
@@ -76,9 +88,18 @@ export function EstimateFlow({
       />
       {aiEnabled && <BotCheck onToken={setBotToken} />}
       {result && (
-        <div ref={resultRef} tabIndex={-1} className="mt-10 focus:outline-none" aria-live="polite">
+        <div ref={resultRef} tabIndex={-1} className="mt-10 focus:outline-none">
           {result.kind === "single" ? (
-            <ResultView response={result.data} aiEnabled={aiEnabled} botToken={botToken} />
+            <ResultView
+              response={result.data}
+              aiEnabled={aiEnabled}
+              botToken={botToken}
+              busy={submitting}
+              onToggleLevers={(ids: LeverId[]) => {
+                if (lastReq)
+                  void post("/api/estimate", { ...lastReq, levers: ids }, "single", false);
+              }}
+            />
           ) : (
             <CompareView response={result.data} aiEnabled={aiEnabled} botToken={botToken} />
           )}

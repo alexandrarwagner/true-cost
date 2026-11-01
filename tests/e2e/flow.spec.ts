@@ -221,3 +221,68 @@ test.describe("Compare schools (COMPARE_ENABLED)", () => {
     await ctx.close();
   });
 });
+
+test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", () => {
+  // Each toggle is another estimate call. With every test sharing one address, the suite sits
+  // right at the general tier's 30 a minute, so these tests get their own bucket.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.98.${process.pid % 250}.${n}` });
+  });
+
+  test("two levers switched on drop the total, update the URL, survive a reload, and pass axe", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page.getByText("Make it more accurate").click();
+    await page.getByLabel("Off campus").check();
+    await page.getByLabel("12-month lease (rent due over the summer)").check();
+    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await expect(page.getByRole("heading", { name: "Ways to lower this number" })).toBeVisible();
+    const total = page.getByText(/in total over the programme\./).first();
+    const before = (await total.textContent()) ?? "";
+
+    await page.getByRole("switch", { name: "Try it: Share with two roommates" }).check();
+    await expect(page.getByRole("status").filter({ hasText: /down from/ })).toBeVisible();
+    await expect(page).toHaveURL(/lv=roommates-2/);
+    await page.getByRole("switch", { name: "Try it: Skip rent over the summer" }).check();
+    await expect(page).toHaveURL(/lv=roommates-2%2Clease-12-vs-9/);
+    const after = (await total.textContent()) ?? "";
+    const dollars = (s: string) => Number((s.match(/\$([\d,]+)/)?.[1] ?? "0").replace(/,/g, ""));
+    expect(dollars(after)).toBeLessThan(dollars(before));
+    await expect(page.getByRole("switch", { name: "Try it: Live on campus" })).toBeDisabled();
+
+    await page.reload();
+    await expect(
+      page.getByRole("switch", { name: "Try it: Share with two roommates" }),
+    ).toBeChecked();
+    await expect(
+      page.getByRole("switch", { name: "Try it: Skip rent over the summer" }),
+    ).toBeChecked();
+    await expect(page.getByText(/in total over the programme\./).first()).toHaveText(after);
+
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
+      .analyze();
+    const serious = axe.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(serious, JSON.stringify(serious, null, 2)).toEqual([]);
+  });
+
+  test("the shared page offers the levers as links that work without JavaScript", async ({
+    browser,
+  }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto(
+      "/r?c=IN&cur=INR&s=243780&sn=Purdue+University-Main+Campus&sc=West+Lafayette&st=IN&sz=47907&t=28794&ts=school&y=2&sy=2027&ss=fall",
+    );
+    await expect(page.getByRole("heading", { name: "Ways to lower this number" })).toBeVisible();
+    await expect(page.getByText("Reduce the uncertainty")).toBeVisible();
+    await page.getByRole("link", { name: "Try it: One fewer trip home a year" }).click();
+    await expect(page).toHaveURL(/lv=flights-fewer/);
+    await expect(page.getByText(/down from/).first()).toBeVisible();
+    await ctx.close();
+  });
+});

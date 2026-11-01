@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { COUNTRIES } from "@/data/countries";
+import { LEVER_IDS } from "@/lib/core/levers";
 
 // The /api/estimate request. Money arrives in whole dollars from the form and is converted
 // to cents at the service boundary. Unknown keys are rejected: the body is untrusted.
@@ -29,6 +30,7 @@ export const OptionsSchema = z.strictObject({
     .strictObject({
       kind: z.enum(["school_plan", "waiver"]),
       premiumPerYear: dollars(30_000).optional(),
+      ownPremiumPerYear: dollars(30_000).optional(),
     })
     .optional(),
   flights: z
@@ -40,6 +42,7 @@ export const OptionsSchema = z.strictObject({
   transfer: z
     .strictObject({ markupBps: z.number().int().min(0).max(2_000), fixedFee: dollars(500) })
     .optional(),
+  transferCadence: z.enum(["monthly", "semester"]).optional(),
   payFromUsd: z.boolean().optional(),
   dependants: z.number().int().min(0).max(6).optional(),
   enrolmentDeposit: dollars(50_000).optional(),
@@ -66,6 +69,8 @@ export const EstimateRequestSchema = z.strictObject({
     season: z.enum(["fall", "spring"]),
   }),
   options: OptionsSchema.default({}),
+  /** Savings levers switched on (step 3). Unknown or inapplicable ids are ignored server-side. */
+  levers: z.array(z.enum(LEVER_IDS)).max(LEVER_IDS.length).default([]),
 });
 export type EstimateRequest = z.infer<typeof EstimateRequestSchema>;
 export type EstimateRequestInput = z.input<typeof EstimateRequestSchema>;

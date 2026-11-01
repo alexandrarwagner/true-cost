@@ -42,6 +42,14 @@ export function Headline({ response }: { response: EstimateResponse }) {
         </>
       )}
       <p className="mt-2">{copy.result.headlineUsd(usdFmt(e.totals.total))}</p>
+      {response.savings && response.savings.active.length > 0 && (
+        <p className="mt-1 text-sm text-neutral-700">
+          {copy.savings.nowLine(
+            usdFmt(e.totals.total),
+            usdFmt(response.savings.baselineTotals.total),
+          )}
+        </p>
+      )}
       <p className="mt-1 font-medium">{copy.result.hidden(e.totals.hiddenPercentOfTuition)}</p>
       {today && !isUsd && (
         <p className="mt-2 text-sm text-neutral-700">
