@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { copy } from "@/content/copy";
+import { Wordmark } from "./Wordmark";
 
 /** Wordmark, the methodology link and the call to action. Sticky, so it stays reachable. */
 export function SiteHeader() {
@@ -7,8 +8,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-page/85 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
-          {copy.siteName}
+        <Link href="/" aria-label={copy.siteName}>
+          <Wordmark />
         </Link>
         <nav aria-label={t.nav}>
           <ul className="flex items-center gap-4">

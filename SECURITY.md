@@ -1,6 +1,6 @@
 # Security
 
-True Cost is a public app that holds paid API keys and receives untrusted pasted text from
+Tuition+ is a public app that holds paid API keys and receives untrusted pasted text from
 families planning a large spend. This document describes how it is protected and how to
 report a problem.
 

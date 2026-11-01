@@ -4,7 +4,7 @@
 import type { ErrorCode } from "@/lib/schema/api";
 
 export const copy = {
-  siteName: "True Cost",
+  siteName: "Tuition+",
   tagline: "What studying in the US will really cost you, in your own money.",
   shell: {
     nav: "Site",
@@ -20,7 +20,7 @@ export const copy = {
     PAYLOAD_TOO_LARGE: "That's more text than we can take at once. Try a shorter version.",
     RATE_LIMITED:
       "You've made a lot of requests in a short time. Please wait a minute and try again.",
-    FORBIDDEN_ORIGIN: "This request didn't come from the True Cost site.",
+    FORBIDDEN_ORIGIN: "This request didn't come from the Tuition+ site.",
     DATA_UNAVAILABLE:
       "One of our data sources isn't answering right now. Please try again in a moment.",
     FEATURE_OFF: "That feature is switched off right now.",

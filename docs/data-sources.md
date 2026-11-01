@@ -1,6 +1,6 @@
 # Data sources
 
-Every figure in True Cost comes from one of these, a hand-curated constant with a source and
+Every figure in Tuition+ comes from one of these, a hand-curated constant with a source and
 date, or the user. Verified on 29 October 2026 by calling each service; re-verify before launch.
 
 | Data                                                        | Source                                                                            | Access                                                                                                                                    | Refresh                                                       | Licence / terms                                                                              |

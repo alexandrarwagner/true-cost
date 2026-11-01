@@ -1,4 +1,4 @@
-# True Cost
+# Tuition+
 
 An international student enters three things, where they're from, which US school, and the
 tuition on their offer, and sees what the degree will really cost in their own currency: every

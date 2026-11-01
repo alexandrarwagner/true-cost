@@ -1,5 +1,5 @@
 # Gitleaks config. Extends the default ruleset; allowlists only files that hold names, not values.
-title = "true-cost"
+title = "tuition-plus"
 
 [extend]
 useDefault = true

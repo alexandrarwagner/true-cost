@@ -14,7 +14,7 @@ async function threeInputs(page: Page) {
   await expect(page.getByLabel("Years", { exact: true })).toHaveValue("2");
 }
 
-test.describe("True Cost flow (DEMO_MODE)", () => {
+test.describe("Tuition+ flow (DEMO_MODE)", () => {
   test("three inputs to a result, with the unfold, range, timeline and sources, and no serious a11y issues", async ({
     page,
   }) => {

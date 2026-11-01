@@ -39,7 +39,7 @@ const ICE_I901: Source = {
 const ESTIMATE: Source = {
   id: "constants",
   kind: "estimate",
-  name: "True Cost estimate, pending review",
+  name: "Tuition+ estimate, pending review",
   date: CHECKED,
 };
 
