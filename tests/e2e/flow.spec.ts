@@ -5,7 +5,7 @@ async function threeInputs(page: Page) {
   await page.goto("/");
   await page.getByLabel("I'm from").selectOption("IN");
   await page.getByLabel("My school").fill("purdue");
-  await page.getByRole("button", { name: /Purdue University-Main Campus/ }).click();
+  await page.getByRole("option", { name: /Purdue University-Main Campus/ }).click();
   await expect(page.getByLabel("Tuition per year")).toHaveValue("28794");
   // Purdue's predominant degree pre-fills four years; two taps make it a master's.
   await expect(page.getByLabel("Years", { exact: true })).toHaveValue("4");
@@ -23,7 +23,9 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
 
     await expect(page.getByRole("heading", { name: "Tuition is where it starts." })).toBeVisible();
     await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
-    await expect(page.getByText(/Your degree could cost between/)).toBeVisible();
+    await expect(
+      page.getByText(/In 8 of 10 past periods, your degree would have cost between/),
+    ).toBeVisible();
     await expect(page.getByText(/Hidden costs: \d+% on top of tuition/)).toBeVisible();
     await expect(page.getByText("Demo data", { exact: true })).toBeVisible();
     // The result nav takes over the header, with the section in view marked current.
@@ -34,9 +36,7 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
       "true",
     );
     await expect(nav.getByRole("link", { name: "Exchange rate" })).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "What the exchange rate could do to this" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "If the rupee moves." })).toBeVisible();
     await expect(page.getByText("This isn't a prediction", { exact: false }).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: "When the money is needed" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Where each number comes from" })).toBeVisible();
@@ -79,7 +79,9 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
       "/r?c=IN&cur=INR&s=243780&sn=Purdue+University-Main+Campus&sc=West+Lafayette&st=IN&sz=47907&t=28794&ts=school&y=2&sy=2027&ss=fall",
     );
     await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
-    await expect(page.getByText(/Your degree could cost between/)).toBeVisible();
+    await expect(
+      page.getByText(/In 8 of 10 past periods, your degree would have cost between/),
+    ).toBeVisible();
     await expect(page.getByText("The same range as a table")).toBeVisible();
     await expect(page.getByRole("link", { name: "Edit the inputs" })).toBeVisible();
     await ctx.close();
@@ -99,7 +101,7 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
     await page.keyboard.press("Tab");
     await expect(page.getByLabel("I'm from")).toBeFocused();
     await page.getByLabel("My school").fill("purdue");
-    await page.getByRole("button", { name: /Purdue University-Main Campus/ }).click();
+    await page.getByRole("option", { name: /Purdue University-Main Campus/ }).click();
     await page.getByLabel("Tuition per year").fill("30000");
     // Years can no longer be empty, so test the school-required path.
     await page.getByRole("button", { name: "Change" }).click();
@@ -155,7 +157,7 @@ test.describe("AI features (DEMO_MODE mock)", () => {
     await page.getByLabel("My school").fill("nyu");
     await expect(page.getByText("No schools found. Try a different spelling.")).toBeVisible();
     await page.getByRole("button", { name: "Try a smarter search" }).click();
-    await page.getByRole("button", { name: /New York University/ }).click();
+    await page.getByRole("option", { name: /New York University/ }).click();
     await expect(page.getByLabel(/Tuition per year/)).not.toHaveValue("");
   });
 });
@@ -186,6 +188,56 @@ test.describe("motion and print", () => {
       page.getByRole("columnheader", { name: "Worst 10% of past periods" }),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
+  });
+});
+
+test.describe("where the money goes and the deals grid", () => {
+  // Own rate-limit bucket: the suite as a whole sits near the general tier's 30 calls a minute.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.95.${process.pid % 250}.${n}` });
+  });
+
+  test("the shares list toggles to labelled circles, and deals filter by category", async ({
+    page,
+  }) => {
+    await threeInputs(page);
+    await page.getByRole("button", { name: "Show me" }).click();
+    const shares = page.locator("#where");
+    await expect(shares.getByRole("heading", { name: "Where the money goes." })).toBeVisible();
+    await expect(shares.getByText(/% of the total/).first()).toBeVisible();
+    await shares.getByRole("button", { name: "See as chart" }).click();
+    await expect(
+      shares.getByRole("img", { name: /Shares of the total: Tuition \d+%/ }),
+    ).toBeVisible();
+    await expect(shares.getByRole("button", { name: "See as list" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    // Deals sit in their own grid, with the check date and the source opening in a new tab.
+    const deals = page.locator("#save");
+    await expect(deals.getByRole("heading", { name: "Student deals" })).toBeVisible();
+    await expect(deals.getByText(/^Checked \w+ 2026 · No paid listings$/)).toBeVisible();
+    await expect(
+      deals.getByRole("link", { name: /Source \(opens in a new tab\)/ }).first(),
+    ).toHaveAttribute("target", "_blank");
+    await expect(
+      page.getByRole("switch", { name: "Try it: Spotify Premium Student" }),
+    ).toBeVisible();
+  });
+
+  test("the school field is a combobox that works from the keyboard", async ({ page }) => {
+    await page.goto("/");
+    const box = page.getByRole("combobox", { name: "My school" });
+    await box.fill("purdue");
+    await expect(page.getByRole("option", { name: /Purdue University-Main Campus/ })).toBeVisible();
+    await box.press("ArrowDown");
+    await box.press("Enter");
+    await expect(
+      page.locator("#estimate").getByText("Purdue University-Main Campus"),
+    ).toBeVisible();
+    await expect(page.getByLabel("Tuition per year")).toHaveValue("28794");
   });
 });
 
@@ -275,13 +327,20 @@ test.describe("page shell", () => {
 });
 
 test.describe("Compare schools (COMPARE_ENABLED)", () => {
+  // Own rate-limit bucket: the suite as a whole sits near the general tier's 30 calls a minute.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.96.${process.pid % 250}.${n}` });
+  });
+
   test("a second school gives a side-by-side table, a comparison link and the first school's full result", async ({
     page,
   }) => {
     await threeInputs(page);
     await page.getByRole("button", { name: "Add a school to compare" }).click();
     await page.getByLabel("School 2", { exact: true }).fill("new york");
-    await page.getByRole("button", { name: /^New York University/ }).click();
+    await page.getByRole("option", { name: /^New York University/ }).click();
     await expect(page.getByLabel(/Tuition per year at school 2/)).toHaveValue("65622");
     await page.getByRole("button", { name: "Show me" }).click();
 

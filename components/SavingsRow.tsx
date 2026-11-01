@@ -3,7 +3,6 @@ import { TRANSFER_DEFAULT, TRANSFER_REFERENCE } from "@/data/constants";
 import type { LeverId, RankedLever } from "@/lib/core/levers";
 import type { EstimateResponse } from "@/services/estimate";
 import { homeShort, usdFmt } from "@/lib/ui/format";
-import { DealRow } from "./DealRow";
 import { LeverSwitch } from "./LeverSwitch";
 
 interface Props {
@@ -18,8 +17,7 @@ interface Props {
   toggleHref: string;
 }
 
-const badge =
-  "inline-block border border-neutral-900 px-1.5 py-0.5 text-xs uppercase tracking-wide";
+const badge = "inline-block rounded-pill border border-line-strong px-2 py-0.5 text-xs";
 
 export function SavingsRow({ lever, response, on, blockedBy, busy, onToggle, toggleHref }: Props) {
   const t = copy.savings;
@@ -35,32 +33,28 @@ export function SavingsRow({ lever, response, on, blockedBy, busy, onToggle, tog
         )
       : (t.notes[lever.noteId] ?? "");
   const noteId = `lever-${lever.id}-note`;
-  const name = lever.deal?.title ?? title ?? lever.id;
+  const name = title ?? lever.id;
   return (
-    <li className="border-t border-neutral-300 py-3">
+    <li className="border-t border-line py-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-6">
-        {lever.deal ? (
-          <DealRow lever={lever} deal={lever.deal} response={response} noteId={noteId} />
-        ) : (
-          <div className="min-w-0 flex-1">
-            <p className="font-medium">{title}</p>
-            {lever.hasFigure ? (
-              <p>
-                {lever.savingHome !== undefined
-                  ? t.saving(homeShort(lever.savingHome, cur), usdFmt(lever.savingUsd))
-                  : t.savingUsd(usdFmt(lever.savingUsd))}
-              </p>
-            ) : (
-              <p className="text-neutral-700">{t.tip}</p>
-            )}
-            <p id={noteId} className="mt-1 text-sm text-neutral-700">
-              {note}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium">{title}</p>
+          {lever.hasFigure ? (
+            <p>
+              {lever.savingHome !== undefined
+                ? t.saving(homeShort(lever.savingHome, cur), usdFmt(lever.savingUsd))
+                : t.savingUsd(usdFmt(lever.savingUsd))}
             </p>
-            <p className="mt-1">
-              <span className={badge}>{copy.confidence[lever.confidence]}</span>
-            </p>
-          </div>
-        )}
+          ) : (
+            <p className="text-muted">{t.tip}</p>
+          )}
+          <p id={noteId} className="mt-1 text-sm text-muted">
+            {note}
+          </p>
+          <p className="mt-1">
+            <span className={badge}>{copy.confidence[lever.confidence]}</span>
+          </p>
+        </div>
         {lever.hasFigure && (
           <div className="shrink-0">
             {onToggle ? (
@@ -78,7 +72,7 @@ export function SavingsRow({ lever, response, on, blockedBy, busy, onToggle, tog
               </a>
             )}
             {blockedBy && (
-              <p className="mt-1 text-sm text-neutral-700">
+              <p className="mt-1 text-sm text-muted">
                 {t.unavailable(t.titles[blockedBy] ?? blockedBy)}
               </p>
             )}

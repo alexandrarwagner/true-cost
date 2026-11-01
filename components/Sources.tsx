@@ -51,6 +51,7 @@ export function Sources({ response }: { response: EstimateResponse }) {
                           rel="noopener noreferrer"
                         >
                           source
+                          <span className="sr-only"> ({copy.opensInNewTab})</span>
                         </a>
                         )
                       </>

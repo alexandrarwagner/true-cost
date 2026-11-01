@@ -9,6 +9,7 @@ import { RangeSection } from "./RangeSection";
 import { ResultNav } from "./ResultNav";
 import { Savings } from "./Savings";
 import { ShareBar } from "./ShareBar";
+import { Shares } from "./Shares";
 import { Sources } from "./Sources";
 import { Timeline } from "./Timeline";
 import { Tree } from "./Tree";
@@ -68,9 +69,10 @@ export function ResultView({
           onChange={onCustomCosts}
         />
       )}
-      <Explanation response={response} aiEnabled={aiEnabled} botToken={botToken} />
+      <Shares response={response} />
       <RangeSection response={response} />
       <Savings response={response} onToggle={onToggleLevers} busy={busy} />
+      <Explanation response={response} aiEnabled={aiEnabled} botToken={botToken} />
       <Timeline response={response} />
       <Sources response={response} />
       <ShareBar shareQuery={shareQuery} />

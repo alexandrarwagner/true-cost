@@ -6,6 +6,7 @@ import type { ErrorCode } from "@/lib/schema/api";
 export const copy = {
   siteName: "Tuition+",
   tagline: "What studying in the US will really cost you, in your own money.",
+  opensInNewTab: "opens in a new tab",
   shell: {
     nav: "Site",
     skip: "Skip to main content",
@@ -143,10 +144,42 @@ export const copy = {
     max: "You can add up to ten.",
     list: "Costs you added",
   },
+  shares: {
+    heading: "Where the money goes.",
+    intro: "Each cost's share of your total. Same inputs, same numbers.",
+    seeChart: "See as chart",
+    seeList: "See as list",
+    share: (pct: number) => `${pct}% of the total`,
+    chartLabel: (parts: string) => `Shares of the total: ${parts}.`,
+  },
   fx: {
+    heading: (currency: string) => `If the ${currency} moves.`,
+    currencyNames: {
+      INR: "rupee",
+      CNY: "yuan",
+      KRW: "won",
+      CAD: "Canadian dollar",
+      VND: "dong",
+      NPR: "Nepalese rupee",
+      TWD: "Taiwan dollar",
+      NGN: "naira",
+      BDT: "taka",
+      BRL: "real",
+    } as Record<string, string>,
+    chartTitle: (currency: string) => `What you'll have spent, in ${currency}`,
+    legend: {
+      today: "At today's rate",
+      band: "Middle 80% of past periods",
+      worst: "Worst tenth of past periods",
+    },
+    keepAside: (amount: string) =>
+      `Keeping about ${amount} aside would have covered 9 in 10 past periods.`,
+    method: (years: number, from: string, n: number) =>
+      `Not a prediction. This replays every ${years}-year period since ${from} (${n} of them) on your payments, starting from today's rate. Rates from Frankfurter, the European Central Bank's reference rates.`,
     notPrediction:
       "This isn't a prediction. It shows what happened in the past to families paying over the same length of time.",
-    rangeLine: (low: string, high: string) => `Your degree could cost between ${low} and ${high}.`,
+    rangeLine: (low: string, high: string) =>
+      `In 8 of 10 past periods, your degree would have cost between ${low} and ${high}.`,
     likePeriod: (start: string, end: string) =>
       `if the next period moves like ${start} to ${end} did`,
     whatYouCanDo:
@@ -418,7 +451,25 @@ export const copy = {
     } as Record<string, string>,
     markupNote: (yours: string, reference: string) =>
       `You're paying ${yours}% over the mid-market rate. Some services charge about ${reference}%. We don't recommend any provider.`,
+    tipsHeading: "Saving tips",
+    tipsIntro: "Worked out from your own inputs, plus student deals a person has checked.",
     deals: {
+      heading: "Student deals",
+      filterAll: "All",
+      filterLabel: "Filter deals by category",
+      checkedLine: (monthYear: string) => `Checked ${monthYear} · No paid listings`,
+      categories: {
+        transport: "Getting around",
+        fitness: "Fitness",
+        culture: "Museums and culture",
+        software: "Software",
+        subscriptions: "Subscriptions",
+        phone: "Phone",
+        food: "Food and coffee",
+        other: "Other",
+      } as Record<string, string>,
+      none: "No deals in this category yet.",
+      free: "Free",
       label: "Student deal",
       scope: {
         school: (school: string) => `For ${school} students`,
