@@ -10,6 +10,7 @@ const feeOf = (i: Parameters<Lever["applies"]>[0]) =>
 /** Batch monthly living costs into one transfer per semester: fewer fixed fees, same markup. */
 export const transfersFewer: Lever = {
   id: "transfers-fewer",
+  kind: "lever",
   excludes: [],
   applies: (i) =>
     i.options.payFromUsd !== true && feeOf(i) > 0 && i.options.transferCadence !== "semester",
@@ -22,6 +23,7 @@ export const transfersFewer: Lever = {
 /** Bring the markup down to the reference value. Names no provider. */
 export const transferMarkup: Lever = {
   id: "transfer-markup",
+  kind: "lever",
   excludes: [],
   applies: (i) => i.options.payFromUsd !== true && markupOf(i) > TRANSFER_REFERENCE.markupBps,
   hasFigure: () => true,
@@ -39,6 +41,7 @@ export const transferMarkup: Lever = {
  */
 export const insuranceWaiver: Lever = {
   id: "insurance-waiver",
+  kind: "lever",
   excludes: [],
   applies: (i) => i.options.insurance?.kind !== "waiver",
   hasFigure: (i, ctx) =>

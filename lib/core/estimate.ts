@@ -1,5 +1,6 @@
-import { ACADEMIC_MONTHS_PER_YEAR, SEMESTERS_PER_YEAR, SUMMER_MONTHS_PER_YEAR } from "./calendar";
+import { occurrencesOverDegree } from "./calendar";
 import { buildLineItems, type CostModelData } from "./costModel";
+import { applyDeductions } from "./deductions";
 import { replay } from "./fxReplay";
 import { addCents, mulCents } from "./money";
 import { buildSchedule, transferOptionsFor } from "./schedule";
@@ -26,22 +27,7 @@ export interface EstimateContext extends CostModelData {
   };
 }
 
-export function occurrencesOverDegree(item: LineItem, years: number): number {
-  const scope = item.yearScope ?? "all";
-  const yearsInScope = scope === "all" ? years : scope === "final" ? 1 : Math.max(0, years - 1);
-  switch (item.frequency) {
-    case "one_off":
-      return 1;
-    case "per_year":
-      return yearsInScope;
-    case "per_semester":
-      return yearsInScope * SEMESTERS_PER_YEAR;
-    case "per_month":
-      return item.billing === "summer"
-        ? yearsInScope * SUMMER_MONTHS_PER_YEAR
-        : yearsInScope * ACADEMIC_MONTHS_PER_YEAR;
-  }
-}
+export { occurrencesOverDegree };
 
 export function degreeTotal(item: LineItem, years: number): Cents {
   if (item.riskOnly || item.timingOnly) return 0 as Cents;
@@ -81,7 +67,8 @@ function uniqueSources(items: LineItem[], extra: Source[]): Source[] {
 
 export function computeEstimate(input: EstimateInput, ctx: EstimateContext): Estimate {
   const payFromUsd = input.options.payFromUsd === true;
-  const model = buildLineItems(input, { school: ctx.school, rent: ctx.rent }, ctx.today);
+  const built = buildLineItems(input, { school: ctx.school, rent: ctx.rent }, ctx.today);
+  const model = { ...built, items: applyDeductions(built.items, input) };
   const schedule = buildSchedule(model.items, input, {
     transfer: transferOptionsFor(input),
     payFromUsd,

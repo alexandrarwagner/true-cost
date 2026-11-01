@@ -4,6 +4,7 @@ import type { Lever } from "./types";
 /** Switch to the school's published room and meals. Not offered to families. */
 export const housingOnCampus: Lever = {
   id: "housing-oncampus",
+  kind: "lever",
   excludes: ["roommates-1", "roommates-2", "lease-12-vs-9"],
   applies: (i, ctx) =>
     housingOf(i).kind === "off_campus" &&
@@ -19,6 +20,7 @@ export const housingOnCampus: Lever = {
 function roommates(n: 1 | 2): Lever {
   return {
     id: n === 1 ? "roommates-1" : "roommates-2",
+    kind: "lever",
     excludes: ["housing-oncampus"],
     applies: (i) => {
       const h = housingOf(i);
@@ -36,6 +38,7 @@ export const roommates2 = roommates(2);
 /** Drop the summer and overlap rent of a 12-month lease, if a shorter one can be found. */
 export const lease12vs9: Lever = {
   id: "lease-12-vs-9",
+  kind: "lever",
   excludes: ["housing-oncampus"],
   applies: (i) => housingOf(i).kind === "off_campus" && housingOf(i).twelveMonthLease === true,
   hasFigure: () => true,

@@ -253,14 +253,29 @@ test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", (
     expect(dollars(after)).toBeLessThan(dollars(before));
     await expect(page.getByRole("switch", { name: "Try it: Live on campus" })).toBeDisabled();
 
+    // A national student deal ranks in the same list (here behind "Show more", since its figure
+    // is small), with its provenance, and toggles too.
+    const showMore = page.getByText(/^Show \d+ more$/);
+    await showMore.click();
+    const deal = page.getByRole("switch", { name: "Try it: Spotify Premium Student" });
+    await expect(page.getByText("Checked on Oct 31, 2026").first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "This deal ended" }).first()).toHaveAttribute(
+      "href",
+      /spotify-premium-student/,
+    );
+    await deal.check();
+    await expect(page).toHaveURL(/deal%3Aspotify-premium-student/);
+
     await page.reload();
+    await showMore.click();
+    await expect(deal).toBeChecked();
     await expect(
       page.getByRole("switch", { name: "Try it: Share with two roommates" }),
     ).toBeChecked();
     await expect(
       page.getByRole("switch", { name: "Try it: Skip rent over the summer" }),
     ).toBeChecked();
-    await expect(page.getByText(/in total over the programme\./).first()).toHaveText(after);
+    await expect(page.getByText(/in total over the programme\./).first()).not.toHaveText(after);
 
     await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
     const axe = await new AxeBuilder({ page })

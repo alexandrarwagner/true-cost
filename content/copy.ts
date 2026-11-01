@@ -71,6 +71,7 @@ export const copy = {
     pay_from_usd: "Paying from a dollar account means exchange rates don't change your total.",
     transfer_assumption:
       "Transfer costs use an illustrative markup and fee. Enter your provider's real numbers to make this exact.",
+    deal_applied: "Lowered by a student deal you switched on.",
   } as Record<string, string>,
   categories: {
     tuition: "Tuition",
@@ -333,9 +334,31 @@ export const copy = {
       transfers_fewer:
         "Fewer transfers means fewer fixed fees. You'd hold more money at once, which is a trade-off.",
       flights_fewer: "If you're able to. Fares here are estimates.",
+      deal: "",
     } as Record<string, string>,
     markupNote: (yours: string, reference: string) =>
       `You're paying ${yours}% over the mid-market rate. Some services charge about ${reference}%. We don't recommend any provider.`,
+    deals: {
+      label: "Student deal",
+      scope: {
+        school: (school: string) => `For ${school} students`,
+        city: (city: string) => `Near you, in ${city}`,
+        national: "Anywhere in the US",
+      },
+      prices: (student: string, regular: string, period: string) =>
+        `${student} instead of ${regular} ${period}`,
+      period: { month: "a month", year: "a year", once: "once" } as Record<string, string>,
+      noFigure: "The source doesn't list a regular price, so we don't show a figure.",
+      noLine: "This doesn't match a line in your estimate, so we don't show a figure.",
+      eligibility: (who: string) => `Who: ${who}`,
+      checkedOn: (date: string) => `Checked on ${date}`,
+      source: "Source",
+      ended: "This deal ended",
+      reportSubject: (id: string) => `Deal ended: ${id}`,
+      reportBody: (id: string) => `Deal ID: ${id}\n\nWhat changed, if you know (optional):\n`,
+      notChecked: "We haven't checked deals for your school yet.",
+      schoolLink: "Your school's own discounts page",
+    },
     uncertainty: {
       heading: "Reduce the uncertainty",
       body: (band: string) =>

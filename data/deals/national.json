@@ -1,0 +1,19 @@
+{
+  "deals": [
+    {
+      "id": "spotify-premium-student",
+      "title": "Spotify Premium Student",
+      "scope": "national",
+      "category": "subscriptions",
+      "studentPrice": { "amount": 699, "currency": "USD" },
+      "regularPrice": { "amount": 1299, "currency": "USD" },
+      "period": "month",
+      "eligibility": "Students at an accredited US college or university, verified through Spotify; re-verify each year, up to four years.",
+      "howToGet": "Sign up on Spotify's student page and verify your enrolment. The first month is free. The price covers Spotify Premium and Hulu (With Ads).",
+      "sourceUrl": "https://www.spotify.com/us/student/",
+      "sourceQuote": "just $6.99/month after. Save up to $17.99/month. Cancel anytime. Spotify Premium Normally $12.99/month",
+      "checkedOn": "2026-10-31",
+      "status": "approved"
+    }
+  ]
+}

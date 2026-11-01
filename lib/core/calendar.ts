@@ -1,10 +1,28 @@
-import type { DegreeYears, IsoDate, Phase, Season } from "./types";
+import type { DegreeYears, IsoDate, LineItem, Phase, Season } from "./types";
 
 // Academic calendar. Deliberately simple: two semesters, ten living months, two summer months.
 export const ACADEMIC_MONTHS_PER_YEAR = 10;
 export const SUMMER_MONTHS_PER_YEAR = 2;
 export const SEMESTERS_PER_YEAR = 2;
 export const PRE_ARRIVAL_DAYS_BEFORE_START = 90;
+
+/** How many times a line item is paid over the degree, given its frequency and year scope. */
+export function occurrencesOverDegree(item: LineItem, years: number): number {
+  const scope = item.yearScope ?? "all";
+  const yearsInScope = scope === "all" ? years : scope === "final" ? 1 : Math.max(0, years - 1);
+  switch (item.frequency) {
+    case "one_off":
+      return 1;
+    case "per_year":
+      return yearsInScope;
+    case "per_semester":
+      return yearsInScope * SEMESTERS_PER_YEAR;
+    case "per_month":
+      return item.billing === "summer"
+        ? yearsInScope * SUMMER_MONTHS_PER_YEAR
+        : yearsInScope * ACADEMIC_MONTHS_PER_YEAR;
+  }
+}
 
 export function iso(year: number, month1: number, day: number): IsoDate {
   const d = new Date(Date.UTC(year, month1 - 1, day));

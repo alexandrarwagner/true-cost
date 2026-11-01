@@ -2,11 +2,12 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { SAVINGS_MIN_USD } from "@/data/constants";
 import { computeEstimate } from "@/lib/core/estimate";
-import { applyLevers, combinedScenario, LEVERS, rankLevers } from "@/lib/core/levers";
+import { applyLevers, combinedScenario, leverById, rankLevers } from "@/lib/core/levers";
 import type { LeverContext, LeverId } from "@/lib/core/levers";
 import { usd } from "@/lib/core/money";
 import type { DegreeYears, EstimateInput } from "@/lib/core/types";
 import { INR_HISTORY } from "../fixtures/fxHistory";
+import { HUGE_FOOD, SPOTIFY } from "../fixtures/deals";
 import { baseInput, LAFAYETTE_RENT, PURDUE, TODAY } from "../fixtures/inputs";
 
 const ctx: LeverContext = {
@@ -20,6 +21,8 @@ const ctx: LeverContext = {
     minorDigits: 2,
   },
   schoolFlags: { "243780": { waiverAllowed: true, sourceUrl: "https://x", checkedOn: TODAY } },
+  // Two deals: one small, one far bigger than the line it reduces (capped at that line).
+  deals: [SPOTIFY, HUGE_FOOD],
 };
 const opts = { thresholdUsd: SAVINGS_MIN_USD };
 
@@ -69,7 +72,7 @@ function compatibleSubset(ids: LeverId[], picks: boolean[]): LeverId[] {
   const out: LeverId[] = [];
   ids.forEach((id, i) => {
     if (!picks[i]) return;
-    const lever = LEVERS.find((l) => l.id === id);
+    const lever = leverById(id, ctx.deals);
     if (out.some((o) => lever?.excludes.includes(o))) return;
     out.push(id);
   });
@@ -83,9 +86,9 @@ describe("lever invariants", () => {
         const baseline = computeEstimate(input, ctx);
         const ranked = rankLevers(input, baseline, ctx, opts);
         for (const l of ranked) {
-          if (l.hasFigure) expect(l.savingUsd).toBeGreaterThan(SAVINGS_MIN_USD);
+          if (l.hasFigure) expect(l.savingUsd).toBeGreaterThan(l.deal ? 0 : SAVINGS_MIN_USD);
           else expect(l.savingUsd).toBe(0);
-          const lever = LEVERS.find((x) => x.id === l.id);
+          const lever = leverById(l.id, ctx.deals);
           if (!lever) throw new Error(l.id);
           const once = lever.apply(input, input);
           expect(lever.apply(once, input)).toEqual(once);
@@ -99,7 +102,7 @@ describe("lever invariants", () => {
     fc.assert(
       fc.property(
         inputArb,
-        fc.array(fc.boolean(), { minLength: 8, maxLength: 8 }),
+        fc.array(fc.boolean(), { minLength: 10, maxLength: 10 }),
         (input, picks) => {
           const baseline = computeEstimate(input, ctx);
           const figures = rankLevers(input, baseline, ctx, opts).filter((l) => l.hasFigure);
@@ -125,7 +128,9 @@ describe("lever invariants", () => {
           expect(saving).toBeLessThanOrEqual(sum + baseline.schedule.length + feeAllowance);
           if (chosen.length > 0) expect(saving).toBeGreaterThan(0);
           // Duplicate ids (a hand-edited URL) change nothing: targets come from the baseline.
-          expect(applyLevers(input, [...chosen, ...chosen])).toEqual(applyLevers(input, chosen));
+          expect(applyLevers(input, [...chosen, ...chosen], ctx.deals)).toEqual(
+            applyLevers(input, chosen, ctx.deals),
+          );
         },
       ),
       { numRuns: 40 },

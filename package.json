@@ -15,6 +15,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check:constants": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-constants-age.ts",
+    "check:deals": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-deals.ts",
     "prepare": "husky",
     "snapshot:fx": "NODE_OPTIONS=--conditions=react-server tsx scripts/snapshot-fx.ts",
     "snapshot:scorecard": "NODE_OPTIONS=--conditions=react-server tsx scripts/snapshot-scorecard.ts",

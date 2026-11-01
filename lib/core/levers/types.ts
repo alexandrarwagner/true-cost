@@ -1,3 +1,4 @@
+import type { Deal } from "../deals";
 import type { EstimateContext } from "../estimate";
 import type { Cents, Confidence, Estimate, EstimateInput, Minor, SchoolFlags } from "../types";
 
@@ -14,14 +15,28 @@ export const LEVER_IDS = [
   "transfer-markup",
   "flights-fewer",
 ] as const;
-export type LeverId = (typeof LEVER_IDS)[number];
+export type BuiltinLeverId = (typeof LEVER_IDS)[number];
+
+/** Student deals are levers too, keyed by the deal's id. */
+export const DEAL_LEVER_PREFIX = "deal:";
+export type DealLeverId = `${typeof DEAL_LEVER_PREFIX}${string}`;
+export type LeverId = BuiltinLeverId | DealLeverId;
+
+const DEAL_ID = /^deal:[a-z0-9][a-z0-9-]{0,62}$/;
+export function isLeverId(value: string): value is LeverId {
+  return (LEVER_IDS as readonly string[]).includes(value) || DEAL_ID.test(value);
+}
 
 export interface LeverContext extends EstimateContext {
   schoolFlags?: SchoolFlags;
+  /** Approved, fresh deals for this school, its city and the country. */
+  deals?: Deal[];
 }
 
 export interface Lever {
   id: LeverId;
+  /** Deals skip the saving threshold and show as tips when they have no figure. */
+  kind: "lever" | "deal";
   /** Levers that cannot be on together; the UI disables these while this one is on. */
   excludes: LeverId[];
   applies(input: EstimateInput, ctx: LeverContext): boolean;
@@ -44,6 +59,8 @@ export interface RankedLever {
   confidence: Confidence;
   noteId: string;
   excludes: LeverId[];
+  /** Present for a deal row: what to show and where it came from. */
+  deal?: Deal;
 }
 
 export interface RankOptions {

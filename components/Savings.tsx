@@ -76,6 +76,19 @@ export function Savings({
           <ul className="mt-2 border-b border-neutral-300">{rest.map(row)}</ul>
         </details>
       )}
+      {!s.deals.schoolChecked && (
+        <p className="mt-3 text-sm text-neutral-700">
+          {t.deals.notChecked}
+          {s.deals.schoolLink && (
+            <>
+              {" "}
+              <a href={s.deals.schoolLink} rel="noopener noreferrer" className="underline">
+                {t.deals.schoolLink}
+              </a>
+            </>
+          )}
+        </p>
+      )}
       {s.uncertainty && !isUsd && (
         <div className="mt-6 border border-neutral-300 p-3">
           <h4 className="font-medium">{t.uncertainty.heading}</h4>

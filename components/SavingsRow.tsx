@@ -3,6 +3,7 @@ import { TRANSFER_DEFAULT, TRANSFER_REFERENCE } from "@/data/constants";
 import type { LeverId, RankedLever } from "@/lib/core/levers";
 import type { EstimateResponse } from "@/services/estimate";
 import { homeShort, usdFmt } from "@/lib/ui/format";
+import { DealRow } from "./DealRow";
 import { LeverSwitch } from "./LeverSwitch";
 
 interface Props {
@@ -34,27 +35,32 @@ export function SavingsRow({ lever, response, on, blockedBy, busy, onToggle, tog
         )
       : (t.notes[lever.noteId] ?? "");
   const noteId = `lever-${lever.id}-note`;
+  const name = lever.deal?.title ?? title ?? lever.id;
   return (
     <li className="border-t border-neutral-300 py-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-x-6">
-        <div className="min-w-0 flex-1">
-          <p className="font-medium">{title}</p>
-          {lever.hasFigure ? (
-            <p>
-              {lever.savingHome !== undefined
-                ? t.saving(homeShort(lever.savingHome, cur), usdFmt(lever.savingUsd))
-                : t.savingUsd(usdFmt(lever.savingUsd))}
+        {lever.deal ? (
+          <DealRow lever={lever} deal={lever.deal} response={response} noteId={noteId} />
+        ) : (
+          <div className="min-w-0 flex-1">
+            <p className="font-medium">{title}</p>
+            {lever.hasFigure ? (
+              <p>
+                {lever.savingHome !== undefined
+                  ? t.saving(homeShort(lever.savingHome, cur), usdFmt(lever.savingUsd))
+                  : t.savingUsd(usdFmt(lever.savingUsd))}
+              </p>
+            ) : (
+              <p className="text-neutral-700">{t.tip}</p>
+            )}
+            <p id={noteId} className="mt-1 text-sm text-neutral-700">
+              {note}
             </p>
-          ) : (
-            <p className="text-neutral-700">{t.tip}</p>
-          )}
-          <p id={noteId} className="mt-1 text-sm text-neutral-700">
-            {note}
-          </p>
-          <p className="mt-1">
-            <span className={badge}>{copy.confidence[lever.confidence]}</span>
-          </p>
-        </div>
+            <p className="mt-1">
+              <span className={badge}>{copy.confidence[lever.confidence]}</span>
+            </p>
+          </div>
+        )}
         {lever.hasFigure && (
           <div className="shrink-0">
             {onToggle ? (
@@ -63,12 +69,12 @@ export function SavingsRow({ lever, response, on, blockedBy, busy, onToggle, tog
                 on={on}
                 disabled={busy || blockedBy !== undefined}
                 describedBy={noteId}
-                label={t.tryIt(title ?? lever.id)}
+                label={t.tryIt(name)}
                 onChange={(checked) => onToggle(lever.id, checked)}
               />
             ) : (
               <a href={toggleHref} className="underline">
-                {on ? `${t.tryIt(title ?? lever.id)} (on)` : t.tryIt(title ?? lever.id)}
+                {on ? `${t.tryIt(name)} (on)` : t.tryIt(name)}
               </a>
             )}
             {blockedBy && (

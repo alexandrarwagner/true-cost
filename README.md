@@ -35,6 +35,7 @@ npm run dev
 | `npm test`                                                    | Unit, property, golden, adapter (mocked HTTP) and AI-contract tests               |
 | `npm run test:e2e`                                            | Playwright flow tests with an axe scan, against the production build in DEMO_MODE |
 | `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)      |
+| `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days     |
 
 ## Keys
 

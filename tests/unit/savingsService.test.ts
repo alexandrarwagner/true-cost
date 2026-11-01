@@ -21,7 +21,14 @@ const req = EstimateRequestSchema.parse({
   degreeYears: 2,
   startTerm: { year: 2027, season: "fall" },
   options: { housing: { kind: "off_campus", bedrooms: 2, roommates: 1, twelveMonthLease: true } },
-  levers: ["roommates-2", "flights-fewer", "housing-oncampus", "transfer-markup"],
+  levers: [
+    "roommates-2",
+    "flights-fewer",
+    "housing-oncampus",
+    "transfer-markup",
+    "deal:spotify-premium-student",
+    "deal:no-such-deal",
+  ],
 });
 const NOW = new Date("2026-10-29T12:00:00Z");
 
@@ -69,16 +76,34 @@ describe("runEstimate with SAVINGS_ENABLED", () => {
     const s = r.savings;
     if (!s) return;
     expect(s.levers[0]?.id).toBe("roommates-2");
-    expect(s.levers.at(-1)).toMatchObject({ id: "insurance-waiver", hasFigure: false });
+    // Tips last: the waiver question, then NYU's museum deal, which has no figure.
+    expect(s.levers.slice(-2).map((l) => [l.id, l.hasFigure])).toEqual([
+      ["insurance-waiver", false],
+      ["deal:nyu-museum-gateway", false],
+    ]);
+    expect(s.levers.find((l) => l.id === "deal:nyu-museum-gateway")?.deal?.scope).toBe("school");
+    expect(s.deals).toMatchObject({ schoolChecked: true });
+    expect(s.deals.reportUrl).toMatch(/^https:\/\//);
     // On the fixture rents, on campus at NYU saves nothing, so it is not offered and the
-    // requested roommates lever stays. No two active levers may exclude each other.
-    expect(s.active).toEqual(["roommates-2", "transfer-markup", "flights-fewer"]);
+    // requested roommates lever stays. No two active levers may exclude each other. Deals
+    // come after the built-in levers; an unknown deal id is dropped.
+    expect(s.active).toEqual([
+      "roommates-2",
+      "transfer-markup",
+      "flights-fewer",
+      "deal:spotify-premium-student",
+    ]);
+    expect(r.estimate.input.options.deductions).toEqual([
+      { id: "spotify-premium-student", lineId: "otherExpenses", amountUsd: 14400 },
+    ]);
     expect(s.levers.some((l) => l.id === "housing-oncampus")).toBe(false);
     expect(r.estimate.totals.total).toBeLessThan(s.baselineTotals.total);
     expect(r.estimate.input.options.housing?.roommates).toBe(2);
     expect(s.uncertainty?.lowHome).toBeLessThan(s.uncertainty?.highHome ?? 0);
     const params = new URLSearchParams(r.shareQuery);
-    expect(params.get("lv")).toBe("roommates-2,transfer-markup,flights-fewer");
+    expect(params.get("lv")).toBe(
+      "roommates-2,transfer-markup,flights-fewer,deal:spotify-premium-student",
+    );
     expect(decodeShare(params)?.levers).toEqual(s.active);
   });
 

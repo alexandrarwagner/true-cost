@@ -1,0 +1,18 @@
+{
+  "unitId": 193900,
+  "school": "New York University",
+  "deals": [
+    {
+      "id": "nyu-museum-gateway",
+      "title": "Free entry to New York museums with your NYU ID",
+      "scope": "school",
+      "category": "culture",
+      "eligibility": "NYU students with a valid NYU ID card.",
+      "howToGet": "Show your NYU ID at the Brooklyn Museum, El Museo del Barrio, the Frick Collection and others on NYU's list. MoMA and MoMA PS1: book online and choose 'Free College - NYU'. Whitney: book with promo code NYU1. Museum of the City of New York: reserve online with the NYU code, plus one guest. The New Museum is temporarily closed.",
+      "sourceUrl": "https://www.nyu.edu/life/arts-culture-and-entertainment/free-museum-access.html",
+      "sourceQuote": "NYU's Museum Gateway gives students free admission to some of New York City's best cultural institutions. Enjoy free museums simply by showing your NYU ID Card at the locations listed below.",
+      "checkedOn": "2026-10-31",
+      "status": "approved"
+    }
+  ]
+}

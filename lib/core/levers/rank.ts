@@ -1,6 +1,8 @@
+import type { Deal } from "../deals";
 import { computeEstimate } from "../estimate";
 import { toMinor } from "../money";
 import type { Cents, Estimate, EstimateInput, Minor } from "../types";
+import { dealLever } from "./deals";
 import { flightsFewer } from "./flights";
 import { housingOnCampus, lease12vs9, roommates1, roommates2 } from "./housing";
 import { insuranceWaiver, transferMarkup, transfersFewer } from "./money";
@@ -18,7 +20,14 @@ export const LEVERS: readonly Lever[] = [
   flightsFewer,
 ];
 
-export const leverById = (id: LeverId): Lever | undefined => LEVERS.find((l) => l.id === id);
+/** The built-in levers, then one per deal, in canonical order. */
+export const allLevers = (deals: readonly Deal[] = []): Lever[] => [
+  ...LEVERS,
+  ...deals.map(dealLever),
+];
+
+export const leverById = (id: LeverId, deals: readonly Deal[] = []): Lever | undefined =>
+  allLevers(deals).find((l) => l.id === id);
 
 function homeFrom(saving: Cents, baseline: Estimate, ctx: LeverContext): Minor | undefined {
   if (!ctx.fx || baseline.input.homeCurrency === "USD" || baseline.input.options.payFromUsd)
@@ -28,7 +37,8 @@ function homeFrom(saving: Cents, baseline: Estimate, ctx: LeverContext): Minor |
 
 /**
  * Every lever that applies, each re-run as its own scenario against the same context. Figures
- * below the threshold are dropped; tips (no figure) sort last. Nothing here adds savings up.
+ * below the threshold are dropped; tips (no figure) sort last. Deals always show: with a
+ * figure when the re-run saves anything, as a tip otherwise. Nothing here adds savings up.
  */
 export function rankLevers(
   input: EstimateInput,
@@ -37,21 +47,29 @@ export function rankLevers(
   opts: RankOptions,
 ): RankedLever[] {
   const out: RankedLever[] = [];
-  for (const lever of LEVERS) {
+  const deals = ctx.deals ?? [];
+  for (const lever of allLevers(deals)) {
     if (!lever.applies(input, ctx)) continue;
+    const deal = deals.find((d) => lever.id === `deal:${d.id}`);
     const common = {
       id: lever.id,
       confidence: lever.confidence(input, ctx),
       noteId: lever.noteId(input, ctx),
       excludes: lever.excludes,
+      ...(deal ? { deal } : {}),
     };
+    const tip = { ...common, savingUsd: 0 as Cents, hasFigure: false };
     if (!lever.hasFigure(input, ctx)) {
-      out.push({ ...common, savingUsd: 0 as Cents, hasFigure: false });
+      out.push(tip);
       continue;
     }
     const scenario = computeEstimate(lever.apply(input, input), ctx);
     const savingUsd = (baseline.totals.total - scenario.totals.total) as Cents;
-    if (savingUsd <= opts.thresholdUsd) continue;
+    const floor = lever.kind === "deal" ? 0 : opts.thresholdUsd;
+    if (savingUsd <= floor) {
+      if (lever.kind === "deal") out.push(tip);
+      continue;
+    }
     const savingHome = homeFrom(savingUsd, baseline, ctx);
     out.push({
       ...common,
@@ -66,12 +84,15 @@ export function rankLevers(
 }
 
 /** The inputs with the given levers applied in canonical order, each against the baseline. */
-export function applyLevers(baseline: EstimateInput, ids: readonly LeverId[]): EstimateInput {
+export function applyLevers(
+  baseline: EstimateInput,
+  ids: readonly LeverId[],
+  deals: readonly Deal[] = [],
+): EstimateInput {
   const wanted = new Set(ids);
-  return LEVERS.filter((l) => wanted.has(l.id)).reduce(
-    (input, l) => l.apply(input, baseline),
-    baseline,
-  );
+  return allLevers(deals)
+    .filter((l) => wanted.has(l.id))
+    .reduce((input, l) => l.apply(input, baseline), baseline);
 }
 
 /** One combined scenario for the levers switched on. Never a sum. */
@@ -80,6 +101,6 @@ export function combinedScenario(
   ids: readonly LeverId[],
   ctx: LeverContext,
 ): Scenario {
-  const input = applyLevers(baseline, ids);
+  const input = applyLevers(baseline, ids, ctx.deals);
   return { input, estimate: computeEstimate(input, ctx) };
 }

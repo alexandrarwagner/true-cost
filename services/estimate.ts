@@ -8,6 +8,7 @@ import type { EstimateRequest } from "@/lib/schema/estimate";
 import { encodeShare } from "@/lib/schema/share";
 import { ValidationError } from "@/lib/server/errors";
 import { getEnv } from "@/lib/server/env";
+import { dealsFor } from "@/lib/server/deals";
 import { log } from "@/lib/server/log";
 import { schoolFlags } from "@/lib/server/schoolFlags";
 import { withSavings, type SavingsResult } from "./levers";
@@ -137,7 +138,17 @@ export async function runEstimate(
     ...(todayRate ? { fx: { today: todayRate, history, minorDigits: cur.minorDigits } } : {}),
   };
   const input = toEstimateInput(req, today);
-  const saved = getEnv().savingsEnabled ? withSavings(input, ctx, req.levers, schoolFlags()) : null;
+  const env = getEnv();
+  const saved = env.savingsEnabled
+    ? withSavings(
+        input,
+        ctx,
+        req.levers,
+        schoolFlags(),
+        dealsFor(input.school, today),
+        env.dealReportUrl,
+      )
+    : null;
   const estimate = saved ? saved.estimate : computeEstimate(input, ctx);
 
   log.info("estimate", {

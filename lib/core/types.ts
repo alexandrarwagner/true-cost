@@ -96,6 +96,15 @@ export interface EstimateOptions {
   payFromUsd?: boolean;
   dependants?: number;
   enrolmentDepositUsd?: Cents;
+  /** Amounts taken off a line over the degree (student deals switched on). Capped at the line. */
+  deductions?: Deduction[];
+}
+
+export interface Deduction {
+  /** The deal's id, so applying the same deal twice replaces rather than doubles. */
+  id: string;
+  lineId: string;
+  amountUsd: Cents;
 }
 
 export interface SchoolRef {

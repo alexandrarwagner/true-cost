@@ -41,7 +41,17 @@ const RawEnvSchema = z.object({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: optionalString,
 
   LOG_LEVEL: z.enum(["info", "debug"]).default("info"),
+
+  // Where "This deal ended" sends people: a mailto: address or an https page (a new-issue URL).
+  DEAL_REPORT_URL: optionalString.pipe(
+    z
+      .string()
+      .regex(/^(mailto:[^\s@]+@[^\s@]+|https:\/\/\S+)$/)
+      .optional(),
+  ),
 });
+
+const DEFAULT_DEAL_REPORT_URL = "https://github.com/alexandrarwagner/true-cost/issues/new";
 
 type RawEnv = z.infer<typeof RawEnvSchema>;
 
@@ -52,6 +62,7 @@ export interface AppEnv {
   logLevel: RawEnv["LOG_LEVEL"];
   compareEnabled: boolean;
   savingsEnabled: boolean;
+  dealReportUrl: string;
   scorecard: { enabled: boolean; apiKey?: string };
   hud: { token?: string };
   ai: { enabled: boolean; apiKey?: string; model: string };
@@ -115,6 +126,7 @@ function buildEnv(raw: RawEnv): AppEnv {
     logLevel: raw.LOG_LEVEL,
     compareEnabled: raw.COMPARE_ENABLED,
     savingsEnabled: raw.SAVINGS_ENABLED ?? isDemo,
+    dealReportUrl: raw.DEAL_REPORT_URL ?? DEFAULT_DEAL_REPORT_URL,
     scorecard: { enabled: scorecardConfigured || isDemo, apiKey: raw.DATA_GOV_API_KEY },
     hud: { token: raw.HUD_API_TOKEN },
     ai: {

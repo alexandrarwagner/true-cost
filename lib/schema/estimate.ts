@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { COUNTRIES } from "@/data/countries";
-import { LEVER_IDS } from "@/lib/core/levers";
+import { isLeverId, type LeverId } from "@/lib/core/levers";
 
 // The /api/estimate request. Money arrives in whole dollars from the form and is converted
 // to cents at the service boundary. Unknown keys are rejected: the body is untrusted.
@@ -9,6 +9,7 @@ const COUNTRY_CODES = COUNTRIES.map((c) => c.code) as [string, ...string[]];
 const CURRENCIES = [...COUNTRIES.map((c) => c.currency), "USD"] as unknown as [string, ...string[]];
 
 const dollars = (max: number) => z.number().min(0).max(max);
+export const MAX_LEVERS = 24;
 
 export const HousingSchema = z.strictObject({
   kind: z.enum(["on_campus", "off_campus"]),
@@ -69,8 +70,11 @@ export const EstimateRequestSchema = z.strictObject({
     season: z.enum(["fall", "spring"]),
   }),
   options: OptionsSchema.default({}),
-  /** Savings levers switched on (step 3). Unknown or inapplicable ids are ignored server-side. */
-  levers: z.array(z.enum(LEVER_IDS)).max(LEVER_IDS.length).default([]),
+  /** Savings levers switched on, built-in ids or `deal:<id>`. Unknown ids are ignored server-side. */
+  levers: z
+    .array(z.custom<LeverId>((v) => typeof v === "string" && isLeverId(v)))
+    .max(MAX_LEVERS)
+    .default([]),
 });
 export type EstimateRequest = z.infer<typeof EstimateRequestSchema>;
 export type EstimateRequestInput = z.input<typeof EstimateRequestSchema>;

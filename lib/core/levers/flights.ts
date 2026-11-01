@@ -7,6 +7,7 @@ const tripsOf = (i: Parameters<Lever["applies"]>[0]) =>
 /** One fewer trip home a year than the baseline. A personal choice, phrased as one. */
 export const flightsFewer: Lever = {
   id: "flights-fewer",
+  kind: "lever",
   excludes: [],
   applies: (i) => tripsOf(i) >= 1,
   hasFigure: () => true,
