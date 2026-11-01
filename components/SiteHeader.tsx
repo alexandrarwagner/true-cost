@@ -5,7 +5,7 @@ import { copy } from "@/content/copy";
 export function SiteHeader() {
   const t = copy.shell;
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-page/95 backdrop-blur print:hidden">
+    <header className="sticky top-0 z-20 border-b border-line bg-page/85 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           {copy.siteName}

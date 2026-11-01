@@ -35,10 +35,12 @@ describe("theme tokens", () => {
       "page",
       "card",
       "line",
+      "line-strong",
       "dark",
       "dark-muted",
       "brand",
       "brand-soft",
+      "chart-worst",
       "tint-brand",
       "tint-pink",
       "error",
@@ -72,6 +74,9 @@ describe("theme tokens", () => {
       expect(ratio("brand", bg), `brand on ${bg}`).toBeGreaterThanOrEqual(4.5);
       expect(ratio("error", bg), `error on ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
+    // The "worst tenth" line is a graphic (3:1) on the page; as legend text it sits on a card.
+    expect(ratio("chart-worst", "card")).toBeGreaterThanOrEqual(4.5);
+    expect(ratio("chart-worst", "page")).toBeGreaterThanOrEqual(3);
     for (const fg of ["card", "dark-muted", "cat-living", "cat-moving", "cat-oneoff"])
       expect(ratio(fg, "dark"), `${fg} on dark`).toBeGreaterThanOrEqual(4.5);
     expect(ratio("ink", "cat-tuition")).toBeGreaterThanOrEqual(4.5);

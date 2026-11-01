@@ -41,7 +41,7 @@ export function Hero() {
   const t = copy.hero;
   return (
     <section className="mx-auto max-w-4xl pt-6 text-center sm:pt-12">
-      <h1 className="text-3xl font-medium sm:text-display">
+      <h1 className="display text-3xl sm:text-display lg:text-display-lg">
         {t.headline1}
         <Tile tone="bg-cat-tuition-chip text-ink">
           <Book />

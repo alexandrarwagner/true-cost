@@ -270,3 +270,31 @@ and the AI explanation.
     DEMO_MODE is off, so it would read the fixture adapters for that one school regardless of
     the flag.
 12. **Copy split**: the `content/copy/*.ts` folder in 6, or keep one file and accept its size?
+
+## 8. Design-system reconciliation (1 November, after steps 3 and 4)
+
+The Tuition+ design system now lives at `.claude/skills/tuition-plus-design-system/SKILL.md`
+and is the source of truth for tokens and checks. Mockup version 22 replaced version 20; its
+only content change is "How we work it out" in the result nav.
+
+Brought in line: the type scale (hero 84, H2 52–60, H3 30, lead 20, body 15), the `.display`
+style (width 112%, weight 500, tracking −0.035em), the single focus ring (2 px brand, offset
+3 px) applied globally, neutral shadows, the frosted nav, the strong divider and the
+"worst tenth" chart colour as tokens, the form pill shape on wide screens.
+
+Still open, because the design system and the briefs disagree or the system is silent:
+
+1. **Name.** The design system calls the product Tuition+ and specifies the logo ("tuition" with
+   a raised "+" in the tuition colour). The app is "True Cost" everywhere. The earlier default
+   kept the name; the design system says otherwise. Decide, and the wordmark follows.
+2. **Six categories, five cost colours.** Health insurance is its own category (approved, built)
+   but the system defines colours for five costs only. Proposed: pale sky `#BFE3FF` (ink 14.6:1).
+3. **Confidence marks.** The system has three marks (official square, estimate dashed circle,
+   your-number dot); the brief keeps four labels. Proposed: four labels, with "school figure" and
+   "government data" both drawn as the official square.
+4. **"No gradients" versus "glowing bubbles".** The bubbles will use flat fills with a soft
+   neutral shadow, not a gradient.
+5. **School search as a combobox** (arrows, Enter, Esc), external links in a new tab with a cue,
+   and chart labels stating key numbers: scheduled in step 5 and checked in step 8.
+6. **Mobile views board.** The system refers to one; it has not reached me. Until it does, the
+   stacked layouts follow the responsive rules in section 5 of this proposal.

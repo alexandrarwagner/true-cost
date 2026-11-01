@@ -38,7 +38,7 @@ export function InputBar(p: Props) {
     : p.currency;
   return (
     <>
-      <div className="grid grid-cols-1 divide-y divide-line rounded-card border border-line bg-card shadow-sm md:grid-cols-[1.1fr_1.7fr_1fr_auto_auto] md:items-center md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-line rounded-card border border-line bg-card shadow-bar md:grid-cols-[1.1fr_1.7fr_1fr_auto_auto] md:items-center md:divide-x md:divide-y-0 md:rounded-pill">
         <div className={cell}>
           <label htmlFor="country" className={label}>
             {t.from}
