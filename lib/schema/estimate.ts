@@ -90,6 +90,8 @@ export const EstimateRequestSchema = z.strictObject({
     .array(z.custom<LeverId>((v) => typeof v === "string" && isLeverId(v)))
     .max(MAX_LEVERS)
     .default([]),
+  /** "See an example first": fixture school figures with today's rates, labelled as a sample. */
+  example: z.boolean().default(false),
 });
 export type EstimateRequest = z.infer<typeof EstimateRequestSchema>;
 export type EstimateRequestInput = z.input<typeof EstimateRequestSchema>;

@@ -3,12 +3,15 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function threeInputs(page: Page) {
   await page.goto("/");
-  await page.getByLabel("Where are you from?").selectOption("IN");
-  await page.getByLabel("Which school?").fill("purdue");
+  await page.getByLabel("I'm from").selectOption("IN");
+  await page.getByLabel("My school").fill("purdue");
   await page.getByRole("button", { name: /Purdue University-Main Campus/ }).click();
-  await expect(page.getByLabel(/Tuition per year/)).toHaveValue("28794");
-  await expect(page.getByLabel("Undergraduate, 4 years")).toBeChecked();
-  await page.getByLabel("Master's, 2 years").check();
+  await expect(page.getByLabel("Tuition per year")).toHaveValue("28794");
+  // Purdue's predominant degree pre-fills four years; two taps make it a master's.
+  await expect(page.getByLabel("Years", { exact: true })).toHaveValue("4");
+  await page.getByRole("button", { name: "Fewer years" }).click();
+  await page.getByRole("button", { name: "Fewer years" }).click();
+  await expect(page.getByLabel("Years", { exact: true })).toHaveValue("2");
 }
 
 test.describe("True Cost flow (DEMO_MODE)", () => {
@@ -16,7 +19,7 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
     page,
   }) => {
     await threeInputs(page);
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
 
     await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
     await expect(page.getByText(/Your degree could cost between/)).toBeVisible();
@@ -54,7 +57,7 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
     await page.getByLabel("Roommates sharing the rent").fill("1");
     await page.getByLabel("12-month lease (rent due over the summer)").check();
     await page.getByLabel(/Scholarship or assistantship/).fill("5000");
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
     await expect(page.locator("summary", { hasText: /^Rent\b/ }).first()).toBeVisible();
     await expect(page.getByText("Rent over the summer").first()).toBeVisible();
@@ -87,13 +90,13 @@ test.describe("True Cost flow (DEMO_MODE)", () => {
     await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
     await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
-    await expect(page.getByLabel("Where are you from?")).toBeFocused();
-    await page.getByLabel("Which school?").fill("purdue");
+    await expect(page.getByLabel("I'm from")).toBeFocused();
+    await page.getByLabel("My school").fill("purdue");
     await page.getByRole("button", { name: /Purdue University-Main Campus/ }).click();
-    await page.getByLabel("Tuition per year (US dollars)").fill("30000");
-    // Purdue preselects undergraduate; clear it by choosing "Other" with no years is impossible, so test the school-required path instead.
+    await page.getByLabel("Tuition per year").fill("30000");
+    // Years can no longer be empty, so test the school-required path.
     await page.getByRole("button", { name: "Change" }).click();
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await expect(
       page.getByRole("alert").filter({ hasText: "Choose a school from the list." }),
     ).toBeVisible();
@@ -122,9 +125,10 @@ test.describe("AI features (DEMO_MODE mock)", () => {
     await expect(page.getByRole("heading", { name: "Here's what the letter says" })).toBeVisible();
     await expect(page.getByText("From the letter:").first()).toBeVisible();
     await page.getByRole("button", { name: "Use the ticked figures" }).click();
-    await expect(page.getByLabel(/Tuition per year \(US dollars\)/)).toHaveValue("31700");
+    await expect(page.getByRole("spinbutton", { name: "Tuition per year" })).toHaveValue("31700");
     await expect(page.getByLabel(/Scholarship or assistantship/)).toHaveValue("5000");
-    await expect(page.getByLabel("Master's, 2 years")).toBeChecked();
+    await expect(page.getByLabel("Years", { exact: true })).toHaveValue("2");
+    await page.getByText("Make it more accurate").click();
     await expect(page.getByLabel("Start term")).toHaveValue("2027-fall");
   });
 
@@ -132,7 +136,7 @@ test.describe("AI features (DEMO_MODE mock)", () => {
     page,
   }) => {
     await threeInputs(page);
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "In plain English" })).toBeVisible();
     await expect(page.getByText("Standard wording from the numbers on this page.")).toBeVisible();
     await page.getByRole("button", { name: "Explain this result" }).click();
@@ -141,7 +145,7 @@ test.describe("AI features (DEMO_MODE mock)", () => {
 
   test("a smarter search resolves a nickname to a real school", async ({ page }) => {
     await page.goto("/");
-    await page.getByLabel("Which school?").fill("nyu");
+    await page.getByLabel("My school").fill("nyu");
     await expect(page.getByText("No schools found. Try a different spelling.")).toBeVisible();
     await page.getByRole("button", { name: "Try a smarter search" }).click();
     await page.getByRole("button", { name: /New York University/ }).click();
@@ -153,7 +157,7 @@ test.describe("motion and print", () => {
   test("with reduced motion the unfold rows are fully visible at once", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await threeInputs(page);
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "How it adds up" })).toBeVisible();
     const opacities = await page.$$eval(".unfold-row", (rows) =>
       rows.map((r) => getComputedStyle(r).opacity),
@@ -166,13 +170,35 @@ test.describe("motion and print", () => {
     page,
   }) => {
     await threeInputs(page);
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await page.getByText("The same range as a table").click();
     await expect(page.getByRole("columnheader", { name: "At today's rate" })).toBeVisible();
     await expect(
       page.getByRole("columnheader", { name: "Worst 10% of past periods" }),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: /Chart of the cumulative cost/ })).toBeVisible();
+  });
+});
+
+test.describe("example mode", () => {
+  test("shows sample figures with a persistent badge, keeps them on reload, and links them", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "Your estimate will appear here." }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "or see an example first" }).click();
+    await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
+    await expect(page.getByText("Sample figures", { exact: true })).toBeVisible();
+    await expect(page).toHaveURL(/ex=1/);
+    // The chosen school shows as text with a "Change" button, not as an input.
+    await expect(page.locator("#estimate").getByText("New York University")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Sample figures", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Your estimate will appear here." }),
+    ).toHaveCount(0);
   });
 });
 
@@ -205,7 +231,7 @@ test.describe("Compare schools (COMPARE_ENABLED)", () => {
     await page.getByLabel("School 2", { exact: true }).fill("new york");
     await page.getByRole("button", { name: /^New York University/ }).click();
     await expect(page.getByLabel(/Tuition per year at school 2/)).toHaveValue("65622");
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
 
     await expect(page.getByRole("heading", { name: "Side by side" })).toBeVisible();
     const table = page.getByRole("table").first();
@@ -261,7 +287,7 @@ test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", (
     await page.getByText("Make it more accurate").click();
     await page.getByLabel("Off campus").check();
     await page.getByLabel("12-month lease (rent due over the summer)").check();
-    await page.getByRole("button", { name: "Show the true cost" }).click();
+    await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "Ways to lower this number" })).toBeVisible();
     const total = page.getByText(/in total over the programme\./).first();
     const before = (await total.textContent()) ?? "";

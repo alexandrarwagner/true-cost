@@ -15,7 +15,7 @@ interface Props {
 }
 
 const field =
-  "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
+  "w-full rounded-field bg-transparent py-1 placeholder:text-muted focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand";
 
 export function SchoolSearch({
   id = "school",
@@ -82,7 +82,7 @@ export function SchoolSearch({
 
   if (chosen) {
     return (
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-2 border border-neutral-900 px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 py-1">
         <span>
           <span className="sr-only">{copy.form.schoolChosen}: </span>
           <strong>{chosen.name}</strong>, {chosen.city}, {chosen.state}
@@ -95,7 +95,7 @@ export function SchoolSearch({
   }
 
   return (
-    <div>
+    <div className="relative">
       <input
         id={id}
         type="text"
@@ -113,11 +113,7 @@ export function SchoolSearch({
         aria-controls={results.length > 0 ? listId : undefined}
         aria-describedby={`${listId}-status`}
       />
-      <p
-        id={`${listId}-status`}
-        className="mt-1 min-h-5 text-sm text-neutral-700"
-        aria-live="polite"
-      >
+      <p id={`${listId}-status`} className="sr-only" aria-live="polite">
         {status === "searching"
           ? copy.form.schoolSearching
           : status === "done"
@@ -143,12 +139,15 @@ export function SchoolSearch({
         </p>
       )}
       {results.length > 0 && (
-        <ul id={listId} className="mt-1 divide-y divide-neutral-300 border border-neutral-900">
+        <ul
+          id={listId}
+          className="absolute top-full left-0 z-10 mt-2 w-full min-w-72 divide-y divide-line rounded-field border border-line bg-card shadow-lg"
+        >
           {results.map((s) => (
             <li key={s.unitId}>
               <button
                 type="button"
-                className="w-full px-3 py-2 text-left hover:bg-neutral-100 focus:bg-neutral-100 focus:outline-none"
+                className="w-full px-3 py-2 text-left hover:bg-page focus:bg-page focus:outline-none"
                 onClick={() => onChoose(s)}
               >
                 {s.name}{" "}

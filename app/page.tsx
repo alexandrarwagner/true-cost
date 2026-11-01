@@ -1,9 +1,9 @@
 import { EstimateFlow } from "@/components/EstimateFlow";
-import { copy } from "@/content/copy";
+import { Hero } from "@/components/Hero";
 import { toEstimateRequests } from "@/lib/schema/compare";
 import { decodeCompareShare, decodeShare } from "@/lib/schema/share";
 import { flags } from "@/lib/server/flags";
-import { buildSources } from "@/lib/server/sources";
+import { buildSources, exampleSources } from "@/lib/server/sources";
 import { runCompare } from "@/services/compare";
 import { runEstimate } from "@/services/estimate";
 
@@ -24,12 +24,14 @@ export default async function HomePage({
   const initialResult = compare
     ? { kind: "compare" as const, data: await runCompare(compare, buildSources()) }
     : initial
-      ? { kind: "single" as const, data: await runEstimate(initial, buildSources()) }
+      ? {
+          kind: "single" as const,
+          data: await runEstimate(initial, initial.example ? exampleSources() : buildSources()),
+        }
       : null;
   return (
-    <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
-      <p className="mt-1 mb-6">{copy.tagline}</p>
+    <div>
+      <Hero />
       <EstimateFlow
         initial={initial}
         initialExtras={compare ? compare.schools.slice(1) : []}

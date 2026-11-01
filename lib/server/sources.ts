@@ -18,3 +18,12 @@ export function buildSources(): DataSources {
   }
   return real;
 }
+
+/**
+ * "See an example first": the fixture school and rent figures that ship with the app, with the
+ * real exchange rates, so the example works in production without a school lookup.
+ */
+export function exampleSources(): DataSources {
+  const base = buildSources();
+  return { schools: mockSources.schools, rent: mockSources.rent, fx: base.fx, demo: base.demo };
+}

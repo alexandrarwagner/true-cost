@@ -8,8 +8,10 @@ import type { CompareRequest, CompareSchool } from "@/lib/schema/compare";
 import type { EstimateRequest } from "@/lib/schema/estimate";
 import type { CompareResponse } from "@/services/compare";
 import type { EstimateResponse } from "@/services/estimate";
+import { exampleRequest } from "@/lib/ui/example";
 import { BotCheck } from "./BotCheck";
 import { CompareView } from "./CompareView";
+import { EmptyTree } from "./EmptyTree";
 import { InputForm } from "./InputForm";
 import { ResultView } from "./ResultView";
 
@@ -34,6 +36,11 @@ export function EstimateFlow({
   const [botToken, setBotToken] = useState<string | undefined>(undefined);
   const [result, setResult] = useState<Result | null>(initialResult);
   const [lastReq, setLastReq] = useState<EstimateRequest | null>(initial);
+  // The form owns its fields; loading the example replaces them by remounting it.
+  const [form, setForm] = useState<{ key: number; initial: EstimateRequest | null }>({
+    key: 0,
+    initial,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -73,13 +80,21 @@ export function EstimateFlow({
     }
   }
 
+  function showExample() {
+    const req = exampleRequest();
+    setForm((f) => ({ key: f.key + 1, initial: req }));
+    void post("/api/estimate", req, "single");
+  }
+
   return (
     <div>
       <InputForm
-        initial={initial}
+        key={form.key}
+        initial={form.initial}
         initialExtras={initialExtras}
         onSubmit={(r) => void post("/api/estimate", r, "single")}
         onCompare={(r) => void post("/api/compare", r, "compare")}
+        onExample={showExample}
         submitting={submitting}
         error={error}
         aiEnabled={aiEnabled}
@@ -87,8 +102,9 @@ export function EstimateFlow({
         botToken={botToken}
       />
       {aiEnabled && <BotCheck onToken={setBotToken} />}
+      {!result && <EmptyTree onExample={showExample} />}
       {result && (
-        <div ref={resultRef} tabIndex={-1} className="mt-10 focus:outline-none">
+        <div ref={resultRef} tabIndex={-1} className="mx-auto mt-10 max-w-3xl focus:outline-none">
           {result.kind === "single" ? (
             <ResultView
               response={result.data}

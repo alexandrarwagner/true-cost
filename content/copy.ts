@@ -119,6 +119,32 @@ export const copy = {
     official_vs_market:
       "Official rates for this currency have at times differed a lot from what banks and transfer services actually offer.",
   },
+  hero: {
+    headline1: "What will your",
+    headline2: "US degree really",
+    headline3: "cost?",
+    subhead:
+      "We add up everything the offer letter leaves out, from rent to bank fees, in your own currency, and show where each number comes from.",
+    from: "I'm from",
+    school: "My school",
+    tuition: "Tuition per year",
+    years: "Years",
+    fewerYears: "Fewer years",
+    moreYears: "More years",
+    submit: "Show me",
+    example: "or see an example first",
+    exampleBadge: "Sample figures",
+    exampleNote:
+      "Sample figures: a real school's published numbers with today's rates, so you can see how it works. Enter your own details for your number.",
+    moreDetails:
+      'Paying from a different currency, or a spring start? Set those under "Make it more accurate".',
+  },
+  empty: {
+    heading: "Your estimate will appear here.",
+    body: "Add where you're from, your school, your tuition and how many years you'll study, then press Show me. It takes about a minute.",
+    enter: "Enter my details",
+    example: "or see an example",
+  },
   form: {
     heading: "What will it really cost?",
     intro: "Three things, then the real number in your own money.",

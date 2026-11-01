@@ -5,7 +5,7 @@ import { ResultView } from "@/components/ResultView";
 import { copy } from "@/content/copy";
 import { decodeCompareShare, decodeShare } from "@/lib/schema/share";
 import { flags } from "@/lib/server/flags";
-import { buildSources } from "@/lib/server/sources";
+import { buildSources, exampleSources } from "@/lib/server/sources";
 import { runCompare } from "@/services/compare";
 import { runEstimate } from "@/services/estimate";
 
@@ -66,7 +66,7 @@ export default async function SharedResultPage({
       </>
     );
   }
-  const response = await runEstimate(req, buildSources());
+  const response = await runEstimate(req, req.example ? exampleSources() : buildSources());
   return (
     <Frame title={req.school.name} shareQuery={response.shareQuery}>
       <ResultView response={response} aiEnabled={AI_ENABLED} />

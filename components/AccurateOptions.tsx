@@ -10,13 +10,15 @@ type Housing = NonNullable<Options["housing"]>;
 interface Props {
   value: Options;
   onChange: (next: Options) => void;
+  /** Request-level fields that moved out of the input bar (start term, currency). */
+  children?: React.ReactNode;
 }
 
 const field =
   "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
 const num = (v: string): number | undefined => (v.trim() === "" ? undefined : Number(v));
 
-export function AccurateOptions({ value, onChange }: Props) {
+export function AccurateOptions({ value, onChange, children }: Props) {
   const t = copy.form;
   const housing: Housing = value.housing ?? { kind: "on_campus", bedrooms: 1, roommates: 0 };
   const set = (patch: Partial<Options>) => onChange({ ...value, ...patch });
@@ -25,6 +27,7 @@ export function AccurateOptions({ value, onChange }: Props) {
     <details className="mt-6 border border-neutral-300 p-3">
       <summary className="cursor-pointer font-medium">{t.accurate}</summary>
       <p className="mt-2 text-sm text-neutral-700">{t.accurateIntro}</p>
+      {children}
 
       <HousingOptions value={housing} onChange={(h) => onChange({ ...value, housing: h })} />
 

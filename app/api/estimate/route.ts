@@ -3,7 +3,7 @@ import { EstimateRequestSchema } from "@/lib/schema/estimate";
 import { AppError, errorResponse } from "@/lib/server/errors";
 import { log } from "@/lib/server/log";
 import { assertSameOrigin, enforceRateLimit, readValidatedBody } from "@/lib/server/request";
-import { buildSources } from "@/lib/server/sources";
+import { buildSources, exampleSources } from "@/lib/server/sources";
 import { runEstimate } from "@/services/estimate";
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     assertSameOrigin(req);
     await enforceRateLimit(req, "general");
     const body = await readValidatedBody(req, EstimateRequestSchema);
-    const result = await runEstimate(body, buildSources());
+    const result = await runEstimate(body, body.example ? exampleSources() : buildSources());
     return NextResponse.json(result, { headers: { "cache-control": "no-store" } });
   } catch (err) {
     if (err instanceof AppError) {

@@ -25,6 +25,8 @@ export interface EstimateResponse {
     rateCaveat?: string;
   };
   demo: boolean;
+  /** Sample figures from "See an example first"; shown with a persistent badge. */
+  example: boolean;
   /** Sources that failed and were replaced by labelled estimates. */
   degraded: DegradedSource[];
   generatedAt: string;
@@ -203,6 +205,7 @@ export async function runEstimate(
       ...(country.rateCaveat ? { rateCaveat: country.rateCaveat } : {}),
     },
     demo: sources.demo,
+    example: req.example,
     degraded,
     generatedAt: now.toISOString(),
     shareQuery: encodeShare(saved ? { ...req, levers: saved.savings.active } : req).toString(),

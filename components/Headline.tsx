@@ -12,6 +12,11 @@ export function Headline({ response }: { response: EstimateResponse }) {
       <h3 id="headline" className="sr-only">
         Headline
       </h3>
+      {response.example && (
+        <p className="mr-2 mb-2 inline-block rounded-pill bg-cat-living px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-ink">
+          {copy.hero.exampleBadge}
+        </p>
+      )}
       {response.demo && (
         <p
           className="mb-2 inline-block border border-neutral-900 px-2 py-0.5 text-xs uppercase tracking-wide"

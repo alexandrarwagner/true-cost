@@ -45,6 +45,7 @@ export function encodeShare(req: EstimateRequest): URLSearchParams {
   p.set("ss", req.startTerm.season);
   if (Object.keys(req.options).length > 0) p.set("o", JSON.stringify(req.options));
   if (req.levers.length > 0) p.set("lv", req.levers.join(","));
+  if (req.example) p.set("ex", "1");
   return p;
 }
 
@@ -70,6 +71,7 @@ export function decodeShare(params: URLSearchParams): EstimateRequest | null {
     startTerm: { year: Number(params.get("sy")), season: params.get("ss") ?? "" },
     options,
     levers: (params.get("lv") ?? "").split(",").filter(Boolean),
+    example: params.get("ex") === "1",
   };
   const parsed = EstimateRequestSchema.safeParse(candidate);
   return parsed.success ? parsed.data : null;

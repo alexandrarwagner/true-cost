@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { copy } from "@/content/copy";
-import { countryByCode } from "@/data/countries";
+import { countryByCode, COUNTRIES } from "@/data/countries";
 import type { SchoolSummary } from "@/lib/adapters/types";
 import {
   CompareRequestSchema,
@@ -16,16 +16,15 @@ import {
   type EstimateRequestInput,
 } from "@/lib/schema/estimate";
 import type { ExtractedField } from "@/lib/schema/ai";
-import { applyLetterFields, type Degree } from "@/lib/ui/letterApply";
+import { applyLetterFields } from "@/lib/ui/letterApply";
 import { nextTerms, termValue } from "@/lib/ui/terms";
 import { AccurateOptions } from "./AccurateOptions";
 import { ComparePicker, slotsFrom, type CompareSlot } from "./ComparePicker";
-import { ProgrammeFields } from "./ProgrammeFields";
+import { InputBar } from "./InputBar";
 import { LetterPaste } from "./LetterPaste";
-import { OriginFields } from "./OriginFields";
-import { SchoolSearch } from "./SchoolSearch";
 
 type Options = NonNullable<EstimateRequestInput["options"]>;
+type Years = 1 | 2 | 3 | 4;
 
 interface Props {
   initial: EstimateRequest | null;
@@ -33,6 +32,7 @@ interface Props {
   initialExtras: CompareSchool[];
   onSubmit: (req: EstimateRequest) => void;
   onCompare: (req: CompareRequest) => void;
+  onExample: () => void;
   submitting: boolean;
   error: string | null;
   aiEnabled: boolean;
@@ -42,19 +42,17 @@ interface Props {
 
 const field =
   "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
-const button =
-  "border border-neutral-900 bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900 disabled:opacity-60";
 
-function degreeFrom(req: EstimateRequest | null): Degree | null {
-  if (!req) return null;
-  return req.degreeYears === 4 ? "undergrad" : req.degreeYears === 2 ? "masters" : "other";
-}
+/** Years from a school's predominant degree (Scorecard: 3 = bachelor's, 4 = graduate). */
+const yearsFromDegree = (predominant: number | undefined): Years | undefined =>
+  predominant === 3 ? 4 : predominant === 4 ? 2 : undefined;
 
 export function InputForm({
   initial,
   initialExtras,
   onSubmit,
   onCompare,
+  onExample,
   submitting,
   error,
   aiEnabled,
@@ -72,10 +70,7 @@ export function InputForm({
   const [tuitionSource, setTuitionSource] = useState<"school" | "user">(
     initial?.tuitionSource ?? "user",
   );
-  const [degree, setDegree] = useState<Degree | null>(degreeFrom(initial));
-  const [otherYears, setOtherYears] = useState<1 | 2 | 3 | 4>(
-    initial && initial.degreeYears !== 2 && initial.degreeYears !== 4 ? initial.degreeYears : 1,
-  );
+  const [years, setYears] = useState<Years>(initial?.degreeYears ?? 4);
   const [term, setTerm] = useState(
     initial
       ? `${initial.startTerm.year}-${initial.startTerm.season}`
@@ -100,8 +95,8 @@ export function InputForm({
       setTuition(String(Math.round(s.tuitionOutOfStateUsd / 100)));
       setTuitionSource("school");
     }
-    if (s.predominantDegree === 3) setDegree("undergrad");
-    else if (s.predominantDegree === 4) setDegree("masters");
+    const y = yearsFromDegree(s.predominantDegree);
+    if (y) setYears(y);
   }
 
   function applyLetter(fields: ExtractedField[]) {
@@ -114,15 +109,15 @@ export function InputForm({
       const scholarshipPerYear = patch.scholarshipDollars;
       setOptions((o) => ({ ...o, scholarshipPerYear }));
     }
-    if (patch.degree) setDegree(patch.degree);
-    if (patch.otherYears) setOtherYears(patch.otherYears);
+    if (patch.degree === "undergrad") setYears(4);
+    else if (patch.degree === "masters") setYears(2);
+    else if (patch.otherYears) setYears(patch.otherYears);
     if (patch.term) setTerm(termValue(patch.term));
   }
 
   function submit() {
     setLocalError(null);
     if (!school) return setLocalError(t.schoolRequired);
-    if (!degree) return setLocalError(t.degreeRequired);
     const [year, season] = term.split("-");
     const candidate: EstimateRequestInput = {
       countryCode: country,
@@ -136,8 +131,7 @@ export function InputForm({
       },
       tuitionPerYear: Number(tuition),
       tuitionSource,
-      degreeYears: (degree === "undergrad" ? 4 : degree === "masters" ? 2 : otherYears) as
-        1 | 2 | 3 | 4,
+      degreeYears: years,
       startTerm: { year: Number(year), season: season as "fall" | "spring" },
       options,
     };
@@ -165,86 +159,85 @@ export function InputForm({
   return (
     <form
       id="estimate"
-      className="print:hidden"
+      className="mx-auto mt-8 max-w-5xl scroll-mt-20 print:hidden"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
         submit();
       }}
     >
-      <h2 className="text-xl font-semibold">{t.heading}</h2>
-      <p className="mt-1 text-neutral-700">{t.intro}</p>
-
-      <OriginFields
+      <InputBar
         country={country}
         onCountry={chooseCountry}
         currency={currency}
-        onCurrency={setCurrency}
+        school={school}
+        onSchool={chooseSchool}
+        tuition={tuition}
+        onTuition={(v) => {
+          setTuition(v);
+          setTuitionSource("user");
+        }}
+        tuitionHint={tuitionSource === "school" ? t.tuitionHintSchool : t.tuitionHintUser}
+        years={years}
+        onYears={setYears}
+        submitting={submitting}
+        onExample={onExample}
+        aiEnabled={aiEnabled}
+        botToken={botToken}
       />
-
-      <div className="mt-4">
-        <label htmlFor="school" className="block">
-          {t.school}
-        </label>
-        <SchoolSearch
-          chosen={school}
-          onChoose={chooseSchool}
-          aiEnabled={aiEnabled}
-          botToken={botToken}
-        />
-      </div>
-
-      <div className="mt-4">
-        <label htmlFor="tuition" className="block">
-          {t.tuition}
-        </label>
-        <input
-          id="tuition"
-          type="number"
-          min={0}
-          inputMode="numeric"
-          className={field}
-          value={tuition}
-          onChange={(e) => {
-            setTuition(e.target.value);
-            setTuitionSource("user");
-          }}
-          aria-describedby="tuition-hint"
-        />
-        <p id="tuition-hint" className="mt-1 text-sm text-neutral-700">
-          {tuitionSource === "school" ? t.tuitionHintSchool : t.tuitionHintUser}
-        </p>
-      </div>
-
-      <ProgrammeFields
-        degree={degree}
-        onDegree={setDegree}
-        otherYears={otherYears}
-        onOtherYears={setOtherYears}
-        term={term}
-        onTerm={setTerm}
-        terms={terms}
-      />
-
-      <AccurateOptions value={options} onChange={setOptions} />
-      {aiEnabled && <LetterPaste botToken={botToken} onApply={applyLetter} />}
-      {compareEnabled && (
-        <ComparePicker
-          slots={slots}
-          onChange={setSlots}
-          aiEnabled={aiEnabled}
-          botToken={botToken}
-        />
-      )}
-
-      <p className="mt-4 text-sm font-medium" role="alert">
+      <p className="mt-2 min-h-5 text-center text-sm font-medium text-error" role="alert">
         {localError ?? error ?? ""}
       </p>
-      <p className="mt-2">
-        <button type="submit" className={button} disabled={submitting} aria-busy={submitting}>
-          {submitting ? t.submitting : t.submit}
-        </button>
-      </p>
+
+      <div className="mx-auto max-w-3xl">
+        <AccurateOptions value={options} onChange={setOptions}>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              {t.startTerm}
+              <select
+                id="startTerm"
+                className={field}
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+              >
+                {terms.map((tm) => (
+                  <option key={termValue(tm)} value={termValue(tm)}>
+                    {tm.season === "fall" ? t.fall : t.spring} {tm.year}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              {t.currency}
+              <select
+                id="currency"
+                className={field}
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                aria-describedby="currency-hint"
+              >
+                {[...COUNTRIES.map((c) => c.currency), "USD"].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <span id="currency-hint" className="mt-1 block text-sm text-neutral-700">
+                {t.currencyHint}
+              </span>
+            </label>
+          </div>
+        </AccurateOptions>
+        {aiEnabled && <LetterPaste botToken={botToken} onApply={applyLetter} />}
+        {compareEnabled && (
+          <ComparePicker
+            slots={slots}
+            onChange={setSlots}
+            aiEnabled={aiEnabled}
+            botToken={botToken}
+          />
+        )}
+      </div>
     </form>
   );
 }
