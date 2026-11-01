@@ -37,3 +37,4 @@ next-env.d.ts
 *.log
 npm-debug.log*
 design/
+.lighthouse/

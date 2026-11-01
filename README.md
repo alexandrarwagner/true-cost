@@ -8,12 +8,15 @@ and a date, and AI never invents a figure.
 
 ## Status
 
-Every build step is done: setup and security, the core engine, the wireframe UI, the real
-adapters with snapshot scripts, the AI features behind `AI_ENABLED` (letter extraction with
-verbatim quotes, a checked plain-English explanation, and fuzzy school matching that still
-resolves to a real UNITID), hardening, and the stretch goal behind `COMPARE_ENABLED`: up to
-three schools side by side in the student's currency, with a shareable link that renders
-without JavaScript. Comparison is off by default until its copy has been reviewed.
+The engine, adapters, AI features and hardening from the original brief are done, as are the
+savings levers and student deals (steps 1 to 4 of the savings brief) and the Tuition+ redesign
+(all eight steps): design-system tokens and fonts, the hero and one-bar input, example mode,
+the tuition tree with staged reveal, the sticky result nav, user-added costs, the shares view,
+the exchange-rate section, the deals grid, the full-calculation page built from the engine's
+derivation traces, the methodology table generated from the source registry, and the
+accessibility, print and Lighthouse checks in CI. Still to come: the deals research and review
+scripts with the weekly freshness job (savings brief steps 5 and 6). `COMPARE_ENABLED` and
+`SAVINGS_ENABLED` stay off in production until their copy has been reviewed.
 
 ## Quick start
 
@@ -36,6 +39,7 @@ npm run dev
 | `npm run test:e2e`                                            | Playwright flow tests with an axe scan, against the production build in DEMO_MODE |
 | `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)      |
 | `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days     |
+| `npm run perf`                                                | Lighthouse on a phone profile against a running server, gated at 90 (CI)          |
 
 ## Keys
 

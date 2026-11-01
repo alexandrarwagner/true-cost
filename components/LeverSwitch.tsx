@@ -25,7 +25,7 @@ export function LeverSwitch({ id, on, disabled, describedBy, label, onChange }: 
         id={`lever-${id}`}
         type="checkbox"
         role="switch"
-        className="h-5 w-5"
+        className="h-6 w-6"
         checked={state.checked}
         disabled={disabled}
         aria-checked={state.checked}

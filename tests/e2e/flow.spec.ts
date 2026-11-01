@@ -337,6 +337,51 @@ test.describe("the full calculation", () => {
   });
 });
 
+test.describe("accessibility across pages", () => {
+  const share =
+    "c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1";
+  const tags = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
+  const serious = (v: { impact?: string | null }) =>
+    v.impact === "serious" || v.impact === "critical";
+
+  test("the empty home page and the shared page pass axe with the full WCAG 2.2 tag set", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const home = await new AxeBuilder({ page }).withTags(tags).analyze();
+    expect(home.violations.filter(serious), JSON.stringify(home.violations, null, 2)).toEqual([]);
+    await page.goto(`/r?${share}`);
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+    const shared = await new AxeBuilder({ page }).withTags(tags).analyze();
+    expect(shared.violations.filter(serious), JSON.stringify(shared.violations, null, 2)).toEqual(
+      [],
+    );
+  });
+
+  test("every keyboard stop on the result page shows a visible focus ring", async ({ page }) => {
+    await page.goto(`/?${share}`);
+    await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
+    const seen = new Set<string>();
+    for (let i = 0; i < 40; i++) {
+      await page.keyboard.press("Tab");
+      const stop = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el || el === document.body) return null;
+        const cs = getComputedStyle(el);
+        return {
+          key: `${el.tagName}:${el.id || el.getAttribute("aria-label") || el.textContent?.trim().slice(0, 30)}`,
+          focusVisible: el.matches(":focus-visible"),
+          outline: cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2,
+        };
+      });
+      if (!stop) break;
+      seen.add(stop.key);
+      if (stop.focusVisible) expect(stop.outline, stop.key).toBe(true);
+    }
+    expect(seen.size).toBeGreaterThan(10);
+  });
+});
+
 test.describe("page shell", () => {
   test("no horizontal scroll at 320px, and the header links to the form and the methodology", async ({
     page,

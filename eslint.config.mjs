@@ -61,7 +61,7 @@ const eslintConfig = defineConfig([
   },
   {
     // Scripts and tests may use console and process.
-    files: ["scripts/**/*.ts", "tests/**/*.ts"],
+    files: ["scripts/**/*.ts", "scripts/**/*.mjs", "tests/**/*.ts"],
     rules: { "no-console": "off" },
   },
 ]);

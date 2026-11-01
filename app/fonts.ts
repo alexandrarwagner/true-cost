@@ -15,4 +15,7 @@ export const notoBengali = Noto_Sans_Bengali({
   weight: "500",
   variable: "--font-bengali",
   display: "swap",
+  // Not preloaded: it is 86 KB and only the taka sign needs it. The browser fetches it when a
+  // `font-bengali` element renders.
+  preload: false,
 });

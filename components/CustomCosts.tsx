@@ -137,7 +137,7 @@ export function CustomCosts({ value, homeCurrency, busy, onChange }: Props) {
               </span>
               <button
                 type="button"
-                className="text-muted underline underline-offset-4"
+                className="flex h-6 w-6 items-center justify-center rounded-pill text-muted hover:bg-page"
                 aria-label={t.remove(c.label)}
                 disabled={busy}
                 onClick={() => onChange(value.filter((_, j) => j !== i))}

@@ -59,9 +59,9 @@ export function LetterPaste({ botToken, onApply }: Props) {
 
   return (
     <section className="mt-6 border border-neutral-300 p-3" aria-labelledby="letter-heading">
-      <h3 id="letter-heading" className="font-medium">
+      <h2 id="letter-heading" className="font-medium">
         {t.letterHeading}
-      </h3>
+      </h2>
       <p className="mt-1 text-sm text-neutral-700">{t.letterIntro}</p>
       <label htmlFor="letter" className="mt-2 block">
         {t.letterLabel}

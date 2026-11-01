@@ -66,3 +66,23 @@ offset. The UI shows the median, the best and worst 10%, the single worst window
 two years move like 2013 to 2015 did"), and a what-if slider that moves the rate in a straight
 line to a chosen change by the last payment. Paying from a US dollar account removes the range.
 Currencies without enough history show today's conversion only.
+
+## Levers
+
+"Ways to lower this number" never adds savings up. Each lever is a counterfactual: one change
+to the inputs, a full re-run of the engine, and the difference against the baseline total. The
+levers in v1 are living on campus, sharing with one or two roommates, skipping summer rent,
+using your own health cover (a figure only when the school is known to allow waivers and the
+user entered their own premium), sending money once a semester, comparing the transfer markup
+against a reference value, and one fewer trip home a year. A lever shows only when it applies
+and saves more than `SAVINGS_MIN_USD` over the degree; levers that conflict exclude each other;
+with several switched on, the page shows one combined scenario. Student deals are levers of the
+same kind: a priced deal takes the source's stated saving off its cost line, capped at what the
+line costs, and the engine re-runs. See ADR 013 and ADR 014.
+
+## Derivations
+
+Every line item carries a `derivation`: the formula and the terms it was computed from, built by
+the same call that produced the amount (`lib/core/derive.ts`), so the full-calculation page can
+print "$3,100 ÷ 3 people = $1,033" and never disagree with the total. Every source names an id
+in the registry at `data/sources.ts`, which also generates the methodology table. See ADR 015.
