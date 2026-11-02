@@ -14,9 +14,12 @@ const DIR = join(process.cwd(), "design", "wired");
 const SAFE = /^[a-z0-9-]+(\/[a-z0-9-]+)*\.js$/;
 
 export function GET(
-  _req: Request,
+  req: Request,
   ctx: { params: Promise<{ path: string[] }> },
 ): Promise<NextResponse> {
+  // A versioned address (?v=<hash>, set by app/route.ts) changes with the file, so it can be
+  // cached for a year; a bare address is cached for an hour.
+  const versioned = new URL(req.url).searchParams.has("v");
   return ctx.params.then(({ path }) => {
     const name = path.join("/");
     if (!SAFE.test(name)) return new NextResponse(null, { status: 404 });
@@ -26,7 +29,11 @@ export function GET(
         headers: {
           "content-type": "text/javascript; charset=utf-8",
           "cache-control":
-            process.env.NODE_ENV === "production" ? "public, max-age=3600" : "no-store",
+            process.env.NODE_ENV !== "production"
+              ? "no-store"
+              : versioned
+                ? "public, max-age=31536000, immutable"
+                : "public, max-age=3600",
           "x-content-type-options": "nosniff",
         },
       });

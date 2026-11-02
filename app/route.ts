@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/server/env";
+import { fileHash, scriptPath, versionScripts } from "@/lib/server/scriptVersion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,6 +29,13 @@ const PROTOTYPE = [
   .map((src) => `<script src="${src}"></script>`)
   .join("");
 let cached: string | undefined;
+// Script versions, by address; computed once per process in production.
+const versions = new Map<string, string | undefined>();
+function versionOf(src: string): string | undefined {
+  if (process.env.NODE_ENV !== "production") return fileHash(scriptPath(src));
+  if (!versions.has(src)) versions.set(src, fileHash(scriptPath(src)));
+  return versions.get(src);
+}
 
 function page(): string {
   if (process.env.NODE_ENV !== "production") return readFileSync(FILE, "utf8");
@@ -46,6 +54,7 @@ export function GET(request: Request): NextResponse {
   if (prototypeAllowed && url.searchParams.get("engine") === "prototype") {
     html = html.replace(REAL_ENGINE, PROTOTYPE);
   }
+  html = versionScripts(html, versionOf);
   const nonce = request.headers.get("x-nonce");
   if (nonce) html = html.replaceAll("<script", `<script nonce="${nonce}"`);
   return new NextResponse(html, {

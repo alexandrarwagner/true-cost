@@ -356,7 +356,9 @@ test.describe("the designer's page: school search", () => {
     const res = await page.goto("/");
     const html = (await res?.text()) ?? "";
     expect(html.match(/<script(?![^>]*\ssrc=)[^>]*>/g) ?? []).toEqual([]);
-    expect(html).toContain('src="/wired/ui-and-animation.js"');
+    // Each script address carries its file's version, so a cached script never outlives a deploy.
+    expect(html).toMatch(/src="\/wired\/ui-and-animation\.js\?v=[0-9a-f]{8}"/);
+    expect(html).toMatch(/src="\/engine\.js\?v=[0-9a-f]{8}"/);
     await page.locator("#example").click();
     await expect(page.locator("#r-total")).not.toHaveText("");
   });
