@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { copy } from "@/content/copy";
 import { dateFmt, home, homeShort, monthYear } from "@/lib/ui/format";
 import type { EstimateResponse } from "@/services/estimate";
+import { InView } from "./InView";
 import { WhatIf } from "./WhatIf";
 
 const RangeChart = dynamic(() => import("./RangeChart").then((m) => m.RangeChart), { ssr: false });
@@ -81,7 +82,9 @@ export function RangeSection({ response }: { response: EstimateResponse }) {
         <div className="min-w-0 rounded-card bg-card p-4 shadow-card">
           <h3 className="font-semibold">{t.chartTitle(cur.code)}</h3>
           <div className="mt-2 print:hidden" role="img" aria-label={copy.result.chartLabel}>
-            <RangeChart path={fx.path} currency={cur} />
+            <InView placeholderClassName="h-[260px]">
+              <RangeChart path={fx.path} currency={cur} />
+            </InView>
           </div>
           <details className="mt-3">
             <summary className="cursor-pointer font-medium">{copy.result.rangeTable}</summary>

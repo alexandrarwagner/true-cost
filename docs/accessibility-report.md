@@ -28,8 +28,8 @@ step 8. Everything under "automated" re-runs in CI on every push.
 - Print: the breakdown page hides the header, nav and report link, keeps the method section,
   and breaks the page per category (structural check; no pixel snapshot, because fonts differ
   between macOS and the Linux runners).
-- Lighthouse 13.5 on the phone profile, gated at performance 90, accessibility 95, best
-  practices 90 (`npm run perf`).
+- Lighthouse 13.5 on the phone profile, median of three runs with the CPU throttle calibrated
+  to the host, gated at performance 90, accessibility 95, best practices 90 (`npm run perf`).
 
 **By hand, this run**
 
@@ -59,8 +59,14 @@ step 8. Everything under "automated" re-runs in CI on every push.
 
 - **Heading order (1.3.1, Lighthouse `heading-order`)**: the empty home page went h1 → h3
   through the letter box. The letter box heading is now an h2.
-- **Performance, home page**: 89 before this step. The Bengali font (86 KB) was preloaded for
-  every visitor though only the taka sign uses it; it is no longer preloaded. Now 91.
+- **Performance**: home 89 and result 91 before this step, and 88 and 84 on the GitHub runner.
+  Three changes: the Bengali font (86 KB) is no longer preloaded for every visitor; Archivo
+  is loaded without its width axis, which took each file from 85-90 KB to 33-35 KB (the design
+  system's 112% display stretch is the one thing given up); and the chart chunk loads only when
+  the exchange-rate section is near the viewport. Now 95, 95 and 97 on this machine. In CI the
+  script takes the median of three runs and calibrates the CPU throttle to the runner's
+  benchmark index, per Lighthouse's throttling guide, so a slow runner is not scored as a slow
+  phone.
 - **Reflow**: three regressions were caught by the 320 px checks during steps 5 to 7 (the
   share link's unbreakable URL, the exchange-rate card's table widening its grid column, the
   methodology table's minimum width) and fixed before merge.

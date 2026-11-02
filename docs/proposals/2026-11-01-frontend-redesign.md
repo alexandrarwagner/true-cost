@@ -298,3 +298,9 @@ Still open, because the design system and the briefs disagree or the system is s
    and chart labels stating key numbers: scheduled in step 5 and checked in step 8.
 6. **Mobile views board.** The system refers to one; it has not reached me. Until it does, the
    stacked layouts follow the responsive rules in section 5 of this proposal.
+
+7. **Display width (added after step 8).** The design system's display style uses Archivo at
+   112% width. That needs the font's width axis, which doubled each font file and held the
+   phone Lighthouse score at 89-91. Archivo now loads without the axis (33-35 KB per file,
+   scores 95-97). If the stretch matters more than those points, it is one line in
+   `app/fonts.ts` and one in `app/globals.css` to restore.

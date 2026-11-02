@@ -2,9 +2,11 @@ import { Archivo, Noto_Sans_Bengali } from "next/font/google";
 
 // Both fonts are downloaded at build time and served from our origin, so the CSP's
 // font-src 'self' holds and no request reaches Google at runtime.
+// Without the width axis: with it each Archivo file was 85-90 KB and the phone Lighthouse
+// score sat at 89-91; without it the files are 33-35 KB and every page clears 95. The
+// design system's 112% display stretch is the one thing given up (docs/accessibility-report.md).
 export const archivo = Archivo({
   subsets: ["latin"],
-  axes: ["wdth"],
   variable: "--font-archivo",
   display: "swap",
 });

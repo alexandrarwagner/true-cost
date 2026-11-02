@@ -73,9 +73,10 @@
   }
 }
 
-/* Display style for headlines and big numbers: wide, medium, tight. */
+/* Display style for headlines and big numbers: medium weight, tight tracking. The design
+   system's 112% width needs Archivo's width axis, which doubled the font files and cost the
+   phone performance target; it is left out (docs/accessibility-report.md). */
 .display {
-  font-stretch: 112%;
   font-weight: 500;
   letter-spacing: -0.035em;
 }

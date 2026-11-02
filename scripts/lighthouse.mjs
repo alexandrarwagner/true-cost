@@ -16,6 +16,13 @@ const pages = [
   { name: "breakdown", path: `/estimate/breakdown?${share}` },
 ];
 const floors = { performance: 0.9, accessibility: 0.95, "best-practices": 0.9 };
+// Scores vary run to run, more so on small CI machines: each page is measured RUNS times and
+// the median of each category counts.
+const RUNS = Number(process.env.LH_RUNS ?? 3);
+const median = (xs) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.floor(s.length / 2)];
+};
 
 // Lighthouse needs a Chrome; Playwright's Chromium is already installed for the e2e suite.
 if (!process.env.CHROME_PATH) {
@@ -29,25 +36,50 @@ if (!process.env.CHROME_PATH) {
 const outDir = join(process.cwd(), ".lighthouse");
 mkdirSync(outDir, { recursive: true });
 const cli = require.resolve("lighthouse/cli/index.js");
-let failed = false;
-for (const page of pages) {
-  const out = join(outDir, `${page.name}.json`);
+
+function run(url, out, extraFlags = []) {
   execFileSync(
     process.execPath,
     [
       cli,
-      `${base}${page.path}`,
+      url,
       "--quiet",
       "--chrome-flags=--headless=new --no-sandbox",
       "--only-categories=performance,accessibility,best-practices",
       "--output=json",
       `--output-path=${out}`,
+      ...extraFlags,
     ],
     { stdio: ["ignore", "ignore", "inherit"] },
   );
-  const report = JSON.parse(readFileSync(out, "utf8"));
+  return JSON.parse(readFileSync(out, "utf8"));
+}
+
+// Lighthouse's default 4x CPU slowdown is calibrated for a fast desktop. On a small CI
+// machine it stacks on an already slow CPU and scores drop for reasons a phone would never
+// see. Following Lighthouse's throttling guide, the multiplier scales with the host's
+// benchmarkIndex, read from a calibration run, against a reference of 1500.
+const calibration = run(`${base}/`, join(outDir, "calibration.json"));
+const benchmarkIndex = calibration.environment?.benchmarkIndex ?? 1500;
+const multiplier = Math.min(4, Math.max(1, (4 * benchmarkIndex) / 1500));
+console.log(
+  `benchmarkIndex ${Math.round(benchmarkIndex)}, cpuSlowdownMultiplier ${multiplier.toFixed(2)}`,
+);
+const flags = [`--throttling.cpuSlowdownMultiplier=${multiplier.toFixed(2)}`];
+let failed = false;
+for (const page of pages) {
+  const runs = [];
+  for (let i = 0; i < RUNS; i++) {
+    const out = join(outDir, `${page.name}-${i + 1}.json`);
+    const report = run(`${base}${page.path}`, out, flags);
+    runs.push(
+      Object.fromEntries(
+        Object.entries(report.categories).map(([k, v]) => [k, Math.round((v.score ?? 0) * 100)]),
+      ),
+    );
+  }
   const scores = Object.fromEntries(
-    Object.entries(report.categories).map(([k, v]) => [k, Math.round((v.score ?? 0) * 100)]),
+    Object.keys(runs[0]).map((k) => [k, median(runs.map((r) => r[k] ?? 0))]),
   );
   const line = Object.entries(scores)
     .map(([k, v]) => `${k} ${v}`)
