@@ -107,16 +107,22 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
     };
 
   const totals = windows.map((w) => w.totalHome).sort((a, b) => a - b);
+  const worst10Home = percentile(totals, 0.9);
+  const worstTenth = perWindowCumulative.filter(
+    (_, i) => (windows[i]?.totalHome ?? 0) >= worst10Home,
+  );
   let running = 0;
   const path: FxPathPoint[] = input.schedule.map((e, i) => {
     running += toMinor(amountDue(e) as never, todayWithSource.rate, input.minorDigits);
     const column = perWindowCumulative.map((c) => c[i] ?? 0).sort((a, b) => a - b);
+    const worstSum = worstTenth.reduce((s, c) => s + (c[i] ?? 0), 0);
     return {
       date: e.date,
       baseline: running as Minor,
       best10: percentile(column, 0.1) as Minor,
       median: median(column) as Minor,
       worst10: percentile(column, 0.9) as Minor,
+      worstMean: Math.round(worstSum / Math.max(1, worstTenth.length)) as Minor,
     };
   });
   const worst = windows.reduce((a, b) => (b.totalHome > a.totalHome ? b : a));
@@ -128,7 +134,7 @@ export function replay(input: ReplayInput): FxReplay | FxUnsupported {
     windows,
     medianHome: median(totals) as Minor,
     best10Home: percentile(totals, 0.1) as Minor,
-    worst10Home: percentile(totals, 0.9) as Minor,
+    worst10Home: worst10Home as Minor,
     worst,
     best,
     path,

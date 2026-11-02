@@ -86,7 +86,7 @@ export interface LineItem {
 }
 
 export type Season = "fall" | "spring";
-export type DegreeYears = 1 | 2 | 3 | 4;
+export type DegreeYears = 1 | 2 | 3 | 4 | 5 | 6;
 export type HousingKind = "on_campus" | "off_campus";
 
 export interface HousingOptions {
@@ -237,6 +237,8 @@ export interface FxPathPoint {
   best10: Minor;
   median: Minor;
   worst10: Minor;
+  /** Mean of the worst tenth of windows at this point: the dashed line on the fan chart. */
+  worstMean: Minor;
 }
 
 export interface FxUnsupported {

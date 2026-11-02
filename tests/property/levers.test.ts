@@ -29,7 +29,7 @@ const opts = { thresholdUsd: SAVINGS_MIN_USD };
 const inputArb: fc.Arbitrary<EstimateInput> = fc
   .record({
     tuition: fc.integer({ min: 0, max: 90_000 }),
-    years: fc.constantFrom<DegreeYears>(1, 2, 3, 4),
+    years: fc.constantFrom<DegreeYears>(1, 2, 3, 4, 5, 6),
     offCampus: fc.boolean(),
     roommates: fc.integer({ min: 0, max: 3 }),
     bedrooms: fc.constantFrom(0 as const, 1 as const, 2 as const, 3 as const, 4 as const),

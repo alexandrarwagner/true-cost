@@ -7,6 +7,7 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // The designer's page and scripts are source as delivered, not ours to lint.
     "design/**",
+    "public/engine.js",
     "tests/design/baseline.html",
     ".next/**",
     "out/**",

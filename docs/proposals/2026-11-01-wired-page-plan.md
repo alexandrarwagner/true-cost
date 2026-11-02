@@ -62,6 +62,24 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   `/api/schools/search?q=` route (College Scorecard, server key, rate limited); the chosen row
   carries the UNITID, city, state and ZIP into `estimate()`.
 
+### What step 3 changed from this plan
+
+- Rate history is served by `/api/fx/history?currency=` instead of static files under
+  `public/data`: the demo/real split happens at run time (fixtures in DEMO_MODE), so a
+  build-time file could not match what the server-side estimate uses. The route serves the
+  same snapshot, cached for a day, about 35 KB compressed.
+- `/api/context?unitId=&zip=&state=&city=` returns the school's costs and the area's rent
+  through the existing adapters, as planned.
+- The fan chart's dashed "worst tenth" line needed a per-payment series the engine did not
+  have; `FxPathPoint.worstMean` (the mean of the worst tenth of windows at each payment) was
+  added to the core, additively.
+- The brief's invariant `fx.lo ≤ base ≤ fx.hi` is not a property of a replay: when every past
+  window weakened the currency (the demo's synthetic history), even the best tenth sits above
+  today's rate. The contract test checks `lo ≤ hi`, `hi > base` and `buf = hi − base`.
+- Monthly "know a cost" items follow the engine's calendar (the months the student is there),
+  not a flat twelve a year; the page's own arithmetic assumed twelve.
+- Degree years now run 1 to 6 across the engine, the schema and the React form.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.

@@ -80,12 +80,21 @@ jobs:
           name: next-build
           path: .next
       - run: npx playwright install --with-deps chromium
+      - run: node scripts/build-engine.mjs
       - run: npm run test:e2e -- --pass-with-no-tests
       - name: Lighthouse (phone profile, gated at 90)
         run: |
           npm run start &
           for i in $(seq 1 30); do curl -sf http://localhost:3000/api/health >/dev/null && break; sleep 2; done
           npm run perf
+      # The runner's own capture of the designer's page: the first run on a new platform has no
+      # baseline, so this is what gets committed as design/reference/screens-served/linux.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-screens-served
+          path: design/reference/screens-served
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

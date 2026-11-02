@@ -6,7 +6,10 @@ import { isLeverId, type LeverId } from "@/lib/core/levers";
 // to cents at the service boundary. Unknown keys are rejected: the body is untrusted.
 
 const COUNTRY_CODES = COUNTRIES.map((c) => c.code) as [string, ...string[]];
-const CURRENCIES = [...COUNTRIES.map((c) => c.currency), "USD"] as unknown as [string, ...string[]];
+export const CURRENCIES = [...COUNTRIES.map((c) => c.currency), "USD"] as unknown as [
+  string,
+  ...string[],
+];
 
 const dollars = (max: number) => z.number().min(0).max(max);
 export const MAX_LEVERS = 24;
@@ -79,7 +82,14 @@ export const EstimateRequestSchema = z.strictObject({
   }),
   tuitionPerYear: dollars(500_000),
   tuitionSource: z.enum(["school", "user"]).default("user"),
-  degreeYears: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  degreeYears: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+  ]),
   startTerm: z.strictObject({
     year: z.number().int().min(2025).max(2035),
     season: z.enum(["fall", "spring"]),

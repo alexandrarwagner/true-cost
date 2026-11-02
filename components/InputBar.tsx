@@ -16,8 +16,8 @@ interface Props {
   tuition: string;
   onTuition: (v: string) => void;
   tuitionHint: string;
-  years: 1 | 2 | 3 | 4;
-  onYears: (y: 1 | 2 | 3 | 4) => void;
+  years: 1 | 2 | 3 | 4 | 5 | 6;
+  onYears: (y: 1 | 2 | 3 | 4 | 5 | 6) => void;
   submitting: boolean;
   onExample: () => void;
   aiEnabled: boolean;

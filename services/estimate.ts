@@ -1,4 +1,5 @@
 import "server-only";
+import { copy } from "@/content/copy";
 import { countryByCode, currencyInfo } from "@/data/countries";
 import type { DataSources } from "@/lib/adapters/types";
 import { computeEstimate, type EstimateContext } from "@/lib/core/estimate";
@@ -69,10 +70,10 @@ export function toEstimateInput(
       ? {
           id: "scorecard",
           kind: "school",
-          name: "School's published tuition (College Scorecard)",
+          name: copy.sources.scorecardTuition,
           date: today,
         }
-      : { id: "user", kind: "user", name: "Your input", date: today };
+      : { id: "user", kind: "user", name: copy.sources.yourInput, date: today };
   const money = (d: number | undefined): Cents | undefined =>
     d === undefined ? undefined : usd(d);
   return {

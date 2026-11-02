@@ -17,7 +17,7 @@ const fx = {
 const inputArb: fc.Arbitrary<EstimateInput> = fc
   .record({
     tuition: fc.integer({ min: 0, max: 90_000 }),
-    years: fc.constantFrom<DegreeYears>(1, 2, 3, 4),
+    years: fc.constantFrom<DegreeYears>(1, 2, 3, 4, 5, 6),
     season: fc.constantFrom("fall" as const, "spring" as const),
     scholarship: fc.option(fc.integer({ min: 0, max: 100_000 }), { nil: undefined }),
     offCampus: fc.boolean(),

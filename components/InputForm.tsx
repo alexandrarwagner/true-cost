@@ -24,7 +24,7 @@ import { InputBar } from "./InputBar";
 import { LetterPaste } from "./LetterPaste";
 
 type Options = NonNullable<EstimateRequestInput["options"]>;
-type Years = 1 | 2 | 3 | 4;
+type Years = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface Props {
   initial: EstimateRequest | null;

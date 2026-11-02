@@ -12,3 +12,4 @@ data/snapshots/*.json
 design/
 tests/design/baseline.html
 public/fonts/fonts.css
+public/engine.js

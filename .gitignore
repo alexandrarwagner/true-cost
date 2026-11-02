@@ -19,6 +19,9 @@ next-env.d.ts
 # production
 /build
 
+# built by scripts/build-engine.mjs (prebuild, pretest, CI)
+/public/engine.js
+
 # env files: keep only the example
 .env*
 !.env.example

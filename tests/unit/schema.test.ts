@@ -36,7 +36,7 @@ describe("EstimateRequestSchema", () => {
         .success,
     ).toBe(false);
     expect(EstimateRequestSchema.safeParse({ ...valid, tuitionPerYear: -1 }).success).toBe(false);
-    expect(EstimateRequestSchema.safeParse({ ...valid, degreeYears: 5 }).success).toBe(false);
+    expect(EstimateRequestSchema.safeParse({ ...valid, degreeYears: 7 }).success).toBe(false);
     expect(EstimateRequestSchema.safeParse({ ...valid, options: { dependants: 99 } }).success).toBe(
       false,
     );

@@ -11,6 +11,7 @@ export default defineConfig({
       "tests/adapters/**/*.test.ts",
       "tests/ai-contract/**/*.test.ts",
       "tests/design/**/*.test.ts",
+      "tests/engine/**/*.test.ts",
     ],
     env: { NODE_ENV: "test", DEMO_MODE: "true" },
   },

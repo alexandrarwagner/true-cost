@@ -688,4 +688,18 @@ export const copy = {
       },
     ],
   },
+  /** Source names the engine prints on tuition lines. */
+  sources: {
+    scorecardTuition: "School's published tuition (College Scorecard)",
+    yourInput: "Your input",
+  },
+  /** The browser engine's line under "Tuition is where it starts." */
+  engine: {
+    note: {
+      demo: "Sample rent and living costs (demo data)",
+      rent: (area: string) => `Rent for ${area} from HUD`,
+      living: (school: string) => `living costs from ${school}'s own figures`,
+      estimate: "Rent and living costs are our estimate until a school is chosen",
+    },
+  },
 } as const;
