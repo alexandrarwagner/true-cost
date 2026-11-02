@@ -110,6 +110,25 @@ for (const width of [1440, 1024, 768, 390]) {
   });
 }
 
+for (const width of [1181, 1300]) {
+  test.describe(`design v2: between the breakpoints at ${width}`, () => {
+    test.use({ viewport: { width, height: 900 }, reducedMotion: "reduce" });
+
+    test("nothing is cut off: no sideways scroll, and the bar fits", async ({ page }) => {
+      // The desktop layout is a fixed 1440 px canvas; below that the fluid layout applies
+      // (decision 22), so no width between the breakpoints clips the page.
+      await settle(page);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+      ).toBeLessThanOrEqual(0);
+      const bar = await page.locator("#calc").boundingBox();
+      if (!bar) throw new Error("the bar is not laid out");
+      expect(bar.x + bar.width).toBeLessThanOrEqual(width);
+      await expect(page.locator("#calc button[type=submit]")).toBeInViewport();
+    });
+  });
+}
+
 for (const width of [1440, 390]) {
   test.describe(`design v2: accessibility at ${width}`, () => {
     // Motion on: the dimmed headings below the fold must still pass contrast (decision 16).

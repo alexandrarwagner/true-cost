@@ -162,5 +162,10 @@
     "change": "Decision 21: the focus ring moves from the input (2 px, 6 px out, which crossed the small label above a 26 px field) to the label cell that holds the field and its name, using the designer's label:focus-within hook.",
     "from": "input:focus-visible{outline:2px solid #3E43C8!important;outline-offset:6px;border-radius:4px}\nlabel:focus-within{border-radius:28px}",
     "to": "input:focus-visible{outline:none!important}\nlabel:focus-within{outline:2px solid #3E43C8;outline-offset:2px;border-radius:28px}"
+  },
+  {
+    "change": "Decision 22: the tablet layout applies up to 1439 px, not 1180 px. The desktop layout is a fixed 1440 px canvas (main{width:1440px}), so between 1181 and 1439 px it was laid out for 1440 and cut off on the right.",
+    "from": "@media (max-width: 1180px){",
+    "to": "@media (max-width: 1439px){"
   }
 ]

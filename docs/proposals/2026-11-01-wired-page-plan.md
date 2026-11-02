@@ -380,3 +380,8 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     ring ran through the name. Decided on 2 November: the ring is drawn on the label cell
     that holds the name and the field (the designer's `label:focus-within` hook), inside the
     pill. One CSS edit under the lock.
+22. **Cut off between 1181 and 1439 px.** The desktop layout is a fixed 1440 px canvas
+    (`main{width:1440px}`) and the tablet layout took over only at 1180 px, so a window
+    between the two was laid out for 1440 and clipped on the right. Decided on 2 November:
+    the tablet layout, which is fluid, applies up to 1439 px. One CSS edit under the lock; a
+    test checks there is no sideways scroll at 1181 and 1300 px.
