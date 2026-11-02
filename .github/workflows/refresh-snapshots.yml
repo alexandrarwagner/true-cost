@@ -14,6 +14,10 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # Secrets are not readable in a step's `if`; they are mapped to env here and tested there.
+    env:
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+      HUD_API_TOKEN: ${{ secrets.HUD_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,14 +28,10 @@ jobs:
       - name: Snapshot exchange-rate history
         run: npm run snapshot:fx
       - name: Snapshot College Scorecard costs
-        if: ${{ secrets.DATA_GOV_API_KEY != '' }}
-        env:
-          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+        if: ${{ env.DATA_GOV_API_KEY != '' }}
         run: npm run snapshot:scorecard
       - name: Snapshot HUD Fair Market Rents
-        if: ${{ secrets.HUD_API_TOKEN != '' }}
-        env:
-          HUD_API_TOKEN: ${{ secrets.HUD_API_TOKEN }}
+        if: ${{ env.HUD_API_TOKEN != '' }}
         run: npm run snapshot:hud
       - name: Open a pull request if anything changed
         env:

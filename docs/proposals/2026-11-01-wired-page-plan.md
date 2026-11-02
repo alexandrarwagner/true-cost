@@ -80,6 +80,19 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   not a flat twelve a year; the page's own arithmetic assumed twelve.
 - Degree years now run 1 to 6 across the engine, the schema and the React form.
 
+### What step 4 changed from this plan
+
+- Change 1 (inline scripts into files) was done first, inside step 4, so that the school
+  search is an edit to `design/wired/typeahead.js` rather than to the page. The scripts are
+  served from `design/wired` by `app/wired/[...path]/route.ts`; the html2pdf bundle lives
+  under `public/vendor` with its licence note. The lock keeps each block's original body under
+  `tests/design/blocks` and checks the page is the delivered file with those blocks replaced
+  by `<script src>` tags, with no inline script left.
+- The school field searches through `/api/schools/search`; the page's nickname table (`SAL`)
+  expands "nyu" to the full name before the search; a pick sets `window.TPSchool` and the
+  tuition's source, which `costs()` passes to the engine. The prototype's static school list
+  is gone.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.

@@ -16,6 +16,7 @@ yrs.addEventListener('keydown',e=>{if(e.key==='ArrowUp'){yrs.value=clampY(+yrs.v
 // tuition formatting
 const tu=$('tuition');const parseT=()=>parseInt((tu.value||'').replace(/[^0-9]/g,''))||0;
 tu.addEventListener('blur',()=>{const v=parseT();tu.value=v?'$'+v.toLocaleString('en-US'):''});
+tu.addEventListener('input',()=>{window.TPTuitionSource='user'}); // typed over: the student's own number
 const err=document.createElement('span');err.id='calc-err';err.setAttribute('role','alert');$('example').before(err);
 // formatting
 let CUR='INR';
@@ -37,7 +38,9 @@ function count(el,to,mode,delay,dur){
 // costs the student knows
 const OV={house:null,live:null,one:null,move:null};const EX=[];let LAST=null;
 // ENGINE SEAM: every number comes from window.TPEngine (engine-adapter.js)
-function costs(T,Y){return window.TPEngine.estimate({tuitionPerYearUsd:T,years:Y,from:$('from').value.trim(),currency:curCode(),school:$('school').value.trim(),overrides:{...OV},extras:EX.slice()})}
+// The school picked from the search (with its UNITID) goes in whole; a name typed over it is just a name.
+function schoolInput(){const s=window.TPSchool,name=$('school').value.trim();return (s&&s.name===name)?s:name}
+function costs(T,Y){return window.TPEngine.estimate({tuitionPerYearUsd:T,years:Y,from:$('from').value.trim(),currency:curCode(),school:schoolInput(),tuitionSource:window.TPTuitionSource||'user',overrides:{...OV},extras:EX.slice()})}
 // flow
 const btn=document.querySelector('#calc button[type=submit]');
 function run(){

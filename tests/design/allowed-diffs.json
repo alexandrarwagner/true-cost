@@ -3,5 +3,40 @@
     "change": "Fonts served from this site (plan section F.2); the stylesheet is a copy of Google's with local file URLs.",
     "from": "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;family=Noto+Sans+Bengali:wght@500&amp;display=swap\">",
     "to": "<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
+  },
+  {
+    "change": "Change 1: the country list, palette switcher and typeahead move to design/wired/typeahead.js.",
+    "block": "typeahead.js",
+    "to": "<script src=\"/wired/typeahead.js\"></script>"
+  },
+  {
+    "change": "Change 1: the fan chart (fanCalc, fanSVG, the table toggle) moves to design/wired/fan.js.",
+    "block": "fan.js",
+    "to": "<script src=\"/wired/fan.js\"></script>"
+  },
+  {
+    "change": "Change 1: the prototype's rate history moves to design/wired/prototype/fx-history.js.",
+    "block": "fx-history.js",
+    "to": "<script src=\"/wired/prototype/fx-history.js\"></script>"
+  },
+  {
+    "change": "Change 1: the engine adapter moves to design/wired/engine-adapter.js.",
+    "block": "engine-adapter.js",
+    "to": "<script src=\"/wired/engine-adapter.js\"></script>"
+  },
+  {
+    "change": "Change 1: the interaction and animation logic moves to design/wired/ui-and-animation.js.",
+    "block": "ui-and-animation.js",
+    "to": "<script src=\"/wired/ui-and-animation.js\"></script>"
+  },
+  {
+    "change": "Change 1: the html2pdf bundle moves to public/vendor/html2pdf.bundle.min.js, with its licence file.",
+    "block": "html2pdf.bundle.min.js",
+    "to": "<script src=\"/vendor/html2pdf.bundle.min.js\"></script>"
+  },
+  {
+    "change": "Change 1: the family PDF sheet builder moves to design/wired/pdf-sheet.js.",
+    "block": "pdf-sheet.js",
+    "to": "<script src=\"/wired/pdf-sheet.js\"></script>"
   }
 ]

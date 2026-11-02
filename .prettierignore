@@ -13,3 +13,4 @@ design/
 tests/design/baseline.html
 public/fonts/fonts.css
 public/engine.js
+public/vendor/
