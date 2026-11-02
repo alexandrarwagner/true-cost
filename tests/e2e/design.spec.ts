@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 /*
  * The designer's page, as served. Two checks at the board's 1440 px with reduced motion and
@@ -15,6 +15,13 @@ import { expect, test } from "@playwright/test";
  *    the baseline). The baseline is per platform; CI re-captures its own once.
  */
 const SECTIONS = ["results", "where", "fx", "save", "how", "share"] as const;
+
+/** The designer's sample: India, $37,500 a year, two years. Typed in, so the example can change. */
+async function showMe(page: Page) {
+  await page.locator("#tuition").fill("$37,500");
+  await page.locator("#years").fill("2");
+  await page.locator("#calc button[type=submit]").click();
+}
 const RATIO = 0.02;
 
 interface Expected {
@@ -73,7 +80,7 @@ test.describe("the designer's page, as served", () => {
       });
     };
     for (const e of reference.elements) if (!afterShowMe.has(e.sel)) await check(e);
-    await page.locator("#example").click();
+    await showMe(page);
     await expect(page.locator("#r-total")).not.toHaveText("");
     await page.evaluate(() => document.fonts.ready);
     for (const e of reference.elements) if (afterShowMe.has(e.sel)) await check(e);
@@ -103,7 +110,7 @@ test.describe("the designer's page, as served", () => {
       maxDiffPixelRatio: RATIO,
     });
 
-    await page.locator("#example").click();
+    await showMe(page);
     await expect(page.locator("#r-total")).not.toHaveText("");
     await page.evaluate(() => document.fonts.ready);
     for (const id of SECTIONS) {

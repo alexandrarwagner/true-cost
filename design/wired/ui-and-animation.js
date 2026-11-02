@@ -40,7 +40,8 @@ const OV={house:null,live:null,one:null,move:null};const EX=[];let LAST=null;
 // ENGINE SEAM: every number comes from window.TPEngine (engine-adapter.js)
 // The school picked from the search (with its UNITID) goes in whole; a name typed over it is just a name.
 function schoolInput(){const s=window.TPSchool,name=$('school').value.trim();return (s&&s.name===name)?s:name}
-function costs(T,Y){return window.TPEngine.estimate({tuitionPerYearUsd:T,years:Y,from:$('from').value.trim(),currency:curCode(),school:schoolInput(),tuitionSource:window.TPTuitionSource||'user',overrides:{...OV},extras:EX.slice()})}
+function engineInput(T,Y){return {tuitionPerYearUsd:T,years:Y,from:$('from').value.trim(),currency:curCode(),school:schoolInput(),tuitionSource:window.TPTuitionSource||'user',overrides:{...OV},extras:EX.slice()}}
+function costs(T,Y){return window.TPEngine.estimate(engineInput(T,Y))}
 // flow
 const btn=document.querySelector('#calc button[type=submit]');
 function run(){
@@ -48,9 +49,14 @@ function run(){
   if(!T){tu.setAttribute('aria-invalid','true');err.textContent='Add your tuition per year to work it out.';tu.focus();return}
   tu.removeAttribute('aria-invalid');err.textContent='';
   CUR=curCode();if(!(CUR in RATE))CUR='USD';
-  const K=costs(T,Y);const c=K.c,tot=K.tot;LAST={T,Y};
   btn.setAttribute('aria-busy','true');const lbl=btn.textContent;btn.textContent='Working it out…';
-  setTimeout(()=>{btn.removeAttribute('aria-busy');btn.textContent=lbl;reveal(T,Y,c,tot,K,false)},RM?0:450);
+  // The real engine loads the school's figures and the currency's rates first (ready); the
+  // prototype adapter has no ready() and runs at once. Then the 450ms pause the design sets.
+  const inp=engineInput(T,Y);const E=window.TPEngine;const t0=performance.now();
+  (E.ready?E.ready(inp):Promise.resolve()).catch(()=>{}).then(()=>{
+    const K=E.estimate(inp);const c=K.c,tot=K.tot;LAST={T,Y};
+    const wait=Math.max(0,(RM?0:450)-(performance.now()-t0));
+    setTimeout(()=>{btn.removeAttribute('aria-busy');btn.textContent=lbl;reveal(T,Y,c,tot,K,false)},wait)});
 }
 function update(){if(!LAST)return;const K=costs(LAST.T,LAST.Y);reveal(LAST.T,LAST.Y,K.c,K.tot,K,true)}
 window.tpUpdate=update;
@@ -136,6 +142,8 @@ function drawFan(F,Y,anim){const box=$('fx-fan');box.innerHTML=window.fanSVG(F,Y
       if(k<1)raf=requestAnimationFrame(step);else{head.style.display='none';r.setAttribute('width',M.W)}};raf=requestAnimationFrame(step)}};
 }
 document.getElementById('calc').addEventListener('submit',e=>{e.preventDefault();run()});
-const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';tu.value='$37,500';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
+// The example is a real school with its published tuition: New York University, two years.
+const EXAMPLE_SCHOOL={unitId:193900,name:'New York University',city:'New York',state:'NY',zip:'10012'};
+const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';window.TPSchool=EXAMPLE_SCHOOL;$('school').value=EXAMPLE_SCHOOL.name;tu.value='$65,622';window.TPTuitionSource='school';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
 ($('cta')||{addEventListener(){}}).addEventListener('click',e=>{e.preventDefault();window.scrollTo({top:0,behavior:RM?'auto':'smooth'});setTimeout(()=>tu.focus({preventScroll:true}),400)});
 })();

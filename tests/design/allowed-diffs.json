@@ -10,19 +10,19 @@
     "to": "<script src=\"/wired/typeahead.js\"></script>"
   },
   {
-    "change": "Change 1: the fan chart (fanCalc, fanSVG, the table toggle) moves to design/wired/fan.js.",
+    "change": "Change 1: the fan chart moves to design/wired/fan.js (change 2 then moved fanCalc, the prototype's maths, to prototype/fan-calc.js).",
     "block": "fan.js",
     "to": "<script src=\"/wired/fan.js\"></script>"
   },
   {
-    "change": "Change 1: the prototype's rate history moves to design/wired/prototype/fx-history.js.",
+    "change": "Change 2: the prototype's rate history is no longer loaded; the engine serves real history. The file stays under design/wired/prototype for ?engine=prototype.",
     "block": "fx-history.js",
-    "to": "<script src=\"/wired/prototype/fx-history.js\"></script>"
+    "to": ""
   },
   {
-    "change": "Change 1: the engine adapter moves to design/wired/engine-adapter.js.",
+    "change": "Change 2: the real engine (public/engine.js, built from lib/browser) replaces the prototype adapter, which stays under design/wired/prototype for ?engine=prototype.",
     "block": "engine-adapter.js",
-    "to": "<script src=\"/wired/engine-adapter.js\"></script>"
+    "to": "<script src=\"/engine.js\"></script>"
   },
   {
     "change": "Change 1: the interaction and animation logic moves to design/wired/ui-and-animation.js.",

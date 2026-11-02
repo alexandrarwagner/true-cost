@@ -93,6 +93,15 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   tuition's source, which `costs()` passes to the engine. The prototype's static school list
   is gone.
 
+### What step 5 changed from this plan
+
+- Change 2: the page loads `/engine.js`; the prototype's rate history, fan maths and adapter
+  live under `design/wired/prototype` and come back only with `?engine=prototype` (outside
+  production, or in DEMO_MODE, which CI uses). `run()` waits for `TPEngine.ready()` before
+  the reveal, within the design's 450 ms pause when the data is already there. The example is
+  New York University at its published tuition, two years. The pixel test types the designer's
+  sample into the bar itself, so the example's content does not move the baseline.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.
