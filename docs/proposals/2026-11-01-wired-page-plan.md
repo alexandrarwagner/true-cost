@@ -151,6 +151,15 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   the head stylesheet (under the lock), so the empty state is laid out from the start. The
   Lighthouse script retries a run once when Lighthouse itself loses the trace.
 
+### Countries (2 November, after the owner tried the UK)
+
+- The country table now holds every country the page lists (99, the ten launch countries
+  first), each with a currency Frankfurter provides; the first ten keep their snapshots and
+  the rest use the adapter's live, day-cached range query. The demo fixture carries today's
+  rate for each. The engine exposes `currencies()`; picking a country the engine cannot
+  calculate in, or pressing Show me with one, is an error at the bar, not dollars by surprise.
+  A unit test keeps the page's list and the table in step.
+
 ### Step 6
 
 - `meta.shareQuery` on the engine's estimate is the shared page's own query for the same

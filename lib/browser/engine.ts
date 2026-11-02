@@ -247,6 +247,10 @@ export function countryName(code: string): string {
   return COUNTRIES.find((c) => c.code === code.toUpperCase())?.name ?? "";
 }
 
+export function currencies(): string[] {
+  return [...new Set(["USD", ...COUNTRIES.map((c) => c.currency)])];
+}
+
 /** The engine behind window.TPEngine; `deps` says where the data comes from. */
 export function createEngine(deps: EngineDeps, version: string): TPEngine {
   const now = deps.now ?? (() => new Date());
@@ -306,5 +310,6 @@ export function createEngine(deps: EngineDeps, version: string): TPEngine {
     symbol,
     currencyName,
     countryName,
+    currencies,
   };
 }

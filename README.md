@@ -57,7 +57,8 @@ npm run dev
 
 Without `DEMO_MODE`, school search needs `DATA_GOV_API_KEY` (free at api.data.gov); cost
 fields and rent come from the snapshots in `data/snapshots/`, falling back to live calls when
-the key or `HUD_API_TOKEN` is set. Exchange rates need no key. The AI features (step 6) need
+the key or `HUD_API_TOKEN` is set. Exchange rates need no key: the ten launch currencies have
+history snapshots, the rest of the 99 countries' currencies use a live Frankfurter query. The AI features (step 6) need
 `ANTHROPIC_API_KEY`. In production, Upstash and Turnstile are required too (see
 `.env.example`).
 

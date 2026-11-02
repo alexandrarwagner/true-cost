@@ -131,6 +131,10 @@ test.describe("the designer's page: school search", () => {
   test("a currency without rate history keeps the figures and says the range is not available", async ({
     page,
   }) => {
+    // Every listed currency has history now, so stand in for a gap in Frankfurter's data.
+    await page.route("**/api/fx/history**", (route) =>
+      route.fulfill({ json: { today: null, history: [] } }),
+    );
     await page.goto("/");
     const from = page.locator("#from");
     await from.fill("Germany");
@@ -278,6 +282,38 @@ test.describe("the designer's page: school search", () => {
       "aria-current",
       "true",
     );
+  });
+
+  test("the United Kingdom works in pounds, with the chart and the heading", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#from").fill("United Kingdom");
+    await page.getByRole("option", { name: /United Kingdom/ }).click();
+    await expect(page.locator("#cur")).toHaveText("GBP £");
+    await expect(page.locator("#calc-err")).toHaveText("");
+    await page.locator("#tuition").fill("$30,000");
+    await page.locator("#years").fill("2");
+    await page.locator("#calc button[type=submit]").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    await expect(page.locator("#r-tui")).toHaveText(/^£[\d,]+$/);
+    await expect(page.locator("#fx h2")).toHaveText("If the pound moves.");
+    await expect(page.locator("#fx-fan svg")).toContainText("£ thousand");
+  });
+
+  test("a currency the engine cannot calculate in is an error at input, not dollars by surprise", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    // No country in the list is unsupported any more, so stand in for one through the chip.
+    await page.evaluate(() => {
+      const chip = document.getElementById("cur");
+      if (chip) chip.textContent = "XXX";
+    });
+    await page.locator("#tuition").fill("$30,000");
+    await page.locator("#calc button[type=submit]").click();
+    await expect(page.locator("#calc-err")).toContainText("We can’t work it out in XXX yet");
+    await expect(page.locator("#from")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.locator("#from")).toBeFocused();
+    expect(await page.evaluate(() => "TP" in window)).toBe(false);
   });
 
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({

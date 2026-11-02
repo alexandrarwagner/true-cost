@@ -51,7 +51,10 @@ function run(){
   const T=parseT(),Y=clampY(yrs.value);yrs.value=Y;
   if(!T){tu.setAttribute('aria-invalid','true');err.textContent='Add your tuition per year to work it out.';tu.focus();return}
   tu.removeAttribute('aria-invalid');err.textContent='';
-  CUR=curCode();if(!(CUR in RATE))CUR='USD';
+  CUR=curCode();
+  // A currency the engine cannot calculate in stops here with a message, instead of dollars.
+  if(window.TPEngine.currencies&&!window.TPEngine.currencies().includes(CUR)){$('from').setAttribute('aria-invalid','true');err.textContent=`We can’t work it out in ${CUR} yet. Pick another country, or a US dollar account.`;$('from').focus();return}
+  if(!(CUR in RATE))CUR='USD';
   btn.setAttribute('aria-busy','true');const lbl=btn.textContent;btn.textContent='Working it out…';
   // The real engine loads the school's figures and the currency's rates first (ready); the
   // prototype adapter has no ready() and runs at once. Then the 450ms pause the design sets.

@@ -135,6 +135,8 @@ export interface TPEngine {
   symbol(currency: string): string;
   /** The currency's everyday name for a sentence ("rupee", "won"), or the code. */
   currencyName(currency: string): string;
-  /** A launch country's name from its code ("IN" → "India"), or "" when unknown. */
+  /** A country's name from its code ("IN" → "India"), or "" when unknown. */
   countryName(code: string): string;
+  /** The currency codes the engine can calculate in, USD included. */
+  currencies(): string[];
 }
