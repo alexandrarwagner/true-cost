@@ -8,7 +8,9 @@ const eslintConfig = defineConfig([
     // The designer's page and scripts are source as delivered, not ours to lint.
     "design/**",
     "public/engine.js",
+    "public/vendor/**",
     "tests/design/baseline.html",
+    "tests/design/blocks/**",
     ".next/**",
     "out/**",
     "build/**",
