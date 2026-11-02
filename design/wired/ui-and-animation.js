@@ -65,7 +65,7 @@ function update(){if(!LAST)return;const K=costs(LAST.T,LAST.Y);reveal(LAST.T,LAS
 window.tpUpdate=update;
 function reveal(T,Y,c,tot,K,Q){
   const cc=curCode();
-  $('r-sample').textContent=`${usd(T)} a year for ${Y} year${Y>1?'s':''}. ${K.meta&&K.meta.sampleNote?K.meta.sampleNote:''}`+(CUR==='USD'&&cc!=='USD'?` · ${cc} rates aren’t connected in this prototype, so this shows dollars`:', at today’s rate');
+  $('r-sample').textContent=`${usd(T)} a year for ${Y} year${Y>1?'s':''}. ${K.meta&&K.meta.sampleNote?K.meta.sampleNote:''}`+(CUR==='USD'&&cc!=='USD'?` · ${cc} rates aren’t available, so this shows dollars`:', at today’s rate');
   const metas=[...document.querySelectorAll('#results .land.l1,#results .land.l2,#results .land.l3,#results .land.l4')].map(cd=>cd.querySelectorAll(':scope > span')[2]);
   const mine='<span style="width:12px;height:12px;flex:none;border-radius:50%;background:var(--ink)"></span>';const est='<span style="width:12px;height:12px;flex:none;border-radius:50%;border:2px dashed var(--ink);box-sizing:border-box"></span>';const off='<span style="width:12px;height:12px;flex:none;border-radius:3px;background:var(--dark)"></span>';
   const nM=EX.filter(e=>e.freq==='month').length,nO=EX.filter(e=>e.freq==='once').length;
@@ -82,7 +82,7 @@ function reveal(T,Y,c,tot,K,Q){
   count($('r-tui'),c.tui,'full',150*D,700);
   [['house',1350],['live',1530],['one',1710],['move',1890]].forEach(([k,d])=>count($('r-'+k),c[k],'full',d*D,700));
   count($('r-total'),tot,'big',3050*D,900);}else{$('r-tui').textContent=fmt(c.tui,'full');['house','live','one','move'].forEach(k=>$('r-'+k).textContent=fmt(c[k],'full'));$('r-total').textContent=fmt(tot,'big');}
-  $('r-total-sub').textContent=CUR==='INR'?fmt(tot,'full')+' · '+usd(tot):'About '+usd(tot/Y)+' a year';
+  $('r-total-sub').textContent=CUR!=='USD'?fmt(tot,'full')+' · '+usd(tot):'About '+usd(tot/Y)+' a year';
   $('r-hidden').textContent=`Hidden costs: ${Math.round((tot-c.tui)/c.tui*100)}% on top of tuition`;
   // status narration
   if(!Q){const s=st.querySelector('span');st.classList.remove('ok');
@@ -106,12 +106,12 @@ function reveal(T,Y,c,tot,K,Q){
   const sem=T/2+1500*6;const n=2*Y;
   // exchange rate: replay past moves on your payments (INR only)
   const fxSec=$('fx');let lo=null,hi=null,buf=null;
-  if(CUR==='INR'&&K.fx){fxSec.querySelectorAll(':scope > div').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
+  if(K.fx){fxSec.querySelectorAll('.fxhide').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
     const F=K.fx;drawFan(F,Y,!Q);
     lo=F.lo/RATE.INR;hi=F.hi/RATE.INR;buf=F.buf/RATE.INR;
     const loT=fmt(lo,'big'),hiT=fmt(hi,'big');$('fx-lo').textContent=(loT.endsWith('crore')&&hiT.endsWith('crore'))?loT.replace(' crore',''):loT;$('fx-hi').textContent=hiT;
     $('r-buf').textContent=fmt(buf,'big');$('fx-len').textContent=Y+'-year';$('fx-n').textContent=F.n;
-  }else{fxSec.querySelectorAll(':scope > div:not(:first-child)').forEach(x=>x.classList.add('fxhide'));if(!fxSec.querySelector('.fx-none')){const n=document.createElement('p');n.className='fx-none';n.style.cssText='margin:0;font-size:18px;color:#4A4B63';n.textContent=`Rate history for ${cc} isn’t connected in this prototype yet. In the live site, this shows how ${cc} has moved against the dollar, and how much to set aside.`;fxSec.appendChild(n)}}
+  }else{fxSec.querySelectorAll(':scope > div > div:last-child, :scope > div > div:first-child > :not(h2)').forEach(x=>x.classList.add('fxhide'));if(!fxSec.querySelector('.fx-none')){const n=document.createElement('p');n.className='fx-none';n.style.cssText='margin:0;font-size:18px;color:#4A4B63';n.textContent=`We don’t have enough rate history for ${cc} to show a range. This section shows how a currency has moved against the dollar over past periods, and how much to set aside.`;fxSec.appendChild(n)}}
   $('save-country').textContent=$('from').value.trim()||'your country';
   fitAll();setTimeout(fitAll,2700*D+60);
   window.TP={T,Y,c,tot,CUR,cc,lo,hi,buf,sem,n,from:$('from').value.trim()||'—',school:$('school').value.trim(),fmt,usd,rate:RATE[CUR],sym:sym()};document.dispatchEvent(new Event('tp-update'));

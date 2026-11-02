@@ -109,6 +109,15 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   otherwise, with the currency's symbol; the family PDF names the currency and prints the
   real rate instead of the prototype's fixed ₹95.35.
 
+- Change 4: the three rupee-only gates are gone (`fmt()` keeps its rupee branch as a format,
+  not a gate; the dollar line under the total and the exchange-rate section now key on
+  "not US dollars" and "the engine has a range"). The two prototype sentences ("isn't
+  connected in this prototype") became real ones. The no-history path hid nothing in the
+  prototype (its selector skipped the section's only div), so the sample chart stayed on
+  screen; it now hides the chart card and the range text and keeps the heading, with the
+  message under it. Not changed, because it is markup: the
+  section heading still reads "If the rupee moves." for every currency; see section F.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.
@@ -215,6 +224,9 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
    does not read the query string, so during the transition those links are redirected to
    `/r?…`, which keeps working. Reading the query string into the wired page would be a later,
    separate change.
-9. **Performance gate.** The width-axis font is the one the Lighthouse work removed; with it
-   back, the phone-profile score will sit near the CI floor of 90 (the GitHub runner already
-   scores 88/84/89 on the React page). Decide the floor with this in mind.
+9. **"If the rupee moves."** The exchange-rate heading is markup and names the rupee for
+   every currency. Changing it to name the chosen currency means a small script edit to the
+   heading text (the markup keeps the rupee as its default). Recommended, with your OK.
+10. **Performance gate.** The width-axis font is the one the Lighthouse work removed; with it
+    back, the phone-profile score will sit near the CI floor of 90 (the GitHub runner already
+    scores 88/84/89 on the React page). Decide the floor with this in mind.

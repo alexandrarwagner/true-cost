@@ -110,7 +110,26 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#r-total")).toContainText("₩");
     await expect(page.locator("#r-tui")).toHaveText(/^₩[\d,]+$/);
     await expect(page.locator("#rb1")).toContainText("₩");
-    // The exchange-rate chart for a non-rupee currency arrives with change 4 (the gates).
+    await expect(page.locator("#fx-fan svg")).toContainText("₩ million");
+    await expect(page.locator("#r-total-sub")).toContainText("₩");
+    await expect(page.locator("#r-total-sub")).toContainText("$");
+  });
+
+  test("a currency without rate history keeps the figures and says the range is not available", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const from = page.locator("#from");
+    await from.fill("Germany");
+    await page.getByRole("option", { name: /Germany/ }).click();
+    await expect(page.locator("#cur")).toHaveText("EUR €");
+    await page.locator("#tuition").fill("$30,000");
+    await page.locator("#years").fill("2");
+    await page.locator("#calc button[type=submit]").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    await expect(page.locator("#fx .fx-none")).toContainText("enough rate history for EUR");
+    await expect(page.locator("#fx-fan")).toBeHidden();
+    await expect(page.locator("#fx h2")).toBeVisible();
   });
 
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
