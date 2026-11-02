@@ -37,21 +37,29 @@ const outDir = join(process.cwd(), ".lighthouse");
 mkdirSync(outDir, { recursive: true });
 const cli = require.resolve("lighthouse/cli/index.js");
 
-function run(url, out, extraFlags = []) {
-  execFileSync(
-    process.execPath,
-    [
-      cli,
-      url,
-      "--quiet",
-      "--chrome-flags=--headless=new --no-sandbox",
-      "--only-categories=performance,accessibility,best-practices",
-      "--output=json",
-      `--output-path=${out}`,
-      ...extraFlags,
-    ],
-    { stdio: ["ignore", "ignore", "inherit"] },
-  );
+function run(url, out, extraFlags = [], attempt = 1) {
+  try {
+    execFileSync(
+      process.execPath,
+      [
+        cli,
+        url,
+        "--quiet",
+        "--chrome-flags=--headless=new --no-sandbox",
+        "--only-categories=performance,accessibility,best-practices",
+        "--output=json",
+        `--output-path=${out}`,
+        ...extraFlags,
+      ],
+      { stdio: ["ignore", "ignore", "inherit"] },
+    );
+  } catch (err) {
+    // Lighthouse itself sometimes loses the trace on a busy runner (NO_NAVSTART). One retry;
+    // a second failure is a real error.
+    if (attempt >= 2) throw err;
+    console.warn(`lighthouse run failed for ${url}; retrying once`);
+    return run(url, out, extraFlags, attempt + 1);
+  }
   return JSON.parse(readFileSync(out, "utf8"));
 }
 

@@ -93,5 +93,10 @@
     "change": "Decision 11: the \"check before you go\" line no longer describes the prototype.",
     "from": "Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.",
     "to": "Deals change and some depend on your school. Check the source before you go."
+  },
+  {
+    "change": "The designer's empty-state rule (body:not(.has-res) #empty shows) also sits in the head stylesheet, so the empty state is laid out at first paint instead of appearing when nav-and-states.js runs; on a slow phone that late appearance moved the sections below it (Lighthouse CLS 0.48 on the CI runner).",
+    "from": ".res.pre{display:none!important}\n",
+    "to": ".res.pre{display:none!important}\nbody:not(.has-res) #empty{display:block}\n"
   }
 ]

@@ -145,6 +145,12 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   `design/wired/nav-and-states.js`, unchanged, and a test covers both states. The pixel tests
   never caught it because `?engine=prototype` loads that block again; the real page did not.
 
+- On the CI runner the home page then scored 68 with a layout shift of 0.48: the empty state
+  is `display: none` in the markup and shown by the designer's script, which runs after first
+  paint on a slow phone, so the sections below it moved. The designer's rule now also sits in
+  the head stylesheet (under the lock), so the empty state is laid out from the start. The
+  Lighthouse script retries a run once when Lighthouse itself loses the trace.
+
 ### Step 6
 
 - `meta.shareQuery` on the engine's estimate is the shared page's own query for the same
