@@ -5,6 +5,7 @@ import { mockSources } from "@/lib/adapters/mock/sources";
 import { createEngine } from "@/lib/browser/engine";
 import type { EngineDeps, PageInput } from "@/lib/browser/contract";
 import { EstimateRequestSchema } from "@/lib/schema/estimate";
+import { decodeShare } from "@/lib/schema/share";
 import { runEstimate } from "@/services/estimate";
 import { buildEngine } from "../../scripts/build-engine.mjs";
 
@@ -207,6 +208,19 @@ describe("TPEngine contract", () => {
     expect(engine.symbol("KRW")).toBe("₩");
     expect(engine.symbol("BDT")).toBe("৳");
     expect(engine.format(100, "XXX", "full")).toBe("XXX 100");
+  });
+
+  it("gives the shared page's query for the same inputs, so the cards can link to their rows", async () => {
+    const engine = createEngine(deps, "engine-test");
+    await engine.ready(input);
+    const q = engine.estimate(input).meta.shareQuery;
+    expect(q).not.toBeNull();
+    const back = decodeShare(new URLSearchParams(q ?? ""));
+    expect(back?.school.unitId).toBe(193900);
+    expect(back?.tuitionPerYear).toBe(65_622);
+    expect(back?.degreeYears).toBe(2);
+    expect(back?.options.customCosts?.map((c) => c.label)).toEqual(["Laptop", "Gym"]);
+    expect(engine.estimate({ ...input, school: "Somewhere" }).meta.shareQuery).toBeNull();
   });
 
   it("bundles to a classic script that defines window.TPEngine", async () => {

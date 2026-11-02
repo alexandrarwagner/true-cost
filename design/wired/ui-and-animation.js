@@ -125,7 +125,13 @@ function reveal(T,Y,c,tot,K,Q){
   }else{fxSec.querySelectorAll(':scope > div > div:last-child, :scope > div > div:first-child > :not(h2)').forEach(x=>x.classList.add('fxhide'));if(!fxSec.querySelector('.fx-none')){const n=document.createElement('p');n.className='fx-none';n.style.cssText='margin:0;font-size:18px;color:#4A4B63';n.textContent=`We don’t have enough rate history for ${cc} to show a range. This section shows how a currency has moved against the dollar over past periods, and how much to set aside.`;fxSec.appendChild(n)}}
   $('save-country').textContent=$('from').value.trim()||'your country';
   fitAll();setTimeout(fitAll,2700*D+60);
-  window.TP={T,Y,c,tot,CUR,cc,lo,hi,buf,sem,n,from:$('from').value.trim()||'—',school:$('school').value.trim(),fmt,usd,rate:RATE[CUR],sym:sym()};document.dispatchEvent(new Event('tp-update'));
+  // Each figure links to its rows on the full calculation, once the count-up has finished.
+  const bh=K.meta&&K.meta.shareQuery?'/estimate/breakdown?'+K.meta.shareQuery:null;
+  const linkCards=()=>[['r-tui','tuition'],['r-house','housing'],['r-live','living'],['r-one','one_off'],['r-move','money_moving']].forEach(([id,cat])=>{const el=$(id);if(!el)return;
+    const a=el.querySelector('a');const txt=el.textContent;if(!bh){if(a)el.textContent=txt;return}
+    el.innerHTML='';const l=document.createElement('a');l.href=bh+'#'+cat;l.style.cssText='color:inherit;text-decoration:none';l.setAttribute('aria-label',txt+' — see how this was worked out');l.textContent=txt;el.appendChild(l)});
+  setTimeout(linkCards,Q?0:(RM?0:4000));
+  window.TP={T,Y,c,tot,CUR,cc,lo,hi,buf,sem,n,from:$('from').value.trim()||'—',school:$('school').value.trim(),fmt,usd,rate:RATE[CUR],sym:sym(),breakdownHref:bh};document.dispatchEvent(new Event('tp-update'));
   if(Q){fitAll();return}
   // later sections reveal on scroll
   const later=res.filter(x=>!['results','where'].includes(x.id));later.forEach(x=>{x.classList.remove('seen');x.classList.add('fade')});

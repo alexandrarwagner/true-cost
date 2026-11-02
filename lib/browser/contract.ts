@@ -93,6 +93,8 @@ export interface PageEstimate {
     degraded: string[];
     currency: string;
     today: string;
+    /** Query for /estimate/breakdown (the shared page's codec); null when the school has no id. */
+    shareQuery: string | null;
   };
   lines: PageLine[];
 }

@@ -137,6 +137,13 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   `public/vendor` when "Download PDF" is first pressed and falls back to the print view if it
   cannot load.
 
+### Step 6
+
+- `meta.shareQuery` on the engine's estimate is the shared page's own query for the same
+  inputs (null when the school has no id). After the count-up, each card's figure becomes a
+  link to `/estimate/breakdown?…#<category>`, the full calculation's rows for that cost, with
+  an aria-label saying so. The prototype adapter has no query, so its figures stay plain.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.

@@ -7,19 +7,12 @@ import {
   type CompareSchool,
 } from "./compare";
 import { EstimateRequestSchema, type EstimateRequest } from "./estimate";
+import { encodeShare, setSchool } from "./shareEncode";
+
+export { encodeShare };
 
 // Shareable URLs carry the inputs only, never personal data. One short param per field.
 // A comparison adds the extra schools with a numeric suffix: s2, sn2, ... t3, ts3.
-
-function setSchool(p: URLSearchParams, s: CompareSchool, suffix = ""): void {
-  p.set(`s${suffix}`, String(s.school.unitId));
-  p.set(`sn${suffix}`, s.school.name);
-  p.set(`sc${suffix}`, s.school.city);
-  p.set(`st${suffix}`, s.school.state);
-  p.set(`sz${suffix}`, s.school.zip);
-  p.set(`t${suffix}`, String(s.tuitionPerYear));
-  p.set(`ts${suffix}`, s.tuitionSource);
-}
 
 function getSchool(p: URLSearchParams, suffix = ""): unknown {
   return {
@@ -33,20 +26,6 @@ function getSchool(p: URLSearchParams, suffix = ""): unknown {
     tuitionPerYear: Number(p.get(`t${suffix}`)),
     tuitionSource: p.get(`ts${suffix}`) ?? "user",
   };
-}
-
-export function encodeShare(req: EstimateRequest): URLSearchParams {
-  const p = new URLSearchParams();
-  p.set("c", req.countryCode);
-  p.set("cur", req.homeCurrency);
-  setSchool(p, req);
-  p.set("y", String(req.degreeYears));
-  p.set("sy", String(req.startTerm.year));
-  p.set("ss", req.startTerm.season);
-  if (Object.keys(req.options).length > 0) p.set("o", JSON.stringify(req.options));
-  if (req.levers.length > 0) p.set("lv", req.levers.join(","));
-  if (req.example) p.set("ex", "1");
-  return p;
 }
 
 /** Longer links are refused outright: custom-cost labels travel in them, so this bounds abuse. */

@@ -12,6 +12,7 @@ import type {
   Minor,
   Source,
 } from "@/lib/core/types";
+import { encodeShare } from "@/lib/schema/shareEncode";
 import { nextTerms } from "@/lib/ui/terms";
 import type {
   Context,
@@ -79,6 +80,38 @@ function toEstimateInput(input: PageInput, today: string, now: Date): EstimateIn
         : {}),
     },
   };
+}
+
+/** The same link the shared page uses, so each card can open its rows on the full calculation. */
+function shareQueryFor(e: Estimate): string | null {
+  const i = e.input;
+  if (i.school.unitId <= 0 || !COUNTRIES.some((c) => c.code === i.countryCode)) return null;
+  const options: Record<string, unknown> = {};
+  if (i.options.customCosts?.length)
+    options.customCosts = i.options.customCosts.map((c) => ({
+      label: c.label,
+      amount: dollars(c.amountUsd),
+      currency: "USD",
+      frequency: c.frequency,
+    }));
+  if (i.options.housing?.monthlyRentUsd !== undefined)
+    options.housing = {
+      kind: "off_campus",
+      bedrooms: 1,
+      roommates: 0,
+      monthlyRent: dollars(i.options.housing.monthlyRentUsd),
+    };
+  return encodeShare({
+    countryCode: i.countryCode,
+    homeCurrency: i.homeCurrency,
+    school: i.school,
+    tuitionPerYear: dollars(i.tuitionPerYearUsd),
+    tuitionSource: i.tuitionSource.kind === "school" ? "school" : "user",
+    degreeYears: i.degreeYears,
+    startTerm: i.startTerm,
+    options,
+    levers: [],
+  }).toString();
 }
 
 function toLine(item: LineItem, years: number): PageLine {
@@ -165,6 +198,7 @@ function toPage(
       degraded,
       currency: e.input.homeCurrency,
       today,
+      shareQuery: shareQueryFor(e),
     },
     lines: e.items.map((i) => toLine(i, years)),
   };

@@ -193,6 +193,21 @@ test.describe("the designer's page: school search", () => {
     );
   });
 
+  test("each cost card links to its rows on the full calculation", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#example").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    const link = page.locator("#r-house a");
+    await expect(link).toHaveAttribute("href", /^\/estimate\/breakdown\?.*#housing$/, {
+      timeout: 10_000,
+    });
+    const figure = (await link.textContent())?.trim() ?? "";
+    await link.click();
+    await expect(page).toHaveURL(/\/estimate\/breakdown\?/);
+    await expect(page.getByRole("heading", { name: "Your full calculation" })).toBeVisible();
+    await expect(page.locator("#housing-heading")).toContainText(figure);
+  });
+
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
     page,
   }) => {
