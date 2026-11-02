@@ -16,7 +16,8 @@
 .sw i{display:inline-flex}.sw i span{width:12px;height:12px;border-radius:50%;margin-left:-3px;border:1.5px solid #fff}
 </style><style>
 .res.pre{display:none!important}
-body:not(.has-res) #empty{display:block}
+body:not(.has-res) #empty{display:block!important}
+body:not(.has-res) .res{display:none}
 .fxhide{display:none!important}
 #r-status{margin:-30px 0 34px;min-height:24px;font-size:15px;color:#4A4B63;display:flex;gap:8px;align-items:center}
 #r-status i{width:8px;height:8px;border-radius:50%;background:var(--tui);animation:pulse 1s ease-in-out infinite}
@@ -34,6 +35,8 @@ button[type=submit][aria-busy=true]{opacity:.85;cursor:progress}
 <body>
 
 
+<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/archivo-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{--ink:#14151F;--dark:#2A2340;--one:#F7B9EE;--move:#9FEADA;--tui:#8F93F2}
@@ -42,8 +45,8 @@ input:focus-visible{outline:2px solid #3E43C8!important;outline-offset:6px;borde
 label:focus-within{border-radius:28px}
 body{margin:0;background:#F2F3F5}
 a{color:var(--ink)}a:hover{color:#4A4B63}
-.d{font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:500;letter-spacing:-0.035em}
-.num{font-family:'Archivo','Noto Sans Bengali',sans-serif;font-variant-numeric:tabular-nums}
+.d{font-family:'Archivo','Archivo Fallback Wide',sans-serif;font-stretch:112%;font-weight:500;letter-spacing:-0.035em}
+.num{font-family:'Archivo','Archivo Fallback','Noto Sans Bengali',sans-serif;font-variant-numeric:tabular-nums}
 .draw{stroke-dasharray:1400;animation:draw 1.8s ease-out .2s backwards}
 @keyframes draw{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
 .land{animation:land .5s ease-out backwards}
@@ -63,7 +66,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 .chip{height:46px;padding:0 18px;border-radius:23px;border:none;background:rgba(255,255,255,0.7);color:var(--ink);font:inherit;font-size:16px;display:flex;align-items:center;gap:8px}
 </style>
 
-<main style="width: 1440px; margin: 0 auto; min-height: 100vh; overflow: clip; background: #F2F3F5; color: var(--ink); font-family: 'Archivo', system-ui, sans-serif">
+<main style="width: 1440px; margin: 0 auto; min-height: 100vh; overflow: clip; background: #F2F3F5; color: var(--ink); font-family: 'Archivo', 'Archivo Fallback', system-ui, sans-serif">
 
 <nav id="topnav" aria-label="Main" style="position: sticky; top: 0; z-index: 40; height: 80px; background: rgba(242, 243, 245, 0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(20, 21, 31, 0.06); padding: 0 56px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; font-size: 15px">
 <a href="#" class="d" aria-label="Tuition+ home" style="font-size: 30px; line-height: 1; text-decoration: none; display: flex; align-items: flex-start">tuition<span aria-hidden="true" style="font-size: 0.62em; font-weight: 600; color: var(--tui); margin-left: 2px">+</span></a>

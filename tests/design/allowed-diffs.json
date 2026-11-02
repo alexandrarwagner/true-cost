@@ -1,8 +1,8 @@
 [
   {
-    "change": "Fonts served from this site (plan section F.2); the stylesheet is a copy of Google's with local file URLs.",
+    "change": "Fonts served from this site (plan section F.2); the stylesheet is a copy of Google's with local file URLs. The two Archivo files the headings use are preloaded, so text is not painted in the fallback face and re-laid out when the font lands (that swap moved everything below the empty state: Lighthouse CLS 0.43).",
     "from": "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;family=Noto+Sans+Bengali:wght@500&amp;display=swap\">",
-    "to": "<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
+    "to": "<link rel=\"preload\" href=\"/fonts/archivo-latin.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/archivo-latin-ext.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
   },
   {
     "change": "Change 1: the country list, palette switcher and typeahead move to design/wired/typeahead.js.",
@@ -95,8 +95,23 @@
     "to": "Deals change and some depend on your school. Check the source before you go."
   },
   {
-    "change": "The designer's empty-state rule (body:not(.has-res) #empty shows) also sits in the head stylesheet, so the empty state is laid out at first paint instead of appearing when nav-and-states.js runs; on a slow phone that late appearance moved the sections below it (Lighthouse CLS 0.48 on the CI runner).",
+    "change": "Two rules in the head stylesheet so the first layout is the final one: the designer's empty-state rule (with !important, since the section's inline style hides it, as the designer's injected rule had) and the result sections kept out of layout until there is a result. Without them a slow phone paints the page, then the script hides the result sections and shows the empty state, and everything below moves (Lighthouse CLS 0.8 on the CI runner).",
     "from": ".res.pre{display:none!important}\n",
-    "to": ".res.pre{display:none!important}\nbody:not(.has-res) #empty{display:block}\n"
+    "to": ".res.pre{display:none!important}\nbody:not(.has-res) #empty{display:block!important}\nbody:not(.has-res) .res{display:none}\n"
+  },
+  {
+    "change": "Metrics-matched fallback faces (public/fonts/fonts.css) in the font stacks, so text drawn before Archivo arrives takes the same space and the swap moves nothing (the swap moved everything below the hero on a slow phone: Lighthouse CLS 0.39).",
+    "from": ".d{font-family:'Archivo',sans-serif;font-stretch:112%",
+    "to": ".d{font-family:'Archivo','Archivo Fallback Wide',sans-serif;font-stretch:112%"
+  },
+  {
+    "change": "Metrics-matched fallback faces (public/fonts/fonts.css) in the font stacks, so text drawn before Archivo arrives takes the same space and the swap moves nothing (the swap moved everything below the hero on a slow phone: Lighthouse CLS 0.39).",
+    "from": ".num{font-family:'Archivo','Noto Sans Bengali',sans-serif",
+    "to": ".num{font-family:'Archivo','Archivo Fallback','Noto Sans Bengali',sans-serif"
+  },
+  {
+    "change": "Metrics-matched fallback faces (public/fonts/fonts.css) in the font stacks, so text drawn before Archivo arrives takes the same space and the swap moves nothing (the swap moved everything below the hero on a slow phone: Lighthouse CLS 0.39).",
+    "from": "font-family: 'Archivo', system-ui, sans-serif",
+    "to": "font-family: 'Archivo', 'Archivo Fallback', system-ui, sans-serif"
   }
 ]

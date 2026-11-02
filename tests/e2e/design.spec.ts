@@ -66,7 +66,9 @@ test.describe("the designer's page, as served", () => {
         .evaluate((el) => {
           const s = getComputedStyle(el);
           return {
-            font: s.fontFamily,
+            // The metrics-matched fallback faces sit in the stacks for a shift-free swap;
+            // the designer's record predates them.
+            font: s.fontFamily.replace(/,\s*"?Archivo Fallback( Wide)?"?/g, ""),
             size: s.fontSize,
             weight: s.fontWeight,
             stretch: s.fontStretch,
