@@ -28,6 +28,13 @@ jobs:
         run: npm run check:deals
       - name: Re-check every approved deal against its source page
         run: npm run check:deal-sources -- --report deals-report.md
+      - name: Keep the report with the run, so an "unreachable" page can be looked up
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deals-report
+          path: deals-report.md
+          if-no-files-found: ignore
       - name: Open or update the issue when a quote has gone
         run: |
           if ! grep -q "Quote no longer on the page" deals-report.md; then
