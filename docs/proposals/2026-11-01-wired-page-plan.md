@@ -264,7 +264,9 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
    and the chart card's title name the chosen currency.
 10. **Performance gate.** The width-axis font is the one the Lighthouse work removed; with it
     back, the phone-profile score will sit near the CI floor of 90 (the GitHub runner already
-    scores 88/84/89 on the React page). Decide the floor with this in mind.
+    scores 88/84/89 on the React page). Decided on 2 November: the floor stays at 90 on CI as
+    well as locally; the home page scores 92 here, and a red run on the runner means the page
+    needs to get lighter, not the gate lower.
 11. **"Tips are examples; the live site will check them with students in each city."** The
     "Check before you go" line under the deals is markup and still describes the prototype.
     Suggested: "Deals change and some depend on your school. Check the source before you go."
