@@ -247,6 +247,39 @@ test.describe("the designer's page: school search", () => {
     await expect(page).toHaveURL(/^http:\/\/[^/]+\/r\?c=IN/);
   });
 
+  test("the empty state shows until Show me, and the sticky nav switches to the result links", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const empty = page.locator("#empty");
+    await expect(empty).toBeVisible();
+    await expect(
+      empty.getByRole("heading", { name: "Your estimate will appear here." }),
+    ).toBeVisible();
+    const nav = page.locator("#topnav");
+    await expect(nav).toHaveCSS("position", "sticky");
+    await expect(nav.getByRole("link", { name: "Get my estimate" })).toBeVisible();
+    await expect(nav.locator(".nav-post a[data-sec]").first()).toBeHidden();
+    // "Enter my details" scrolls back to the bar and focuses the first field.
+    await empty.getByRole("link", { name: "Enter my details" }).click();
+    await expect(page.locator("#from")).toBeFocused();
+
+    await page.locator("#example").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    await expect(empty).toBeHidden();
+    await expect(nav.getByRole("link", { name: "Get my estimate" })).toBeHidden();
+    await expect(nav.locator("#nb-total")).toContainText("₹");
+    await expect(nav.locator('.nav-post a[data-sec="results"]')).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    await nav.locator('.nav-post a[data-sec="where"]').click();
+    await expect(nav.locator('.nav-post a[data-sec="where"]')).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+  });
+
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
     page,
   }) => {

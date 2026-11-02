@@ -137,6 +137,14 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   `public/vendor` when "Download PDF" is first pressed and falls back to the print view if it
   cannot load.
 
+### Found after step 7
+
+- The prototype's rate-history block also carried the page's nav behaviour and the rule that
+  shows the empty state until a result. Change 2 stopped loading the block, so the empty state
+  and the sticky nav's result links were missing. That code now loads from
+  `design/wired/nav-and-states.js`, unchanged, and a test covers both states. The pixel tests
+  never caught it because `?engine=prototype` loads that block again; the real page did not.
+
 ### Step 6
 
 - `meta.shareQuery` on the engine's estimate is the shared page's own query for the same

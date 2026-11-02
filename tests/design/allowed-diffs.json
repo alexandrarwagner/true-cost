@@ -15,9 +15,9 @@
     "to": "<script src=\"/wired/fan.js\"></script>"
   },
   {
-    "change": "Change 2: the prototype's rate history is no longer loaded; the engine serves real history. The file stays under design/wired/prototype for ?engine=prototype.",
+    "change": "Change 2: the prototype's rate history is no longer loaded (the engine serves real history; the file stays under design/wired/prototype for ?engine=prototype). The nav and empty-state behaviour that sat in the same block loads from design/wired/nav-and-states.js, unchanged.",
     "block": "fx-history.js",
-    "to": ""
+    "to": "<script src=\"/wired/nav-and-states.js\"></script>"
   },
   {
     "change": "Change 2: the real engine (public/engine.js, built from lib/browser) replaces the prototype adapter, which stays under design/wired/prototype for ?engine=prototype.",
