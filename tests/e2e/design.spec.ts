@@ -44,6 +44,12 @@ const reference = JSON.parse(
 
 test.describe("the designer's page, as served", () => {
   test.skip(({ isMobile }) => isMobile, "desktop width only; the mockup is desktop-only");
+  // Own rate-limit bucket per test: the suite as a whole sits near the general tier's 30 calls a minute.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.93.${process.pid % 250}.${n}` });
+  });
   test.use({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
 
   test("key elements compute to the designer's styles, and the keyframes are intact", async ({

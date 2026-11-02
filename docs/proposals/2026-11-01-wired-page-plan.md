@@ -124,6 +124,15 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   your school", "Our estimate", "Your number". With the prototype adapter the page's own
   labels stay, so the pixel baseline holds.
 
+- Change 6: six copy edits in the markup (Frankfurter for FRED in three places, the school's
+  own figures for BLS, HUD as government data in the methodology table, the placeholder),
+  the generic tips block removed, and the deal chips and cards rendered by
+  `design/wired/deals.js` from `/api/deals` (the school's file, its city's and the national
+  list, approved and fresh) in the page's own card markup. The pixel baseline for the savings
+  section moves with it. Found on the way: the prototype's chip filter and the "money plan"
+  checklist lived in the rate-history script that change 2 stopped loading; the chips are
+  back in deals.js, the checklist had no markup left to drive.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.
@@ -236,3 +245,7 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 10. **Performance gate.** The width-axis font is the one the Lighthouse work removed; with it
     back, the phone-profile score will sit near the CI floor of 90 (the GitHub runner already
     scores 88/84/89 on the React page). Decide the floor with this in mind.
+11. **"Tips are examples; the live site will check them with students in each city."** The
+    "Check before you go" line under the deals is markup and still describes the prototype.
+    Suggested: "Deals change and some depend on your school. Check the source before you go."
+    A one-line copy edit, with your OK.

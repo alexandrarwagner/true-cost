@@ -7,6 +7,12 @@ import { expect, test } from "@playwright/test";
  */
 test.describe("the designer's page: school search", () => {
   test.skip(({ isMobile }) => isMobile, "desktop width only; the mockup is desktop-only");
+  // Own rate-limit bucket per test: the suite as a whole sits near the general tier's 30 calls a minute.
+  let n = 0;
+  test.beforeEach(async ({ context }) => {
+    n++;
+    await context.setExtraHTTPHeaders({ "x-forwarded-for": `10.94.${process.pid % 250}.${n}` });
+  });
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("typing a school shows matches from the route; picking one fills the tuition", async ({
@@ -135,6 +141,39 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#fx .fx-none")).toContainText("enough rate history for EUR");
     await expect(page.locator("#fx-fan")).toBeHidden();
     await expect(page.locator("#fx h2")).toBeVisible();
+  });
+
+  test("the deals are the approved ones for the school, with working filter chips", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.locator("#example").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    const grid = page.locator("#deals");
+    await expect(grid.locator(".deal")).toHaveCount(2);
+    await expect(grid).toContainText("Spotify Premium Student");
+    await expect(grid).toContainText("Free entry to New York museums");
+    await expect(grid).toContainText("checked Oct 2026");
+    await expect(page.locator("#deals-checked")).toHaveText("Checked Oct 2026 · No paid listings");
+    await expect(page.locator("#save-city")).toHaveText("New York");
+    // No generic tips, no Boston cards.
+    await expect(page.getByText("General tips")).toHaveCount(0);
+    await expect(page.getByText("Orangetheory")).toHaveCount(0);
+    // The chips filter the cards.
+    await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();
+    await expect(grid.locator(".deal:visible")).toHaveCount(1);
+    await page.locator("#deal-chips .dchip", { hasText: "All" }).click();
+    await expect(grid.locator(".deal:visible")).toHaveCount(2);
+    // The copy fixes.
+    await expect(page.locator("#fx")).toContainText(
+      "Frankfurter (European Central Bank reference rates)",
+    );
+    await expect(page.locator("#sources")).toContainText("College Scorecard");
+    await expect(page.locator("#sources")).not.toContainText("FRED");
+    await expect(page.locator("#add-cost-form input[name=n]")).toHaveAttribute(
+      "placeholder",
+      "e.g. Laptop, winter coat",
+    );
   });
 
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
