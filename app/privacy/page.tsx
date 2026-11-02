@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: `${copy.privacy.title} · ${copy.site
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="container max-w-[900px] pt-8">
       <h1 className="text-2xl font-semibold">{copy.privacy.title}</h1>
       {copy.privacy.sections.map((s) => (
         <section key={s.heading} className="mt-6">

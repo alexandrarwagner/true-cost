@@ -1,23 +1,25 @@
 import { Archivo, Noto_Sans_Bengali } from "next/font/google";
 
-// Both fonts are downloaded at build time and served from our origin, so the CSP's
-// font-src 'self' holds and no request reaches Google at runtime.
-// Without the width axis: with it each Archivo file was 85-90 KB and the phone Lighthouse
-// score sat at 89-91; without it the files are 33-35 KB and every page clears 95. The
-// design system's 112% display stretch is the one thing given up (docs/accessibility-report.md).
+// All fonts download at build time and serve from our origin, so font-src 'self' holds.
+
+/**
+ * Archivo without the width axis: 33-35 KB per file. The design's 112% display width needs
+ * the axis, which was measured three ways and kept out each time: preloaded it doubled the
+ * font bytes (performance 89-91); loaded late with swap it shifted every heading (CLS 0.147,
+ * performance 83); loaded late as optional it still lengthened the simulated largest paint
+ * (performance 88). See docs/accessibility-report.md.
+ */
 export const archivo = Archivo({
   subsets: ["latin"],
   variable: "--font-archivo",
   display: "swap",
 });
 
-/** Only for the taka sign and Bengali digits; falls back to Archivo for everything else. */
+/** Only for the taka sign and Bengali digits; not preloaded. */
 export const notoBengali = Noto_Sans_Bengali({
   subsets: ["bengali"],
   weight: "500",
   variable: "--font-bengali",
   display: "swap",
-  // Not preloaded: it is 86 KB and only the taka sign needs it. The browser fetches it when a
-  // `font-bengali` element renders.
   preload: false,
 });

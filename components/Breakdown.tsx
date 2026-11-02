@@ -51,10 +51,12 @@ export function Breakdown({
   response,
   reportUrl,
   backHref,
+  aiEnabled = false,
 }: {
   response: EstimateResponse;
   reportUrl: string;
   backHref: string;
+  aiEnabled?: boolean;
 }) {
   const t = copy.breakdown;
   const { estimate: e, currency: cur } = response;
@@ -74,7 +76,7 @@ export function Breakdown({
   };
   const options = optionLines(e.input.options);
   return (
-    <article className="mx-auto max-w-5xl space-y-10">
+    <article className="container space-y-10 pt-8">
       <header>
         <h1 className="display text-3xl sm:text-4xl">{t.title}</h1>
         <p className="mt-2 text-muted">{t.intro}</p>
@@ -115,6 +117,13 @@ export function Breakdown({
           <dt className="font-semibold">{t.inputs.options}</dt>
           <dd>{options.length > 0 ? options.join("; ") : t.inputs.none}</dd>
         </dl>
+        {response.degraded.length > 0 && (
+          <ul className="mt-3 list-disc pl-5 text-sm text-muted">
+            {response.degraded.map((d) => (
+              <li key={d}>{copy.result.degraded[d]}</li>
+            ))}
+          </ul>
+        )}
         {today && cur.code !== "USD" && (
           <p className="mt-3 text-sm text-muted">
             {t.rateUsed(`${today.rate} ${cur.code} per USD`, dateFmt(today.date), today.source)}
@@ -188,7 +197,7 @@ export function Breakdown({
         );
       })}
 
-      <BreakdownMethod response={response} reportUrl={reportUrl} />
+      <BreakdownMethod response={response} reportUrl={reportUrl} aiEnabled={aiEnabled} />
     </article>
   );
 }

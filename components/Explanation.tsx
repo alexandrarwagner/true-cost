@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BotCheck } from "./BotCheck";
 import { templateExplanation } from "@/lib/adapters/ai/validate";
 import { copy } from "@/content/copy";
 import { decodeShare } from "@/lib/schema/share";
@@ -10,6 +11,7 @@ import { explainInputFromClient } from "@/lib/ui/explain";
 interface Props {
   response: EstimateResponse;
   aiEnabled: boolean;
+  /** From the page's own bot check; when absent and AI is on, this component runs its own. */
   botToken?: string;
 }
 
@@ -19,6 +21,8 @@ export function Explanation({ response, aiEnabled, botToken }: Props) {
   const [text, setText] = useState(template);
   const [by, setBy] = useState<"template" | "ai">("template");
   const [busy, setBusy] = useState(false);
+  const [ownToken, setOwnToken] = useState<string | undefined>(undefined);
+  const token = botToken ?? ownToken;
 
   async function explain() {
     const request = decodeShare(new URLSearchParams(response.shareQuery));
@@ -28,7 +32,7 @@ export function Explanation({ response, aiEnabled, botToken }: Props) {
       const res = await fetch("/api/ai/explain", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ request, ...(botToken ? { botToken } : {}) }),
+        body: JSON.stringify({ request, ...(token ? { botToken: token } : {}) }),
       });
       if (res.ok) {
         const json = (await res.json()) as { text: string; generatedBy: "ai" | "template" };
@@ -41,25 +45,20 @@ export function Explanation({ response, aiEnabled, botToken }: Props) {
   }
 
   return (
-    <section
-      id="explain"
-      aria-labelledby="explain-heading"
-      className="rounded-card bg-card p-5 shadow-card"
-    >
-      <h3 id="explain-heading" className="font-medium">
+    <section id="explain" aria-labelledby="explain-heading">
+      <h2 id="explain-heading" className="text-2xl font-semibold">
         {copy.ai.explainHeading}
-      </h3>
-      <p className="mt-2" aria-live="polite">
+      </h2>
+      {aiEnabled && botToken === undefined && <BotCheck onToken={setOwnToken} />}
+      <p className="mt-2 max-w-[70ch]" aria-live="polite">
         {text}
       </p>
-      <p className="mt-1 text-sm text-neutral-700">
-        {by === "ai" ? copy.ai.byAi : copy.ai.byTemplate}
-      </p>
+      <p className="mt-1 text-sm text-muted">{by === "ai" ? copy.ai.byAi : copy.ai.byTemplate}</p>
       {aiEnabled && by === "template" && (
         <p className="mt-2 print:hidden">
           <button
             type="button"
-            className="border border-neutral-900 bg-white px-3 py-1 text-sm hover:bg-neutral-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900 disabled:opacity-60"
+            className="inline-flex h-11 items-center rounded-pill border-[1.5px] border-ink px-5 text-[15px] hover:bg-card disabled:opacity-60"
             onClick={() => void explain()}
             disabled={busy}
           >

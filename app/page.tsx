@@ -31,7 +31,7 @@ export default async function HomePage({
         }
       : null;
   return (
-    <div>
+    <div className="pb-10">
       <Hero />
       <EstimateFlow
         initial={initial}

@@ -24,10 +24,9 @@ interface Props {
   botToken: string | undefined;
 }
 
-const cell = "min-w-0 px-4 py-3 md:py-2";
-const label = "block text-xs font-semibold text-ink";
-const input =
-  "w-full bg-transparent py-1 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand";
+const cell = "min-w-0 px-5 py-3 md:px-6 md:py-0";
+const label = "block text-[13px] font-semibold text-ink";
+const input = "w-full bg-transparent py-0.5 text-[19px]";
 
 /** One bar on wide screens, a stacked form on phones. Every field keeps a real label. */
 export function InputBar(p: Props) {
@@ -38,7 +37,7 @@ export function InputBar(p: Props) {
     : p.currency;
   return (
     <>
-      <div className="grid grid-cols-1 divide-y divide-line rounded-card border border-line bg-card shadow-bar md:grid-cols-[1.1fr_1.7fr_1fr_auto_auto] md:items-center md:divide-x md:divide-y-0 md:rounded-pill">
+      <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 divide-y divide-line rounded-[28px] bg-card p-2.5 shadow-bar md:min-h-[92px] md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,0.95fr)_minmax(0,0.8fr)_auto] md:items-center md:divide-x md:divide-y-0 md:rounded-[46px]">
         <div className={cell}>
           <label htmlFor="country" className={label}>
             {t.from}
@@ -56,7 +55,7 @@ export function InputBar(p: Props) {
                 </option>
               ))}
             </select>
-            <span className="rounded-pill bg-page px-2 py-0.5 text-xs font-semibold whitespace-nowrap">
+            <span className="rounded-[10px] bg-page px-2.5 py-1 text-sm font-semibold whitespace-nowrap tabular-nums">
               {chip}
             </span>
           </div>
@@ -99,10 +98,10 @@ export function InputBar(p: Props) {
           </label>
           <YearsStepper value={p.years} onChange={p.onYears} />
         </div>
-        <div className="p-2 md:pr-2">
+        <div className="pt-2 md:pt-0">
           <button
             type="submit"
-            className="w-full rounded-pill bg-dark px-5 py-3 font-medium text-white hover:bg-ink focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand disabled:opacity-60 md:w-auto"
+            className="inline-flex h-14 w-full items-center justify-center rounded-pill bg-dark px-8 text-lg font-semibold text-white hover:bg-ink disabled:opacity-60 md:h-[72px] md:w-auto"
             disabled={p.submitting}
             aria-busy={p.submitting}
           >

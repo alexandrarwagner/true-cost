@@ -2,21 +2,45 @@ import { copy } from "@/content/copy";
 import { dealReportHref } from "@/lib/ui/dealReport";
 import { homeShort, usdFmt } from "@/lib/ui/format";
 import type { EstimateResponse } from "@/services/estimate";
+import { Explanation } from "./Explanation";
+import { Timeline } from "./Timeline";
+import { WhatIf } from "./WhatIf";
 
-/** The exchange-rate method, the money-moving trace, what is left out, and the mistake link. */
+/**
+ * After the line items: the plain-English note, the payment timeline, the exchange-rate method
+ * with the what-if slider, the money-moving trace, what is left out, and the mistake link.
+ */
 export function BreakdownMethod({
   response,
   reportUrl,
+  aiEnabled,
 }: {
   response: EstimateResponse;
   reportUrl: string;
+  aiEnabled: boolean;
 }) {
   const t = copy.breakdown;
   const { estimate: e, currency: cur } = response;
   const fx = e.fx;
   const mm = e.moneyMoving;
+  const uncertainty = response.savings?.uncertainty;
+  const notes = e.noteIds.filter((n) => copy.notes[n]);
   return (
     <>
+      <Explanation response={response} aiEnabled={aiEnabled} />
+      {notes.length > 0 && (
+        <section aria-labelledby="notes-heading">
+          <h2 id="notes-heading" className="text-2xl font-semibold">
+            {t.notesHeading}
+          </h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            {notes.map((n) => (
+              <li key={n}>{copy.notes[n]}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <Timeline response={response} />
       <section
         id="fx-method"
         aria-labelledby="fx-method-heading"
@@ -38,11 +62,22 @@ export function BreakdownMethod({
               )}
             </p>
             <p className="mt-1 font-medium">{copy.fx.notPrediction}</p>
+            <p className="mt-3 max-w-[70ch]">{copy.fx.whatYouCanDo}</p>
+            {uncertainty && cur.code !== "USD" && (
+              <p className="mt-3 max-w-[70ch]">
+                <b>{copy.savings.uncertainty.heading}.</b>{" "}
+                {copy.savings.uncertainty.body(
+                  `${homeShort(uncertainty.lowHome, cur)} to ${homeShort(uncertainty.highHome, cur)}`,
+                )}
+              </p>
+            )}
           </>
         ) : (
           <p className="mt-2">{t.fxNone}</p>
         )}
       </section>
+
+      {fx.kind === "replay" && <WhatIf response={response} />}
 
       <section aria-labelledby="moving-heading">
         <h2 id="moving-heading" className="text-2xl font-semibold">

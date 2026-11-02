@@ -73,7 +73,17 @@ export function EstimateFlow({
       setResult(next);
       if (kind === "single") setLastReq(body as EstimateRequest);
       window.history.replaceState(null, "", `/?${next.data.shareQuery}`);
-      if (focus) requestAnimationFrame(() => resultRef.current?.focus());
+      if (focus)
+        requestAnimationFrame(() => {
+          const el = resultRef.current;
+          if (!el) return;
+          el.focus({ preventScroll: true });
+          const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          (document.getElementById("breakdown") ?? el).scrollIntoView({
+            behavior: reduce ? "auto" : "smooth",
+            block: "start",
+          });
+        });
     } catch {
       setError(copy.errors.DATA_UNAVAILABLE);
     } finally {
@@ -116,12 +126,10 @@ export function EstimateFlow({
       {aiEnabled && <BotCheck onToken={setBotToken} />}
       {!result && <EmptyTree onExample={showExample} />}
       {result && (
-        <div ref={resultRef} tabIndex={-1} className="mx-auto mt-10 max-w-3xl focus:outline-none">
+        <div ref={resultRef} tabIndex={-1} className="focus:outline-none">
           {result.kind === "single" ? (
             <ResultView
               response={result.data}
-              aiEnabled={aiEnabled}
-              botToken={botToken}
               busy={submitting}
               onCustomCosts={changeCustomCosts}
               onToggleLevers={(ids: LeverId[]) => {
@@ -130,7 +138,7 @@ export function EstimateFlow({
               }}
             />
           ) : (
-            <CompareView response={result.data} aiEnabled={aiEnabled} botToken={botToken} />
+            <CompareView response={result.data} />
           )}
         </div>
       )}

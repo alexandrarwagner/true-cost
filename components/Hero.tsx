@@ -40,8 +40,8 @@ const Receipt = () => (
 export function Hero() {
   const t = copy.hero;
   return (
-    <section className="mx-auto max-w-4xl pt-6 text-center sm:pt-12">
-      <h1 className="display text-3xl sm:text-display lg:text-display-lg">
+    <section className="container flex flex-col items-center pt-10 text-center sm:pt-20 lg:pt-[150px]">
+      <h1 className="display max-w-[1100px] text-[40px] leading-none sm:text-display lg:text-display-lg">
         {t.headline1}
         <Tile tone="bg-cat-tuition-chip text-ink">
           <Book />
@@ -52,7 +52,9 @@ export function Hero() {
         </Tile>
         {t.headline3}
       </h1>
-      <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">{t.subhead}</p>
+      <p className="mx-auto mt-6 max-w-[680px] text-lg leading-[1.55] text-muted sm:text-xl">
+        {t.subhead}
+      </p>
     </section>
   );
 }

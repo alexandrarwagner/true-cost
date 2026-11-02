@@ -29,11 +29,11 @@ export function DealGrid({ deals, response, active, busy, onToggle, shareQuery }
     .sort()
     .at(-1);
   const chip = (on: boolean) =>
-    `rounded-pill px-3 py-1.5 text-sm ${on ? "bg-dark text-white" : "bg-card shadow-card hover:bg-page"}`;
+    `inline-flex h-10 items-center rounded-pill border-[1.5px] px-4 text-[15px] ${on ? "border-dark bg-dark text-white" : "border-line-strong bg-card hover:bg-page"}`;
   return (
-    <div className="mt-8">
+    <div className="mt-12">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-2xl font-semibold">{t.heading}</h3>
+        <h3 className="display text-[30px]">{t.heading}</h3>
         {latest && <p className="text-sm text-muted">{t.checkedLine(monthYear(latest))}</p>}
       </div>
       {categories.length > 1 && (
@@ -62,7 +62,7 @@ export function DealGrid({ deals, response, active, busy, onToggle, shareQuery }
       {shown.length === 0 ? (
         <p className="mt-4 text-muted">{t.none}</p>
       ) : (
-        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {shown.map((l) =>
             l.deal ? (
               <DealCard

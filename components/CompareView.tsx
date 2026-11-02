@@ -7,15 +7,7 @@ import { ResultView } from "./ResultView";
 type Cell = (col: EstimateResponse) => string;
 
 // Side by side (step 8). Server-safe and static: a table, then the first school's full result.
-export function CompareView({
-  response,
-  aiEnabled = false,
-  botToken,
-}: {
-  response: CompareResponse;
-  aiEnabled?: boolean;
-  botToken?: string;
-}) {
+export function CompareView({ response }: { response: CompareResponse }) {
   const t = copy.compare;
   const { columns, currency: cur } = response;
   const isUsd = cur.code === "USD";
@@ -116,8 +108,6 @@ export function CompareView({
           response={primary}
           heading={t.fullResult(primary.estimate.input.school.name)}
           shareQuery={response.shareQuery}
-          aiEnabled={aiEnabled}
-          botToken={botToken}
         />
       )}
     </div>

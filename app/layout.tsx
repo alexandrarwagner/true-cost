@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {copy.shell.skip}
         </a>
         <SiteHeader />
-        <main id="main" className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <main id="main" className="w-full flex-1">
           {children}
         </main>
         <SiteFooter />

@@ -49,13 +49,13 @@ export function ResultNav({ summary, editHref, breakdownHref }: Props) {
   if (!slot) return null;
   return createPortal(
     <nav aria-label={t.label} className="flex w-full min-w-0 items-center justify-end gap-3">
-      <ul className="flex max-w-full min-w-0 items-center gap-1 overflow-x-auto rounded-pill bg-card p-1 shadow-card">
+      <ul className="flex max-w-full min-w-0 items-center gap-1 overflow-x-auto rounded-[24px] bg-card p-1">
         {SECTIONS.map((id) => (
           <li key={id} className="shrink-0">
             <a
               href={id === "breakdown" ? breakdownHref : `#${id}`}
               aria-current={current === id ? "true" : undefined}
-              className={`inline-block rounded-pill px-3 py-1.5 text-sm whitespace-nowrap ${
+              className={`inline-flex h-10 items-center rounded-pill px-4 text-[15px] whitespace-nowrap ${
                 current === id ? "bg-dark text-white" : "hover:bg-page"
               }`}
             >
@@ -64,10 +64,14 @@ export function ResultNav({ summary, editHref, breakdownHref }: Props) {
           </li>
         ))}
       </ul>
-      <p className="hidden shrink-0 text-sm lg:block">
-        <span className="font-semibold tabular-nums">{summary}</span>
-        <span className="mx-2 text-muted">·</span>
-        <a href={editHref} className="underline underline-offset-4">
+      <p className="hidden shrink-0 items-center gap-3 text-[15px] text-muted lg:flex">
+        <span className="tabular-nums">
+          <b className="text-lg text-ink">{summary.split(" · ")[0]}</b> · {summary.split(" · ")[1]}
+        </span>
+        <a
+          href={editHref}
+          className="inline-flex h-11 items-center rounded-pill border-[1.5px] border-ink px-4 text-ink"
+        >
           {t.edit}
         </a>
       </p>

@@ -21,7 +21,7 @@ step 8. Everything under "automated" re-runs in CI on every push.
 - Reflow (1.4.10): no horizontal scroll at 320 px on the empty page and on the result page
   with the range table open, measured after web fonts settle; the result page is also checked
   on the 412 px Pixel profile.
-- Motion: with `prefers-reduced-motion: reduce` the tree's four stages are fully visible at
+- Motion: with `prefers-reduced-motion: reduce` the tree's stages are fully visible at
   once and the status line shows its final text; the count-up never runs.
 - Live updates: the staged reveal narrates through one `role="status"` line; lever switches
   announce the new total the same way.
@@ -61,8 +61,11 @@ step 8. Everything under "automated" re-runs in CI on every push.
   through the letter box. The letter box heading is now an h2.
 - **Performance**: home 89 and result 91 before this step, and 88 and 84 on the GitHub runner.
   Three changes: the Bengali font (86 KB) is no longer preloaded for every visitor; Archivo
-  is loaded without its width axis, which took each file from 85-90 KB to 33-35 KB (the design
-  system's 112% display stretch is the one thing given up); and the chart chunk loads only when
+  is loaded without its width axis, which took each file from 85-90 KB to 33-35 KB. The
+  design system's 112% display stretch was then tried two more ways: a second, late-loaded wide
+  face with `font-display: swap` shifted every heading when it arrived (CLS 0.147, performance
+  83), and the same face as `optional` had no shift but still lengthened the simulated largest
+  paint (performance 88). The stretch stays out; and the chart chunk loads only when
   the exchange-rate section is near the viewport. Now 95, 95 and 97 on this machine. In CI the
   script takes the median of three runs and calibrates the CPU throttle to the runner's
   benchmark index, per Lighthouse's throttling guide, so a slow runner is not scored as a slow

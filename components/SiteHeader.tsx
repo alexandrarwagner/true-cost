@@ -6,8 +6,8 @@ import { Wordmark } from "./Wordmark";
 export function SiteHeader() {
   const t = copy.shell;
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-page/85 backdrop-blur print:hidden">
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-20 border-b border-ink/5 bg-page/85 backdrop-blur-[14px] print:hidden">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:h-20 sm:px-6 lg:px-14">
         <Link href="/" aria-label={copy.siteName}>
           <Wordmark />
         </Link>
@@ -22,7 +22,7 @@ export function SiteHeader() {
             <li>
               <Link
                 href="/#estimate"
-                className="inline-block rounded-pill bg-dark px-4 py-2 text-sm font-medium text-white hover:bg-ink focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand"
+                className="inline-flex h-11 items-center rounded-pill bg-dark px-5 text-[15px] text-white hover:bg-ink"
               >
                 {t.cta}
               </Link>

@@ -1,8 +1,10 @@
 import { copy } from "@/content/copy";
 import { SOURCES } from "@/data/sources";
 import { METHODOLOGY } from "@/lib/ui/methodology";
-import { CategoryChip } from "./CategoryChip";
+import { CATEGORY_BG } from "./CategoryChip";
 import { ConfidenceMark } from "./ConfidenceMark";
+
+const COLS = "md:grid-cols-[200px_minmax(0,1.25fr)_minmax(0,1fr)_150px]";
 
 /** "How we work it out": one row per cost, sources from the registry, always on the page. */
 export function Methodology() {
@@ -11,52 +13,48 @@ export function Methodology() {
     <section
       id="how"
       aria-labelledby="how-heading"
-      className="mx-auto mt-16 max-w-5xl scroll-mt-24"
+      className="container mt-20 scroll-mt-24 lg:mt-40"
     >
-      <div className="grid gap-4 md:grid-cols-[1fr_1fr] md:items-end">
-        <h2 id="how-heading" className="display text-3xl sm:text-4xl">
+      <div className="flex flex-wrap items-end justify-between gap-6 lg:gap-10">
+        <h2 id="how-heading" className="display max-w-[700px] text-4xl sm:text-display">
           {t.heading}
         </h2>
-        <p className="text-muted md:text-right">{t.intro}</p>
+        <p className="max-w-[460px] text-lg leading-relaxed text-muted">{t.intro}</p>
       </div>
-      <div className="mt-6 rounded-card bg-card p-4 shadow-card">
-        <table className="block w-full border-collapse text-left text-sm sm:table">
-          <thead className="sr-only sm:not-sr-only">
-            <tr className="border-b border-line-strong">
-              <th scope="col" className="py-2 pr-4">
-                {t.columns.cost}
-              </th>
-              <th scope="col" className="py-2 pr-4">
-                {t.columns.how}
-              </th>
-              <th scope="col" className="py-2 pr-4">
-                {t.columns.source}
-              </th>
-              <th scope="col" className="py-2">
-                {t.columns.type}
-              </th>
+      <div className="mt-10 rounded-[28px] bg-card px-5 pt-3 pb-5 shadow-card sm:px-10">
+        <div
+          className={`hidden gap-8 py-4 text-sm font-semibold text-muted md:grid ${COLS}`}
+          aria-hidden="true"
+        >
+          <span>{t.columns.cost}</span>
+          <span>{t.columns.how}</span>
+          <span>{t.columns.source}</span>
+          <span>{t.columns.type}</span>
+        </div>
+        <table className="block w-full border-collapse text-left md:table">
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">{t.columns.cost}</th>
+              <th scope="col">{t.columns.how}</th>
+              <th scope="col">{t.columns.source}</th>
+              <th scope="col">{t.columns.type}</th>
             </tr>
           </thead>
-          <tbody className="block sm:table-row-group">
+          <tbody className="block md:table-row-group">
             {METHODOLOGY.map((row) => (
               <tr
                 key={row.key}
-                className="block border-b border-line py-3 align-top sm:table-row sm:py-0"
+                className={`grid gap-2 border-t border-line py-5 md:gap-8 md:py-6 ${COLS} md:items-start`}
               >
-                <th scope="row" className="block py-1 pr-4 font-normal sm:table-cell sm:py-3">
-                  {row.key === "fx" ? (
-                    <span className="font-semibold">{t.fxRow}</span>
-                  ) : (
-                    <CategoryChip category={row.key} />
-                  )}
+                <th scope="row" className="flex items-center gap-2.5 text-[19px] font-semibold">
+                  <span
+                    aria-hidden="true"
+                    className={`h-3.5 w-3.5 shrink-0 rounded-[4px] ${row.key === "fx" ? "bg-dark" : CATEGORY_BG[row.key]}`}
+                  />
+                  {row.key === "fx" ? t.fxRow : copy.categories[row.key]}
                 </th>
-                <td data-label={t.columns.how} className="block py-1 pr-4 sm:table-cell sm:py-3">
-                  {t.rows[row.key]}
-                </td>
-                <td
-                  data-label={t.columns.source}
-                  className="block py-1 pr-4 text-muted sm:table-cell sm:py-3"
-                >
+                <td className="text-[17px] leading-relaxed">{t.rows[row.key]}</td>
+                <td className="text-[15px] leading-relaxed text-muted">
                   {row.sourceIds.map((id, i) => {
                     const s = SOURCES[id];
                     return (
@@ -79,12 +77,10 @@ export function Methodology() {
                     );
                   })}
                 </td>
-                <td data-label={t.columns.type} className="block py-1 sm:table-cell sm:py-3">
-                  <span className="flex flex-wrap gap-x-3 gap-y-1 sm:flex-col">
-                    {row.kinds.map((k) => (
-                      <ConfidenceMark key={k} kind={k} />
-                    ))}
-                  </span>
+                <td className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted md:flex-col">
+                  {row.kinds.map((k) => (
+                    <ConfidenceMark key={k} kind={k} />
+                  ))}
                 </td>
               </tr>
             ))}

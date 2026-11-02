@@ -145,6 +145,7 @@ export const copy = {
     ) =>
       `${transfers} transfers, each with a ${markup}% markup over the mid-market rate and a ${fee} fixed fee: ${markupUsd} in markup and ${feesUsd} in fees, ${total} in all.`,
     movingNone: "Paid from a US dollar account: no transfer costs.",
+    notesHeading: "Notes on these figures",
     notIncludedHeading: "What we don't include",
     notIncluded: [
       "Application and test fees paid before the offer (TOEFL, GRE, GMAT, application fees).",
@@ -298,6 +299,16 @@ export const copy = {
     privacy: "Don't add personal details: this goes in your share link.",
     max: "You can add up to ten.",
     list: "Costs you added",
+  },
+  share: {
+    heading: "Share it with your family.",
+    body: "One page with the full cost, each payment and where every number comes from, in your currency and in dollars. Easy to print, or to send on WhatsApp or email.",
+    pdf: "Download PDF",
+    note: "The PDF is made on your device. Nothing you typed is saved or sent to us.",
+    sheetSubtitle: (years: number, currency: string) =>
+      `Your US degree, the full cost · ${years} ${years === 1 ? "year" : "years"} · ${currency}`,
+    sheetFooter:
+      "Sources: your school, College Scorecard, HUD Fair Market Rents, Frankfurter. Not a prediction.",
   },
   shares: {
     heading: "Where the money goes.",

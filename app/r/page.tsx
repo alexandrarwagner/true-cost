@@ -17,7 +17,7 @@ function Frame({
   children,
 }: React.PropsWithChildren<{ title: string; shareQuery: string }>) {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="container pt-8">
       <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
       <p className="mt-1 mb-6">
         {title} ·{" "}
@@ -41,14 +41,14 @@ export default async function SharedResultPage({
   const raw = await searchParams;
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(raw)) if (typeof v === "string") params.set(k, v);
-  const { AI_ENABLED, COMPARE_ENABLED } = flags();
+  const { COMPARE_ENABLED } = flags();
   const compare = COMPARE_ENABLED ? decodeCompareShare(params) : null;
   if (compare) {
     const response = await runCompare(compare, buildSources());
     const names = compare.schools.map((s) => s.school.name).join(" · ");
     return (
       <Frame title={names} shareQuery={response.shareQuery}>
-        <CompareView response={response} aiEnabled={AI_ENABLED} />
+        <CompareView response={response} />
       </Frame>
     );
   }
@@ -69,11 +69,7 @@ export default async function SharedResultPage({
   const response = await runEstimate(req, req.example ? exampleSources() : buildSources());
   return (
     <Frame title={req.school.name} shareQuery={response.shareQuery}>
-      <ResultView
-        editHref={`/?${response.shareQuery}`}
-        response={response}
-        aiEnabled={AI_ENABLED}
-      />
+      <ResultView editHref={`/?${response.shareQuery}`} response={response} />
     </Frame>
   );
 }

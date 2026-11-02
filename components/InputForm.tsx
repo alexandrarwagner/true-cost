@@ -40,8 +40,7 @@ interface Props {
   botToken: string | undefined;
 }
 
-const field =
-  "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
+const field = "mt-1 w-full rounded-[12px] border-[1.5px] border-line-strong bg-white px-3 py-2.5";
 
 /** Years from a school's predominant degree (Scorecard: 3 = bachelor's, 4 = graduate). */
 const yearsFromDegree = (predominant: number | undefined): Years | undefined =>
@@ -159,7 +158,7 @@ export function InputForm({
   return (
     <form
       id="estimate"
-      className="mx-auto mt-8 max-w-5xl scroll-mt-20 print:hidden"
+      className="container mt-8 scroll-mt-24 print:hidden"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
@@ -189,7 +188,7 @@ export function InputForm({
         {localError ?? error ?? ""}
       </p>
 
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto mt-3 max-w-[960px] space-y-5">
         <AccurateOptions value={options} onChange={setOptions}>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <label className="block">
@@ -222,7 +221,7 @@ export function InputForm({
                   </option>
                 ))}
               </select>
-              <span id="currency-hint" className="mt-1 block text-sm text-neutral-700">
+              <span id="currency-hint" className="mt-1 block text-sm text-muted">
                 {t.currencyHint}
               </span>
             </label>

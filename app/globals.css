@@ -36,8 +36,10 @@
   --radius-card-lg: 32px;
   --radius-pill: 999px;
 
-  --shadow-card: 0 8px 24px rgba(17, 20, 30, 0.08);
-  --shadow-bar: 0 10px 30px rgba(17, 20, 30, 0.08);
+  --shadow-card: 0 18px 40px rgba(17, 20, 30, 0.06);
+  --shadow-bar: 0 20px 40px rgba(17, 20, 30, 0.07);
+  --shadow-pill: 0 16px 36px rgba(17, 20, 30, 0.06);
+  --shadow-sheet: 0 30px 60px rgba(0, 0, 0, 0.3);
 
   --text-xs: 13px;
   --text-xs--line-height: 1.5;
@@ -73,12 +75,57 @@
   }
 }
 
-/* Display style for headlines and big numbers: medium weight, tight tracking. The design
-   system's 112% width needs Archivo's width axis, which doubled the font files and cost the
-   phone performance target; it is left out (docs/accessibility-report.md). */
+/* Display style for headlines and big numbers: medium weight, tight tracking. The design's
+   112% width needs Archivo's width axis, which costs the phone performance target whichever
+   way it is loaded (app/fonts.ts); it is left out. */
 .display {
   font-weight: 500;
   letter-spacing: -0.035em;
+}
+
+/* Full-width bands inside a centred page: the section spans the viewport, its content keeps
+   the 1200px column. */
+.band {
+  width: 100%;
+}
+.container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 16px;
+}
+@media (min-width: 640px) {
+  .container {
+    padding-inline: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding-inline: 64px;
+  }
+}
+@media (min-width: 1280px) {
+  .container {
+    padding-inline: 120px;
+  }
+}
+
+/* The tree's branch lines draw in; the rule above removes it under reduced motion. */
+@keyframes draw-in {
+  from {
+    stroke-dashoffset: 1400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.draw {
+  stroke-dasharray: 1400;
+  animation: draw-in 1.8s ease-out 0.2s backwards;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -109,6 +156,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
@@ -119,13 +169,13 @@ body {
   }
 }
 
-/* The tree reveals in stages: tuition, the branches, the cost cards, the total. Content is
-   visible by default; the animation runs from hidden (fill-mode backwards). Reduced motion
-   removes it through the rule above. */
-@keyframes tree-in {
+/* The tree, per the board: the blue line draws (.draw), the cards land on it, the total counts
+   up once. Each stage sets --delay. Content is visible by default; the animation runs from
+   hidden (fill-mode backwards). Reduced motion: everything is already in place. */
+@keyframes land {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -133,8 +183,30 @@ body {
   }
 }
 .tree-stage {
-  animation: tree-in 500ms ease-out backwards;
-  animation-delay: calc(var(--stage, 0) * 450ms);
+  animation: land 0.5s ease-out backwards;
+  animation-delay: var(--delay, 0s);
+}
+
+/* "Where the money goes": the circles grow, largest first, once the band scrolls into view.
+   Before that they are hidden only when scripts run, so the no-JavaScript page shows them. */
+@keyframes bub-in {
+  from {
+    transform: scale(0);
+  }
+}
+@media (scripting: enabled) {
+  .bubbles:not(.is-in) .bub {
+    transform: scale(0);
+  }
+}
+.bubbles.is-in .bub {
+  animation: bub-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: var(--delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubbles:not(.is-in) .bub {
+    transform: none;
+  }
 }
 
 /* The unfold: rows appear in sequence. Switched off by the reduced-motion rule above. */

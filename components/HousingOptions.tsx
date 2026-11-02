@@ -10,8 +10,7 @@ interface Props {
   onChange: (next: Housing) => void;
 }
 
-const field =
-  "mt-1 w-full border border-neutral-900 bg-white px-3 py-2 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-neutral-900";
+const field = "mt-1 w-full rounded-[12px] border-[1.5px] border-line-strong bg-white px-3 py-2.5";
 const num = (v: string): number | undefined => (v.trim() === "" ? undefined : Number(v));
 
 export function HousingOptions({ value, onChange }: Props) {

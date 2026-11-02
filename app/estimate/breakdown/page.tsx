@@ -4,6 +4,7 @@ import { Breakdown } from "@/components/Breakdown";
 import { copy } from "@/content/copy";
 import { decodeShare } from "@/lib/schema/share";
 import { getEnv } from "@/lib/server/env";
+import { flags } from "@/lib/server/flags";
 import { buildSources, exampleSources } from "@/lib/server/sources";
 import { runEstimate } from "@/services/estimate";
 
@@ -22,7 +23,7 @@ export default async function BreakdownPage({
   const req = decodeShare(params);
   if (!req) {
     return (
-      <div className="mx-auto max-w-3xl">
+      <div className="container pt-8">
         <h1 className="text-2xl font-semibold">{copy.breakdown.title}</h1>
         <p className="mt-4">{copy.result.notFound}</p>
         <p className="mt-2">
@@ -39,6 +40,7 @@ export default async function BreakdownPage({
       response={response}
       reportUrl={getEnv().dealReportUrl}
       backHref={`/?${response.shareQuery}`}
+      aiEnabled={flags().AI_ENABLED}
     />
   );
 }

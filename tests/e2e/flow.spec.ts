@@ -15,7 +15,7 @@ async function threeInputs(page: Page) {
 }
 
 test.describe("Tuition+ flow (DEMO_MODE)", () => {
-  test("three inputs to a result, with the unfold, range, timeline and sources, and no serious a11y issues", async ({
+  test("three inputs to a result, with the tree, the nav and the range, and no serious a11y issues", async ({
     page,
   }) => {
     await threeInputs(page);
@@ -38,9 +38,9 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
     await expect(nav.getByRole("link", { name: "Exchange rate" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "If the rupee moves." })).toBeVisible();
     await expect(page.getByText("This isn't a prediction", { exact: false }).first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: "When the money is needed" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Where each number comes from" })).toBeVisible();
-    await expect(page.getByText("Visa Integrity Fee (may apply)").first()).toBeVisible();
+    // The sections the boards don't have are on the full calculation, not here.
+    await expect(page.getByRole("heading", { name: "When the money is needed" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "In plain English" })).toHaveCount(0);
     await expect(page).toHaveURL(/\?c=IN&cur=INR&s=243780/);
 
     const overflow = await page.evaluate(
@@ -66,7 +66,12 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
     await page.getByLabel(/Scholarship or assistantship/).fill("5000");
     await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "Your true cost" })).toBeVisible();
-    await expect(page.locator("summary", { hasText: /^Rent\b/ }).first()).toBeVisible();
+    // The lines themselves are on the full calculation.
+    await page
+      .locator("#breakdown")
+      .getByRole("link", { name: "See the full calculation" })
+      .click();
+    await expect(page.getByText(/^Rent\b/).first()).toBeVisible();
     await expect(page.getByText("Rent over the summer").first()).toBeVisible();
     await expect(page.getByText("Your scholarship has been taken off the tuition.")).toBeVisible();
     await expect(page.getByText(/What if my currency moves/)).toBeVisible();
@@ -146,6 +151,10 @@ test.describe("AI features (DEMO_MODE mock)", () => {
   }) => {
     await threeInputs(page);
     await page.getByRole("button", { name: "Show me" }).click();
+    await page
+      .locator("#breakdown")
+      .getByRole("link", { name: "See the full calculation" })
+      .click();
     await expect(page.getByRole("heading", { name: "In plain English" })).toBeVisible();
     await expect(page.getByText("Standard wording from the numbers on this page.")).toBeVisible();
     await page.getByRole("button", { name: "Explain this result" }).click();
@@ -171,7 +180,8 @@ test.describe("motion and print", () => {
     const opacities = await page.$$eval(".tree-stage", (rows) =>
       rows.map((r) => getComputedStyle(r).opacity),
     );
-    expect(opacities.length).toBe(4);
+    // Tuition, two lines, five cost cards, the total.
+    expect(opacities.length).toBe(9);
     expect(opacities.every((o) => o === "1")).toBe(true);
     // Reduced motion also means the status line and the total show their final text at once.
     await expect(page.getByRole("status").filter({ hasText: /^Your degree: about/ })).toBeVisible();
@@ -206,12 +216,13 @@ test.describe("where the money goes and the deals grid", () => {
     await page.getByRole("button", { name: "Show me" }).click();
     const shares = page.locator("#where");
     await expect(shares.getByRole("heading", { name: "Where the money goes." })).toBeVisible();
-    await expect(shares.getByText(/% of the total/).first()).toBeVisible();
-    await shares.getByRole("button", { name: "See as chart" }).click();
+    // Circles by default, with a text description; the list is the accessible alternative.
     await expect(
       shares.getByRole("img", { name: /Shares of the total: Tuition \d+%/ }),
     ).toBeVisible();
-    await expect(shares.getByRole("button", { name: "See as list" })).toHaveAttribute(
+    await shares.getByRole("button", { name: "See as list" }).click();
+    await expect(shares.getByText(/% of the total/).first()).toBeVisible();
+    await expect(shares.getByRole("button", { name: "See as chart" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -252,7 +263,11 @@ test.describe("Know a cost we missed?", () => {
   test("an added cost joins the total and the share link, and can be removed", async ({ page }) => {
     await threeInputs(page);
     await page.getByRole("button", { name: "Show me" }).click();
-    const usdTotal = page.getByText(/in total over the programme\./).first();
+    // The dollar figure under the big total: "₹… · $…".
+    const usdTotal = page
+      .locator("#breakdown")
+      .getByText(/· \$[\d,]+$/)
+      .first();
     const before = (await usdTotal.textContent()) ?? "";
     await page.getByLabel("What is it").fill("Laptop");
     await page.getByLabel("Amount").fill("1200");
@@ -321,6 +336,12 @@ test.describe("the full calculation", () => {
     await expect(page).toHaveURL(/\/estimate\/breakdown\?/);
     const housingHeading = page.locator("#housing-heading");
     await expect(housingHeading).toContainText(housingOnResult.trim());
+    // The sections that moved here from the result page.
+    await expect(page.getByRole("heading", { name: "In plain English" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "When the money is needed" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "What if my currency moves?" })).toBeVisible();
+    await expect(page.getByText("Reduce the uncertainty.")).toBeVisible();
+    await expect(page.getByText("Visa Integrity Fee (may apply)").first()).toBeVisible();
 
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag22aa"])
@@ -495,7 +516,10 @@ test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", (
     await page.getByLabel("12-month lease (rent due over the summer)").check();
     await page.getByRole("button", { name: "Show me" }).click();
     await expect(page.getByRole("heading", { name: "Ways to lower this number" })).toBeVisible();
-    const total = page.getByText(/in total over the programme\./).first();
+    const total = page
+      .locator("#breakdown")
+      .getByText(/· \$[\d,]+$/)
+      .first();
     const before = (await total.textContent()) ?? "";
 
     await page.getByRole("switch", { name: "Try it: Share with two roommates" }).check();
@@ -530,7 +554,7 @@ test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", (
     await expect(
       page.getByRole("switch", { name: "Try it: Skip rent over the summer" }),
     ).toBeChecked();
-    await expect(page.getByText(/in total over the programme\./).first()).not.toHaveText(after);
+    await expect(total).not.toHaveText(after);
 
     await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
     const axe = await new AxeBuilder({ page })
@@ -549,7 +573,6 @@ test.describe("Ways to lower this number (SAVINGS_ENABLED follows DEMO_MODE)", (
       "/r?c=IN&cur=INR&s=243780&sn=Purdue+University-Main+Campus&sc=West+Lafayette&st=IN&sz=47907&t=28794&ts=school&y=2&sy=2027&ss=fall",
     );
     await expect(page.getByRole("heading", { name: "Ways to lower this number" })).toBeVisible();
-    await expect(page.getByText("Reduce the uncertainty")).toBeVisible();
     await page.getByRole("link", { name: "Try it: One fewer trip home a year" }).click();
     await expect(page).toHaveURL(/lv=flights-fewer/);
     await expect(page.getByText(/down from/).first()).toBeVisible();

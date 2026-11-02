@@ -19,7 +19,7 @@ interface Props {
 }
 
 const toggle = (on: boolean) =>
-  `rounded-pill px-3 py-1.5 text-sm font-medium ${on ? "bg-dark text-white" : "bg-page hover:bg-line"}`;
+  `inline-flex h-11 items-center rounded-pill px-4 text-[15px] ${on ? "bg-card text-ink shadow-[0_2px_6px_rgba(17,20,30,0.08)]" : "text-ink hover:bg-white/60"}`;
 
 /** "Know a cost we missed?": the user's own items, re-run through the engine as they are added. */
 export function CustomCosts({ value, homeCurrency, busy, onChange }: Props) {
@@ -43,44 +43,43 @@ export function CustomCosts({ value, homeCurrency, busy, onChange }: Props) {
   }
 
   return (
-    <section aria-labelledby={`${id}-h`} className="mx-auto mt-8 max-w-3xl text-center">
-      <h3 id={`${id}-h`} className="text-xl font-semibold">
-        {t.heading}
-      </h3>
-      <p className="mt-1 text-muted">{t.intro}</p>
-      <div className="mt-4 grid grid-cols-1 gap-2 rounded-card border border-line bg-card p-2 text-left shadow-card sm:grid-cols-[1.4fr_1fr_auto_auto_auto] sm:items-center sm:rounded-pill">
-        <div className="px-3 py-2">
-          <label htmlFor={`${id}-what`} className="block text-xs font-semibold">
-            {t.what}
-          </label>
+    <section
+      aria-labelledby={`${id}-h`}
+      className="container mt-12 flex flex-col items-center gap-4 text-center"
+    >
+      <div>
+        <h3 id={`${id}-h`} className="text-xl font-semibold">
+          {t.heading}
+        </h3>
+        <p className="mt-1 text-[15px] text-muted">{t.intro}</p>
+      </div>
+      <div className="grid w-full max-w-[960px] grid-cols-1 gap-2 rounded-[28px] bg-card p-2 text-left shadow-pill md:min-h-[76px] md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_auto_auto_auto] md:items-center md:rounded-pill">
+        <label className="flex flex-col px-5 py-2 md:border-r-[1.5px] md:border-line md:py-0">
+          <span className="text-xs font-semibold">{t.what}</span>
           <input
-            id={`${id}-what`}
             type="text"
             maxLength={40}
-            className="w-full bg-transparent py-1 placeholder:text-muted"
+            className="h-7 w-full bg-transparent text-[17px] placeholder:text-muted"
             placeholder={t.placeholder}
             value={label}
             disabled={full || busy}
             onChange={(e) => setLabel(e.target.value)}
           />
-        </div>
-        <div className="px-3 py-2">
-          <label htmlFor={`${id}-amount`} className="block text-xs font-semibold">
-            {t.amount}
-          </label>
+        </label>
+        <label className="flex flex-col px-5 py-2 md:border-r-[1.5px] md:border-line md:py-0">
+          <span className="text-xs font-semibold">{t.amount}</span>
           <input
-            id={`${id}-amount`}
             type="number"
             min={0}
             inputMode="decimal"
-            className="w-full bg-transparent py-1"
+            className="h-7 w-full bg-transparent text-[17px] tabular-nums placeholder:text-muted"
             placeholder="0"
             value={amount}
             disabled={full || busy}
             onChange={(e) => setAmount(e.target.value)}
           />
-        </div>
-        <div className="flex gap-1 px-2" role="group" aria-label={t.currency}>
+        </label>
+        <div className="flex gap-1 rounded-pill bg-page p-1" role="group" aria-label={t.currency}>
           {(["USD", "home"] as const).map((c) => (
             <button
               key={c}
@@ -93,7 +92,7 @@ export function CustomCosts({ value, homeCurrency, busy, onChange }: Props) {
             </button>
           ))}
         </div>
-        <div className="flex gap-1 px-2" role="group" aria-label={t.frequency}>
+        <div className="flex gap-1 rounded-pill bg-page p-1" role="group" aria-label={t.frequency}>
           {(["one_off", "monthly"] as const).map((f) => (
             <button
               key={f}
@@ -106,29 +105,27 @@ export function CustomCosts({ value, homeCurrency, busy, onChange }: Props) {
             </button>
           ))}
         </div>
-        <div className="p-1">
-          <button
-            type="button"
-            className="w-full rounded-pill bg-dark px-5 py-2.5 font-medium text-white hover:bg-ink disabled:opacity-60"
-            disabled={full || busy}
-            onClick={add}
-          >
-            {t.add}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="inline-flex h-[60px] items-center justify-center rounded-pill bg-dark px-7 text-[17px] font-semibold text-white hover:bg-ink disabled:opacity-60"
+          disabled={full || busy}
+          onClick={add}
+        >
+          {t.add}
+        </button>
       </div>
-      <p className="mt-2 min-h-5 text-sm text-error" role="alert">
+      <p className="min-h-5 text-sm text-error" role="alert">
         {error ?? ""}
       </p>
-      <p className="text-sm text-muted">
+      <p className="-mt-3 text-sm text-muted">
         {t.privacy} {full ? t.max : ""}
       </p>
       {value.length > 0 && (
-        <ul aria-label={t.list} className="mt-3 flex flex-wrap justify-center gap-2">
+        <ul aria-label={t.list} className="flex flex-wrap justify-center gap-2">
           {value.map((c, i) => (
             <li
               key={`${c.label}-${i}`}
-              className="flex items-center gap-2 rounded-pill bg-card px-3 py-1 text-sm shadow-card"
+              className="flex items-center gap-2 rounded-pill bg-card px-3 py-1.5 text-sm shadow-card"
             >
               <span>
                 {c.label}: {c.currency === "USD" ? "$" : `${homeCurrency} `}

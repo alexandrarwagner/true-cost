@@ -13,9 +13,11 @@ export function WhatIf({ response }: { response: EstimateResponse }) {
   if (!today) return null;
   const total = whatIf(e.schedule, today, pct, cur.minorDigits, response.generatedAt.slice(0, 10));
   return (
-    <div className="mt-4 border border-neutral-300 p-3 print:hidden">
-      <h4 className="font-medium">{copy.result.whatIfHeading}</h4>
-      <label className="mt-2 block">
+    <section aria-labelledby="whatif-heading" className="print:hidden">
+      <h2 id="whatif-heading" className="text-2xl font-semibold">
+        {copy.result.whatIfHeading}
+      </h2>
+      <label className="mt-2 block max-w-[560px]">
         {copy.result.whatIfLabel}: {pct}%{" "}
         {pct >= 0 ? copy.result.whatIfWeaker : copy.result.whatIfStronger}
         <input
@@ -31,7 +33,7 @@ export function WhatIf({ response }: { response: EstimateResponse }) {
       <p className="mt-2" aria-live="polite">
         {copy.result.whatIfResult(pct, homeShort(total, cur))}
       </p>
-      <p className="mt-1 text-sm text-neutral-700">{copy.fx.notPrediction}</p>
-    </div>
+      <p className="mt-1 text-sm text-muted">{copy.fx.notPrediction}</p>
+    </section>
   );
 }
