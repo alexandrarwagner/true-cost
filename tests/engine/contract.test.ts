@@ -196,6 +196,19 @@ describe("TPEngine contract", () => {
     expect(e.lines.some((l) => l.confidence === "estimate")).toBe(true);
   });
 
+  it("formats any supported currency the way the app does, and keeps lakh and crore", () => {
+    const engine = createEngine(deps, "engine-test");
+    expect(engine.format(12_748_295, "INR", "big")).toBe("₹1.27 crore");
+    expect(engine.format(7_151_250, "INR", "big")).toBe("₹71.5 lakh");
+    expect(engine.format(7_151_250, "INR", "full")).toBe("₹71,51,250");
+    expect(engine.format(133_700_000, "KRW", "full")).toBe("₩133,700,000");
+    expect(engine.format(133_700_000, "KRW", "short")).toBe("₩133.7M");
+    expect(engine.format(715_125, "BRL", "full")).toMatch(/^R\$\s?715\.125$/);
+    expect(engine.symbol("KRW")).toBe("₩");
+    expect(engine.symbol("BDT")).toBe("৳");
+    expect(engine.format(100, "XXX", "full")).toBe("XXX 100");
+  });
+
   it("bundles to a classic script that defines window.TPEngine", async () => {
     const result = await buildEngine({ write: false, minify: false });
     expect(result.errors).toEqual([]);

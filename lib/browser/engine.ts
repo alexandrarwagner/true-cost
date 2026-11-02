@@ -2,8 +2,16 @@ import { copy } from "@/content/copy";
 import { COUNTRIES, currencyInfo } from "@/data/countries";
 import fxLatest from "@/lib/adapters/mock/fixtures/fx-latest.json";
 import { computeEstimate, degreeTotal, type EstimateContext } from "@/lib/core/estimate";
+import { formatLakhCrore, formatMoney } from "@/lib/core/format";
 import { usd } from "@/lib/core/money";
-import type { CustomCost, Estimate, EstimateInput, LineItem, Source } from "@/lib/core/types";
+import type {
+  CustomCost,
+  Estimate,
+  EstimateInput,
+  LineItem,
+  Minor,
+  Source,
+} from "@/lib/core/types";
 import { nextTerms } from "@/lib/ui/terms";
 import type {
   Context,
@@ -162,6 +170,40 @@ function toPage(
   };
 }
 
+export function symbol(currency: string): string {
+  const info = currencyInfo(currency);
+  if (!info) return currency.toUpperCase();
+  const parts = new Intl.NumberFormat(info.locale, {
+    style: "currency",
+    currency: info.currency,
+  }).formatToParts(1);
+  return parts.find((p) => p.type === "currency")?.value ?? info.currency;
+}
+
+export function format(
+  units: number,
+  currency: string,
+  mode: "full" | "big" | "cr" | "short",
+): string {
+  const info = currencyInfo(currency);
+  if (!info) return `${currency.toUpperCase()} ${Math.round(units).toLocaleString("en")}`;
+  const minor = Math.round(units * Math.pow(10, info.minorDigits)) as Minor;
+  if (mode === "short")
+    return new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: info.currency,
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(units);
+  if (info.grouping === "indian" && mode !== "full")
+    return formatLakhCrore(minor, info.minorDigits, symbol(currency));
+  return formatMoney(minor, {
+    currency: info.currency,
+    locale: info.locale,
+    minorDigits: info.minorDigits,
+  });
+}
+
 /** The engine behind window.TPEngine; `deps` says where the data comes from. */
 export function createEngine(deps: EngineDeps, version: string): TPEngine {
   const now = deps.now ?? (() => new Date());
@@ -212,5 +254,5 @@ export function createEngine(deps: EngineDeps, version: string): TPEngine {
     return toPage(e, ctx, fx, input, today);
   }
 
-  return { version, rates: () => rates, ready, estimate };
+  return { version, rates: () => rates, ready, estimate, format, symbol };
 }

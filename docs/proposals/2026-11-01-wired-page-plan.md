@@ -102,6 +102,13 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   New York University at its published tuition, two years. The pixel test types the designer's
   sample into the bar itself, so the example's content does not move the baseline.
 
+- Change 3: `fmt()` keeps its rupee branch character for character and hands every other
+  home currency to `TPEngine.format()`, which uses the app's own formatter (locale grouping,
+  minor digits, compact form for the circles), so the page and the shared page print the same
+  figures. The fan chart's axis reads lakh and crore for rupees and thousands or millions
+  otherwise, with the currency's symbol; the family PDF names the currency and prints the
+  real rate instead of the prototype's fixed ₹95.35.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.

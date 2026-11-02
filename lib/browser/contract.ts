@@ -123,4 +123,12 @@ export interface TPEngine {
   ready(input: PageInput): Promise<void>;
   /** Synchronous, from whatever ready() has loaded; missing sources become estimates. */
   estimate(input: PageInput): PageEstimate;
+  /**
+   * An amount in whole units of a currency, as the app prints it: "full" with the locale's
+   * grouping, "big" the culture's short form where one exists (lakh, crore), "short" compact
+   * for tight spaces (₩134M). The page keeps its own rupee formatting; this covers the rest.
+   */
+  format(units: number, currency: string, mode: "full" | "big" | "cr" | "short"): string;
+  /** The currency's symbol in its own locale, e.g. "₩", or the code when there is none. */
+  symbol(currency: string): string;
 }

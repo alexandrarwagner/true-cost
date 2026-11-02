@@ -28,8 +28,11 @@ function fmt(usd,mode){ // mode: full | big | short
     if(mode==='big')return v>=1e7?'₹'+(v/1e7).toFixed(2)+' crore':'₹'+(v/1e5).toFixed(1)+' lakh';
     if(mode==='cr')return v>=1e7?'₹'+(v/1e7).toFixed(2)+' cr':'₹'+(v/1e5).toFixed(1)+' L';
     return '₹'+(v/1e5).toFixed(1)+'L'}
+  // Any other home currency: the engine formats it the way the rest of the site does.
+  if(CUR!=='USD'&&window.TPEngine.format)return window.TPEngine.format(usd*RATE[CUR],CUR,mode);
   if(mode==='full'||mode==='big'||mode==='cr')return '$'+Math.round(usd).toLocaleString('en-US');
   return '$'+(usd/1e3).toFixed(usd<1e4?1:0)+'k'}
+const sym=()=>CUR==='USD'?'$':(window.TPEngine.symbol?window.TPEngine.symbol(CUR):CUR);
 const usd=v=>'$'+Math.round(v).toLocaleString('en-US');
 function count(el,to,mode,delay,dur){
   if(RM){el.textContent=fmt(to,mode);return}
@@ -111,7 +114,7 @@ function reveal(T,Y,c,tot,K,Q){
   }else{fxSec.querySelectorAll(':scope > div:not(:first-child)').forEach(x=>x.classList.add('fxhide'));if(!fxSec.querySelector('.fx-none')){const n=document.createElement('p');n.className='fx-none';n.style.cssText='margin:0;font-size:18px;color:#4A4B63';n.textContent=`Rate history for ${cc} isn’t connected in this prototype yet. In the live site, this shows how ${cc} has moved against the dollar, and how much to set aside.`;fxSec.appendChild(n)}}
   $('save-country').textContent=$('from').value.trim()||'your country';
   fitAll();setTimeout(fitAll,2700*D+60);
-  window.TP={T,Y,c,tot,CUR,cc,lo,hi,buf,sem,n,from:$('from').value.trim()||'—',school:$('school').value.trim(),fmt,usd};document.dispatchEvent(new Event('tp-update'));
+  window.TP={T,Y,c,tot,CUR,cc,lo,hi,buf,sem,n,from:$('from').value.trim()||'—',school:$('school').value.trim(),fmt,usd,rate:RATE[CUR],sym:sym()};document.dispatchEvent(new Event('tp-update'));
   if(Q){fitAll();return}
   // later sections reveal on scroll
   const later=res.filter(x=>!['results','where'].includes(x.id));later.forEach(x=>{x.classList.remove('seen');x.classList.add('fade')});
@@ -132,7 +135,7 @@ function reveal(T,Y,c,tot,K,Q){
 // bubbles <-> list
 (function(){const b=$('where-toggle');if(!b)return;b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);b.textContent=on?'See as bubbles':'See as chart';$('r-bubbles').style.display=on?'none':'';$('where-list').style.display=on?'block':'none'})})();
 // fan chart: draw left to right, with hover
-function drawFan(F,Y,anim){const box=$('fx-fan');box.innerHTML=window.fanSVG(F,Y,{anim:anim&&!RM});const svg=box.querySelector('svg');const M=JSON.parse(svg.querySelector('metadata').textContent);
+function drawFan(F,Y,anim){const box=$('fx-fan');box.innerHTML=window.fanSVG(F,Y,{anim:anim&&!RM,symbol:sym(),indian:CUR==='INR'});const svg=box.querySelector('svg');const M=JSON.parse(svg.querySelector('metadata').textContent);
   const X=m=>M.L+M.pw*(m+1)/M.H,Yy=v=>M.T+M.ph*(1-v/M.top);
   const r=svg.querySelector('#fanclip-r'),head=svg.querySelector('#fan-head');let raf,played=!anim||RM;
   window.fxDraw={reset(){},play(){if(played)return;played=true;const t0=performance.now(),dur=2400;head.style.display='';

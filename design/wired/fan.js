@@ -1,12 +1,13 @@
 function fanSVG(f,Y,opt){
   opt=opt||{};const W=780,Hh=470,L=52,R=16,T=30,B=44,pw=W-L-R,ph=Hh-T-B;
-  const top=Math.max(...f.worst,...f.p90)*1.06;const unit=top>=1e7?1e7:1e5;const u=unit===1e7?'cr':'L';
-  const X=m=>L+pw*(m+1)/f.H,Yy=v=>T+ph*(1-v/top);const fx=v=>'₹'+(v/unit).toFixed(unit===1e7?2:1)+(u==='cr'?' cr':' L');
+  const top=Math.max(...f.worst,...f.p90)*1.06;const S=opt.symbol||'₹';const ind=opt.indian!==false;
+  const unit=ind?(top>=1e7?1e7:1e5):(top>=1e6?1e6:1e3);const u=ind?(unit===1e7?'cr':'L'):(unit===1e6?'M':'k');const uName=ind?(u==='cr'?'crore':'lakh'):(u==='M'?'million':'thousand');
+  const X=m=>L+pw*(m+1)/f.H,Yy=v=>T+ph*(1-v/top);const fx=v=>S+(v/unit).toFixed(unit>=1e6?2:1)+(ind?(u==='cr'?' cr':' L'):u);
   const pts=a=>a.map((v,m)=>`${X(m).toFixed(1)},${Yy(v).toFixed(1)}`);const start=`${L},${Yy(0).toFixed(1)}`;
   let g='';
   const raw=top/unit/4;const mag=Math.pow(10,Math.floor(Math.log10(raw)));const stp=[1,2,2.5,5,10].map(x=>x*mag).find(x=>x>=raw);const dec=stp<0.1?2:(stp<1?(String(stp).split('.')[1]||'').length:0);
   for(let i=0;i*stp*unit<=top;i++){const v=i*stp*unit;g+=`<line x1="${L}" x2="${L+pw}" y1="${Yy(v).toFixed(1)}" y2="${Yy(v).toFixed(1)}" stroke="${i?'#ECEDF1':'#CFD0D8'}"/><text x="${L-12}" y="${(Yy(v)+4).toFixed(1)}" text-anchor="end" font-size="15" fill="#4A4B63">${i?(v/unit).toFixed(dec):'0'}</text>`}
-  g+=`<text x="0" y="${T-12}" text-anchor="start" font-size="14" fill="#4A4B63">₹ ${u==='cr'?'crore':'lakh'}</text>`;
+  g+=`<text x="0" y="${T-12}" text-anchor="start" font-size="14" fill="#4A4B63">${S} ${uName}</text>`;
   for(let y=1;y<Y;y++){const x=X(12*y-1);g+=`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${T}" y2="${T+ph}" stroke="#ECEDF1" stroke-dasharray="3 5"/>`}
   const xl=[[L,'Start','start']];for(let y=1;y<Y;y++)xl.push([X(12*y-1),'Year '+y,'middle']);xl.push([L+pw,'Graduation','end']);
   xl.forEach(([x,t,a])=>g+=`<text x="${x.toFixed(1)}" y="${Hh-14}" text-anchor="${a}" font-size="15" fill="#4A4B63">${t}</text>`);

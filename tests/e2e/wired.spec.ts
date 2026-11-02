@@ -95,6 +95,24 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#r-sample")).toContainText("$65,622 a year for 2 years");
   });
 
+  test("another currency shows in its own symbol and grouping, in the total and the chart", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const from = page.locator("#from");
+    await from.fill("South Korea");
+    await page.getByRole("option", { name: /South Korea/ }).click();
+    await expect(page.locator("#cur")).toHaveText("KRW ₩");
+    await page.locator("#tuition").fill("$30,000");
+    await page.locator("#years").fill("2");
+    await page.locator("#calc button[type=submit]").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    await expect(page.locator("#r-total")).toContainText("₩");
+    await expect(page.locator("#r-tui")).toHaveText(/^₩[\d,]+$/);
+    await expect(page.locator("#rb1")).toContainText("₩");
+    // The exchange-rate chart for a non-rupee currency arrives with change 4 (the gates).
+  });
+
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
     page,
   }) => {
