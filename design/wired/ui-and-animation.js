@@ -120,7 +120,7 @@ function reveal(T,Y,c,tot,K,Q){
   // list view of the same numbers
   {const rows=[...document.querySelectorAll('#where-list .wl-row')];const ks=['tui','house','live','one','move'];const mxv=Math.max(...ks.map(k=>c[k]));
    const det=[`${usd(T)} × ${Y} year${Y>1?'s':''}, paid each semester`,`Rent near your school, ${12*Y} months`,'Food, transport, phone, books, insurance'+(K.exM?' + yours':''),'Visa, SEVIS, flights, deposits'+(K.exO?' + yours':''),'Transfer fees and rate markup'];
-   rows.forEach((r,i)=>{r.querySelector('.wl-v').textContent=fmt(c[ks[i]],'full');r.querySelector('.wl-bar').style.width=(c[ks[i]]/mxv*100).toFixed(1)+'%';r.querySelector('.wl-d').textContent=det[i]})}
+   rows.forEach((r,i)=>{r.querySelector('.wl-v').textContent=fmt(c[ks[i]],'full');r.querySelector('.wl-bar').style.width=(c[ks[i]]/tot*100).toFixed(1)+'%';r.querySelector('.wl-d').textContent=det[i]})}
   const bs=$('r-bubbles');if(!Q)bs.classList.add('paused');
   // section bar
   $('nb-total').textContent=fmt(tot,'big');$('nb-meta').textContent=`· ${Y} year${Y>1?'s':''}`;document.body.classList.add('has-res');

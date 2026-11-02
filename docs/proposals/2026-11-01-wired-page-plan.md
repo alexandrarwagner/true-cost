@@ -366,3 +366,17 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     link in the line under "How we work it out": "See your full calculation." appears once
     there is a result and opens `/estimate/breakdown` for the current estimate. One markup
     edit under the lock; the card links stay.
+19. **Five pieces removed** at the owner's request (2 November): the "Prototype" line under
+    the sources table, the "Five costs, added up in dollars" sentence (the full-calculation
+    link stays in its place), the "Check before you go" line under the deals, the sentence
+    under the PDF buttons, the "Print it" button and the footer's "Sources" link. Markup
+    edits under the lock.
+20. **List bars as a share of the total.** The "Where the money goes" list scaled each bar to
+    the largest cost, so housing always filled the row and the lengths read wrong. Decided
+    on 2 November: each bar is its share of the total, so the five add up to the row.
+    Also fixed: a filter chip cleared the deal cards' column layout (`deals.js`).
+21. **The focus ring crossed the field's label.** Every focused input drew a 2 px ring 6 px
+    outside itself; the fields are 26 px tall with their 12 px name directly above, so the
+    ring ran through the name. Decided on 2 November: the ring is drawn on the label cell
+    that holds the name and the field (the designer's `label:focus-within` hook), inside the
+    pill. One CSS edit under the lock.

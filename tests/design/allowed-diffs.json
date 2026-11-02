@@ -97,9 +97,9 @@
     "to": "<span id=\"deals-checked\" style=\"font-size: 14px; color: #4A4B63\">Checked October 2026 · No paid listings</span>"
   },
   {
-    "change": "Decision 11: the \"check before you go\" line no longer describes the prototype.",
-    "from": "Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.",
-    "to": "Deals change and some depend on your school. Check the source before you go."
+    "change": "Decision 19: the \"Check before you go\" line under the deals is removed (it replaced decision 11's rewording).",
+    "from": "<p style=\"margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63\"><span style=\"height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)\">Check before you go</span>Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.</p>",
+    "to": ""
   },
   {
     "change": "Two rules in the head stylesheet so the first layout is the final one: the designer's empty-state rule (with !important, since the section's inline style hides it, as the designer's injected rule had) and the result sections kept out of layout until there is a result (with !important too, since they carry display:flex inline). Without them a slow phone paints the page, then the script hides the result sections and shows the empty state, and everything below moves (Lighthouse CLS 0.8 on the CI runner).",
@@ -134,8 +134,33 @@
     "to": "<script src=\"/wired/intro.js\"></script>"
   },
   {
-    "change": "Decision 18: the line under \"How we work it out\" carries a link to the full calculation (every row with its figure and source), shown once there is a result; the script sets its address to the current estimate.",
+    "change": "Decision 18 and 19: the line under \"How we work it out\" is the link to the full calculation (every row with its figure and source), shown once there is a result; the \"Five costs\" sentence is removed.",
     "from": "<p style=\"margin: 0; max-width: 460px; font-size: 18px; line-height: 1.55; color: #4A4B63\">Five costs, added up in dollars, then turned into your currency at today’s rate.</p>",
-    "to": "<p style=\"margin: 0; max-width: 460px; font-size: 18px; line-height: 1.55; color: #4A4B63\">Five costs, added up in dollars, then turned into your currency at today’s rate. <a id=\"full-calc\" href=\"/estimate/breakdown\" hidden>See your full calculation.</a></p>"
+    "to": "<p style=\"margin: 0; max-width: 460px; font-size: 18px; line-height: 1.55; color: #4A4B63\"><a id=\"full-calc\" href=\"/estimate/breakdown\" hidden>See your full calculation.</a></p>"
+  },
+  {
+    "change": "Decision 19: the \"Prototype\" line under the sources table is removed.",
+    "from": "<p style=\"margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63\"><span style=\"height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)\">Prototype</span>The figures on this page are samples. The sources listed are the ones the live site will use.</p>",
+    "to": ""
+  },
+  {
+    "change": "Decision 19: the sentence under the PDF buttons is removed.",
+    "from": "<span style=\"font-size: 15px; color: #C4C6CE\">The PDF is made on your device. Nothing you typed is saved or sent to us.</span>\n",
+    "to": ""
+  },
+  {
+    "change": "Decision 19: the \"Print it\" button is removed (pdf-sheet.js tolerates its absence).",
+    "from": "<button type=\"button\" id=\"print-btn\" style=\"height: 64px; padding: 0 28px; border: 1.5px solid #FFFFFF; border-radius: 32px; background: transparent; color: #FFFFFF; font: inherit; font-size: 18px; cursor: pointer\">Print it</button>",
+    "to": ""
+  },
+  {
+    "change": "Decision 19: the footer's \"Sources\" link is removed.",
+    "from": "<div style=\"display: flex; gap: 28px\"><a href=\"#sources\" style=\"display: inline-flex; align-items: center; min-height: 44px\">Sources</a></div>",
+    "to": ""
+  },
+  {
+    "change": "Decision 21: the focus ring moves from the input (2 px, 6 px out, which crossed the small label above a 26 px field) to the label cell that holds the field and its name, using the designer's label:focus-within hook.",
+    "from": "input:focus-visible{outline:2px solid #3E43C8!important;outline-offset:6px;border-radius:4px}\nlabel:focus-within{border-radius:28px}",
+    "to": "input:focus-visible{outline:none!important}\nlabel:focus-within{outline:2px solid #3E43C8;outline-offset:2px;border-radius:28px}"
   }
 ]

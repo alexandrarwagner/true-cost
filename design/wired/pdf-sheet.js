@@ -35,15 +35,16 @@ document.addEventListener('tp-update',thumb);
 const host=document.createElement('div');host.id='pdf-host';document.body.appendChild(host);
 const st=document.createElement('style');st.textContent='#pdf-host{position:fixed;left:0;top:0;z-index:-1;opacity:0;pointer-events:none}#pdf-host.cap{opacity:1}@media print{@page{size:A4;margin:0}body *{visibility:hidden!important}#pdf-host,#pdf-host *{visibility:visible!important}#pdf-host{position:absolute;left:0;top:0}.pdf-sheet{zoom:0.98}}';document.head.appendChild(st);
 const pb=document.getElementById('pdf-btn'),pr=document.getElementById('print-btn');
-pr.onclick=()=>{host.innerHTML=sheet();setTimeout(()=>window.print(),50)};
+// Printing stays as the fallback when the PDF library cannot load; the button itself is gone (decision 19).
+const printSheet=()=>{host.innerHTML=sheet();setTimeout(()=>window.print(),50)};if(pr)pr.onclick=printSheet;
 // html2pdf (about 900 KB) loads only when the button is pressed, from this site; a script a
 // nonced script inserts is trusted by the policy. If it cannot load, the print view opens.
 const loadPdf=()=>window.html2pdf?Promise.resolve():new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='/vendor/html2pdf.bundle.min.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});
 pb.onclick=async()=>{host.innerHTML=sheet();const lbl=pb.innerHTML;
   pb.setAttribute('aria-busy','true');pb.lastChild.textContent='Making your PDF…';
-  try{await loadPdf()}catch(e){pb.removeAttribute('aria-busy');pb.innerHTML=lbl;pr.onclick();return}
+  try{await loadPdf()}catch(e){pb.removeAttribute('aria-busy');pb.innerHTML=lbl;printSheet();return}
   host.classList.add('cap');
   try{await html2pdf().set({margin:0,filename:'tuition-plus-full-cost.pdf',image:{type:'jpeg',quality:0.96},html2canvas:{scale:2,backgroundColor:'#ffffff',scrollX:0,scrollY:0},jsPDF:{unit:'px',format:[794,1123],orientation:'portrait',hotfixes:['px_scaling']}}).from(host.firstElementChild).save()}
-  catch(e){console.error(e);pr.onclick()}
+  catch(e){console.error(e);printSheet()}
   host.classList.remove('cap');pb.removeAttribute('aria-busy');pb.innerHTML=lbl};
 })();

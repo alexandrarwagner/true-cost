@@ -170,7 +170,8 @@ test.describe("the designer's page: school search", () => {
     // No generic tips, no Boston cards.
     await expect(page.getByText("General tips")).toHaveCount(0);
     await expect(page.getByText("Orangetheory")).toHaveCount(0);
-    await expect(page.locator("#save")).toContainText("Check the source before you go.");
+    // The "Check before you go" line is gone (decision 19).
+    await expect(page.locator("#save")).not.toContainText("Check before you go");
     await expect(page.locator("#save")).not.toContainText("Tips are examples");
     // The chips filter the cards.
     await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();

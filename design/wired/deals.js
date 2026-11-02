@@ -40,7 +40,7 @@ const chip=(cat,on)=>`<button type="button" class="dchip" data-cat="${esc(cat)}"
 function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];
  cs.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
   cs.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
-  cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'':'none';k.classList.remove('pre');k.classList.add('seen')})}))}
+  cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'flex':'none';k.classList.remove('pre');k.classList.add('seen')})}))}
 function render(deals){
  const cats=[...new Set(deals.map(d=>LABEL[d.category]||LABEL.other))];
  chips.innerHTML=chip('All',true)+cats.map(c=>chip(c,false)).join('');
