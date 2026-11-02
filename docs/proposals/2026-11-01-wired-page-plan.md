@@ -160,6 +160,14 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   calculate in, or pressing Show me with one, is an error at the bar, not dollars by surprise.
   A unit test keeps the page's list and the table in step.
 
+### Deals research (2 November)
+
+- `scripts/research-deals.ts` and `scripts/review-deals.ts` are the savings brief's step 5.
+  The research script finds official pages with Claude's web search (aggregators blocked),
+  reads each page itself and keeps a draft only when its quote is on the page verbatim; the
+  review script is the only path to `approved`, and a person drives it. Seven national drafts
+  from 2 November sit in the review folder.
+
 ### Step 6
 
 - `meta.shareQuery` on the engine's estimate is the shared page's own query for the same

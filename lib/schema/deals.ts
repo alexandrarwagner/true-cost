@@ -61,6 +61,25 @@ export const CityDealsFileSchema = z.strictObject({
 });
 export const NationalDealsFileSchema = z.strictObject({ deals });
 
+/** A research output under data/deals/review: where its deals would go once approved. */
+export const ReviewTargetSchema = z.discriminatedUnion("kind", [
+  z.strictObject({ kind: z.literal("national") }),
+  z.strictObject({
+    kind: z.literal("city"),
+    city: z.string().trim().min(1).max(100),
+    state: z.string().trim().length(2),
+  }),
+  z.strictObject({
+    kind: z.literal("school"),
+    unitId: z.number().int().positive(),
+    school: z.string().trim().min(1).max(200),
+    city: z.string().trim().min(1).max(100),
+    state: z.string().trim().length(2),
+  }),
+]);
+export type ReviewTarget = z.infer<typeof ReviewTargetSchema>;
+export const ReviewFileSchema = z.strictObject({ target: ReviewTargetSchema, deals });
+
 export const SchoolLinksSchema = z.record(
   z.string().regex(/^\d+$/),
   z.strictObject({ url: z.url().startsWith("https://").max(500) }),

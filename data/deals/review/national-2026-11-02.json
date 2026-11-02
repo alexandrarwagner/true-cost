@@ -1,4 +1,7 @@
 {
+  "target": {
+    "kind": "national"
+  },
   "deals": [
     {
       "id": "apple-music-student",
