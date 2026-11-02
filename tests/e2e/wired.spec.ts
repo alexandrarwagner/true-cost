@@ -125,6 +125,7 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#fx-fan svg")).toContainText("₩ million");
     await expect(page.locator("#r-total-sub")).toContainText("₩");
     await expect(page.locator("#r-total-sub")).toContainText("$");
+    await expect(page.locator("#fx h2")).toHaveText("If the won moves.");
   });
 
   test("a currency without rate history keeps the figures and says the range is not available", async ({
@@ -160,6 +161,8 @@ test.describe("the designer's page: school search", () => {
     // No generic tips, no Boston cards.
     await expect(page.getByText("General tips")).toHaveCount(0);
     await expect(page.getByText("Orangetheory")).toHaveCount(0);
+    await expect(page.locator("#save")).toContainText("Check the source before you go.");
+    await expect(page.locator("#save")).not.toContainText("Tips are examples");
     // The chips filter the cards.
     await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();
     await expect(grid.locator(".deal:visible")).toHaveCount(1);
@@ -221,6 +224,27 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#r-status.ok")).toBeVisible({ timeout: 10_000 });
     const after = await new AxeBuilder({ page }).withTags(tags).analyze();
     expect(after.violations, JSON.stringify(after.violations, null, 2)).toEqual([]);
+  });
+
+  test("a shared link with edit=1 fills the bar and runs; without it the shared page opens", async ({
+    page,
+  }) => {
+    const share =
+      "c=IN&cur=INR&s=243780&sn=Purdue+University-Main+Campus&sc=West+Lafayette&st=IN&sz=47907&t=28794&ts=school&y=2&sy=2027&ss=fall";
+    await page.goto(`/?${share}&edit=1`);
+    await expect(page.locator("#from")).toHaveValue("India");
+    await expect(page.locator("#cur")).toHaveText("INR ₹");
+    await expect(page.locator("#school")).toHaveValue("Purdue University-Main Campus");
+    await expect(page.locator("#tuition")).toHaveValue("$28,794");
+    await expect(page.locator("#years")).toHaveValue("2");
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    const tp = await page.evaluate(
+      () => (window as unknown as { TP: { c: { tui: number }; Y: number } }).TP,
+    );
+    expect(tp.c.tui).toBe(28_794 * 2);
+    expect(tp.Y).toBe(2);
+    await page.goto(`/?${share}`);
+    await expect(page).toHaveURL(/^http:\/\/[^/]+\/r\?c=IN/);
   });
 
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({

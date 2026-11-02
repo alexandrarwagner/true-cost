@@ -238,6 +238,15 @@ export function format(
   });
 }
 
+export function currencyName(currency: string): string {
+  const code = currency.toUpperCase();
+  return copy.fx.currencyNames[code] ?? code;
+}
+
+export function countryName(code: string): string {
+  return COUNTRIES.find((c) => c.code === code.toUpperCase())?.name ?? "";
+}
+
 /** The engine behind window.TPEngine; `deps` says where the data comes from. */
 export function createEngine(deps: EngineDeps, version: string): TPEngine {
   const now = deps.now ?? (() => new Date());
@@ -288,5 +297,14 @@ export function createEngine(deps: EngineDeps, version: string): TPEngine {
     return toPage(e, ctx, fx, input, today);
   }
 
-  return { version, rates: () => rates, ready, estimate, format, symbol };
+  return {
+    version,
+    rates: () => rates,
+    ready,
+    estimate,
+    format,
+    symbol,
+    currencyName,
+    countryName,
+  };
 }

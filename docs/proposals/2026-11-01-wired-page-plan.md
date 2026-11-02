@@ -260,15 +260,17 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
    separate change.
 9. **"If the rupee moves."** The exchange-rate heading is markup and names the rupee for
    every currency. Changing it to name the chosen currency means a small script edit to the
-   heading text (the markup keeps the rupee as its default). Recommended, with your OK.
+   heading text (the markup keeps the rupee as its default). Done on 2 November: the heading
+   and the chart card's title name the chosen currency.
 10. **Performance gate.** The width-axis font is the one the Lighthouse work removed; with it
     back, the phone-profile score will sit near the CI floor of 90 (the GitHub runner already
     scores 88/84/89 on the React page). Decide the floor with this in mind.
 11. **"Tips are examples; the live site will check them with students in each city."** The
     "Check before you go" line under the deals is markup and still describes the prototype.
     Suggested: "Deals change and some depend on your school. Check the source before you go."
-    A one-line copy edit, with your OK.
+    Done on 2 November, under the lock.
 12. **"Edit" from the shared page.** The home page does not read the query string, so "Edit
     the inputs" on `/r` opens an empty form. Reading `/?c=…&edit=1` into the bar (country,
     currency, school, tuition, years) is a small script edit outside the brief's list.
-    Recommended, with your OK.
+    Done on 2 November: `/?c=…&edit=1` fills the bar's fields and runs; added costs and
+    options stay on the shared page.

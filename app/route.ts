@@ -37,7 +37,8 @@ function page(): string {
 
 export function GET(request: Request): NextResponse {
   const url = new URL(request.url);
-  if (url.searchParams.has("c")) {
+  // A shared link opens the shared page; with edit=1 the page itself fills its bar from it.
+  if (url.searchParams.has("c") && url.searchParams.get("edit") !== "1") {
     return NextResponse.redirect(new URL(`/r${url.search}`, url), 307);
   }
   let html = page();

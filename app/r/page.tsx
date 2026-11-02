@@ -11,13 +11,17 @@ import { runEstimate } from "@/services/estimate";
 
 export const metadata: Metadata = { title: `${copy.result.heading} · ${copy.siteName}` };
 
-function Frame({ title, children }: React.PropsWithChildren<{ title: string }>) {
+function Frame({
+  title,
+  shareQuery,
+  children,
+}: React.PropsWithChildren<{ title: string; shareQuery: string }>) {
   return (
     <div className="container pt-8">
       <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
       <p className="mt-1 mb-6">
         {title} ·{" "}
-        <Link href="/" className="underline print:hidden">
+        <Link href={`/?${shareQuery}&edit=1`} className="underline print:hidden">
           {copy.result.edit}
         </Link>
       </p>
@@ -43,7 +47,7 @@ export default async function SharedResultPage({
     const response = await runCompare(compare, buildSources());
     const names = compare.schools.map((s) => s.school.name).join(" · ");
     return (
-      <Frame title={names}>
+      <Frame title={names} shareQuery={response.shareQuery}>
         <CompareView response={response} />
       </Frame>
     );
@@ -64,8 +68,8 @@ export default async function SharedResultPage({
   }
   const response = await runEstimate(req, req.example ? exampleSources() : buildSources());
   return (
-    <Frame title={req.school.name}>
-      <ResultView editHref="/" response={response} />
+    <Frame title={req.school.name} shareQuery={response.shareQuery}>
+      <ResultView editHref={`/?${response.shareQuery}&edit=1`} response={response} />
     </Frame>
   );
 }

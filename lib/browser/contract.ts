@@ -133,4 +133,8 @@ export interface TPEngine {
   format(units: number, currency: string, mode: "full" | "big" | "cr" | "short"): string;
   /** The currency's symbol in its own locale, e.g. "₩", or the code when there is none. */
   symbol(currency: string): string;
+  /** The currency's everyday name for a sentence ("rupee", "won"), or the code. */
+  currencyName(currency: string): string;
+  /** A launch country's name from its code ("IN" → "India"), or "" when unknown. */
+  countryName(code: string): string;
 }

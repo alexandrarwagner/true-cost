@@ -88,5 +88,10 @@
     "change": "Change 6: the checked line is set from the data.",
     "from": "<span style=\"font-size: 14px; color: #4A4B63\">Checked October 2026 · No paid listings</span>",
     "to": "<span id=\"deals-checked\" style=\"font-size: 14px; color: #4A4B63\">Checked October 2026 · No paid listings</span>"
+  },
+  {
+    "change": "Decision 11: the \"check before you go\" line no longer describes the prototype.",
+    "from": "Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.",
+    "to": "Deals change and some depend on your school. Check the source before you go."
   }
 ]

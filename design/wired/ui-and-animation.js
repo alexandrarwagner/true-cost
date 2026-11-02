@@ -119,6 +119,9 @@ function reveal(T,Y,c,tot,K,Q){
   const fxSec=$('fx');let lo=null,hi=null,buf=null;
   if(K.fx){fxSec.querySelectorAll('.fxhide').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
     const F=K.fx;drawFan(F,Y,!Q);
+    // The heading and the chart's title name the chosen currency (the markup says rupees).
+    if(window.TPEngine.currencyName){const h=fxSec.querySelector('h2');if(h)h.textContent=`If the ${window.TPEngine.currencyName(CUR)} moves.`;
+      const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
     lo=F.lo/RATE.INR;hi=F.hi/RATE.INR;buf=F.buf/RATE.INR;
     const loT=fmt(lo,'big'),hiT=fmt(hi,'big');$('fx-lo').textContent=(loT.endsWith('crore')&&hiT.endsWith('crore'))?loT.replace(' crore',''):loT;$('fx-hi').textContent=hiT;
     $('r-buf').textContent=fmt(buf,'big');$('fx-len').textContent=Y+'-year';$('fx-n').textContent=F.n;
@@ -165,5 +168,16 @@ document.getElementById('calc').addEventListener('submit',e=>{e.preventDefault()
 // The example is a real school with its published tuition: New York University, two years.
 const EXAMPLE_SCHOOL={unitId:193900,name:'New York University',city:'New York',state:'NY',zip:'10012'};
 const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';window.TPSchool=EXAMPLE_SCHOOL;$('school').value=EXAMPLE_SCHOOL.name;tu.value='$65,622';window.TPTuitionSource='school';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
+// A shared link with edit=1 fills the bar and runs, so "Edit the inputs" on the shared page
+// lands on a filled form. Only the bar's fields; added costs and options stay on the shared page.
+(function(){const q=new URLSearchParams(location.search);const E=window.TPEngine;if(q.get('edit')!=='1'||!q.get('c')||!E.countryName)return;
+ const cur=(q.get('cur')||'USD').toUpperCase();const s=E.symbol?E.symbol(cur):'';
+ $('from').value=E.countryName(q.get('c'))||$('from').value;$('cur').textContent=cur+(s&&s!==cur?' '+s:'');
+ const sch={unitId:+(q.get('s')||0),name:q.get('sn')||'',city:q.get('sc')||'',state:q.get('st')||'',zip:q.get('sz')||''};
+ if(sch.unitId>0&&sch.name){window.TPSchool=sch;$('school').value=sch.name}
+ const t=parseInt(q.get('t')||'',10);if(t>0)tu.value='$'+t.toLocaleString('en-US');
+ const y=parseInt(q.get('y')||'',10);if(y>0)yrs.value=clampY(y);
+ window.TPTuitionSource=q.get('ts')==='school'?'school':'user';
+ if(t>0)run()})();
 ($('cta')||{addEventListener(){}}).addEventListener('click',e=>{e.preventDefault();window.scrollTo({top:0,behavior:RM?'auto':'smooth'});setTimeout(()=>tu.focus({preventScroll:true}),400)});
 })();

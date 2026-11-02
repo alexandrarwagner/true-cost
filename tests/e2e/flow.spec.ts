@@ -24,7 +24,10 @@ test.describe("the shared page (DEMO_MODE)", () => {
       page.getByText(/In 8 of 10 past periods, your degree would have cost between/),
     ).toBeVisible();
     await expect(page.getByText("The same range as a table")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Edit the inputs" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit the inputs" })).toHaveAttribute(
+      "href",
+      /^\/\?c=IN.*&edit=1$/,
+    );
     await ctx.close();
   });
 
