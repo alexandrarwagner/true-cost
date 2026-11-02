@@ -351,9 +351,9 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 16. **Headings dimmed below the fold.** The v2 "word by word" motion (`scroll-motion.js`)
     holds every section heading below the top third of the viewport at 25% opacity until it
     is scrolled to, which axe reports as a contrast of 1.7:1 on 60 to 84 px text (3:1 is the
-    floor). It is the designer's motion, so it is not changed here; the axe checks run with
-    reduced motion, which is the page's own path without it, until you decide. Suggested
-    default: floor the dimmed words at 50% opacity, which keeps the effect and passes 3:1.
+    floor). Decided on 2 November: the dimmed words floor at 50% opacity
+    (`design/wired/scroll-motion.js`), which keeps the effect and passes 3:1; the axe checks
+    run with motion on.
 17. **The kit's screens were captured without the width axis.** In every reference PNG the
     headings render at Archivo's normal width; the page specifies 112% (`computed-styles.json`,
     and the computed-style test passes), so headings wrap differently ("Where the money

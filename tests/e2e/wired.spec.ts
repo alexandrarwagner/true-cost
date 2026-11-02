@@ -221,17 +221,11 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#housing-heading")).toContainText(figure);
   });
 
-  test("passes axe with no violations, before and after Show me", async ({ page, browser }) => {
-    // Reduced motion until plan decision 16: the v2 scroll motion dims headings below the
-    // fold to 25% opacity, which axe reports as a contrast failure.
-    const ctx = await browser.newContext({
-      reducedMotion: "reduce",
-      viewport: { width: 1440, height: 900 },
-      extraHTTPHeaders: { "x-forwarded-for": `10.94.${process.pid % 250}.250` },
-    });
-    page = await ctx.newPage();
+  test("passes axe with no violations, before and after Show me", async ({ page }) => {
     const tags = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
     await page.goto("/");
+    // axe scans a settled page: the opening sequence fades the hero words in from 25%.
+    await page.waitForFunction(() => !document.documentElement.classList.contains("intro"));
     const before = await new AxeBuilder({ page }).withTags(tags).analyze();
     expect(before.violations, JSON.stringify(before.violations, null, 2)).toEqual([]);
     await page.locator("#example").click();
@@ -241,7 +235,6 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#r-status.ok")).toBeVisible({ timeout: 10_000 });
     const after = await new AxeBuilder({ page }).withTags(tags).analyze();
     expect(after.violations, JSON.stringify(after.violations, null, 2)).toEqual([]);
-    await ctx.close();
   });
 
   test("a shared link with edit=1 fills the bar and runs; without it the shared page opens", async ({

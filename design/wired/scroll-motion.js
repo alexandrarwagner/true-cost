@@ -1,5 +1,7 @@
-// The designer's scroll-driven motion, unchanged: the line drawn through the Type column of
-// "How we work it out" and the section headings that brighten word by word.
+// The designer's scroll-driven motion: the line drawn through the Type column of "How we work
+// it out" and the section headings that brighten word by word. One edit (plan decision 16):
+// the dimmed words start at 50% opacity, not 25%, so a heading below the fold still meets the
+// 3:1 contrast floor for large text (the designer's 25% measured 1.7:1).
 
 // motion: line drawn by scroll through the Type column of "How we work it out"
 (function(){const box=document.getElementById('sources');if(!box||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -14,7 +16,7 @@ measure();update();addEventListener('scroll',req,{passive:true});addEventListene
 (function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 const hs=[...document.querySelectorAll('section h2.d')].filter(h=>h.id!=='empty-h');if(!hs.length)return;
 const items=hs.map(h=>{const words=[];[...h.childNodes].forEach(n=>{if(n.nodeType===3){const frag=document.createDocumentFragment();n.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t))frag.appendChild(document.createTextNode(t));else{const sp=document.createElement('span');sp.className='wd';sp.textContent=t;frag.appendChild(sp);words.push(sp)}});h.replaceChild(frag,n)}else if(n.nodeType===1){n.classList.add('wd');words.push(n)}});return{h,words}});
-let tick=false;const update=()=>{tick=false;const vh=innerHeight;items.forEach(({h,words})=>{const r=h.getBoundingClientRect();const p=Math.max(0,Math.min(1,(vh-r.top)/(vh*0.7)));const N=words.length;words.forEach((w,i)=>{const st=N>1?i/N*0.6:0;const k=Math.max(0,Math.min(1,(p-st)/0.4));w.style.opacity=(0.25+0.75*k).toFixed(3)})})};
+let tick=false;const update=()=>{tick=false;const vh=innerHeight;items.forEach(({h,words})=>{const r=h.getBoundingClientRect();const p=Math.max(0,Math.min(1,(vh-r.top)/(vh*0.7)));const N=words.length;words.forEach((w,i)=>{const st=N>1?i/N*0.6:0;const k=Math.max(0,Math.min(1,(p-st)/0.4));w.style.opacity=(0.5+0.5*k).toFixed(3)})})};
 const req=()=>{if(!tick){tick=true;requestAnimationFrame(update)}};
 update();addEventListener('scroll',req,{passive:true});addEventListener('resize',req);document.addEventListener('tp-update',()=>setTimeout(update,80));
 })();

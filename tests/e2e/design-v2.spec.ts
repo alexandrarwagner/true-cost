@@ -34,6 +34,17 @@ async function showMe(page: Page) {
   await page.evaluate(() => document.fonts.ready);
 }
 
+/** Waits for every animation and transition under `sel` to finish: axe scans a settled state. */
+async function settled(page: Page, sel: string) {
+  await page
+    .locator(sel)
+    .evaluate((el) =>
+      Promise.all(
+        el.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined)),
+      ),
+    );
+}
+
 async function settle(page: Page) {
   await page.goto("/?engine=prototype");
   await page.evaluate(() => document.fonts.ready);
@@ -101,9 +112,8 @@ for (const width of [1440, 1024, 768, 390]) {
 
 for (const width of [1440, 390]) {
   test.describe(`design v2: accessibility at ${width}`, () => {
-    // Reduced motion until plan decision 16: the scroll motion dims headings below the fold
-    // to 25% opacity, which axe reports as a contrast failure.
-    test.use({ viewport: { width, height: width < 640 ? 844 : 900 }, reducedMotion: "reduce" });
+    // Motion on: the dimmed headings below the fold must still pass contrast (decision 16).
+    test.use({ viewport: { width, height: width < 640 ? 844 : 900 } });
 
     test("axe passes before and after Show me and with the refine panel open", async ({ page }) => {
       const axe = () =>
@@ -116,6 +126,8 @@ for (const width of [1440, 390]) {
         await expect(curtain).toHaveAttribute("aria-hidden", "true");
         expect(await curtain.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe("none");
       }
+      // axe scans a settled page: the opening sequence fades the hero words in from 25%.
+      await page.waitForFunction(() => !document.documentElement.classList.contains("intro"));
       expect((await axe().analyze()).violations).toEqual([]);
 
       // The error is announced: role="alert", with the field and its label marked.
@@ -124,9 +136,12 @@ for (const width of [1440, 390]) {
       await expect(err).toHaveAttribute("role", "alert");
       await expect(err).toContainText("Add your school");
       await expect(page.locator("#school")).toHaveAttribute("aria-invalid", "true");
+      await settled(page, "#calc-err"); // its 300 ms fade-in
       expect((await axe().analyze()).violations).toEqual([]);
 
       await showMe(page);
+      await expect(page.locator("#r-status.ok")).toBeVisible({ timeout: 10_000 }); // the reveal's own done mark
+      await settled(page, "#results");
       expect((await axe().analyze()).violations).toEqual([]);
 
       const toggle = page.locator("#refine-toggle");
@@ -134,6 +149,7 @@ for (const width of [1440, 390]) {
       await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       await expect(page.locator("#rent-form input")).toBeFocused();
+      await settled(page, "#refine-panel");
       expect((await axe().analyze()).violations).toEqual([]);
       await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "false");

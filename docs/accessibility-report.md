@@ -22,10 +22,10 @@ The home page is now the designer's HTML (ADR 016). Its checks, all in CI:
   the panel's toggle updates `aria-expanded`, the form's error has `role="alert"` with the
   field and its label marked, and the opening curtain is `aria-hidden` with no pointer events
   (`tests/e2e/design-v2.spec.ts`). The page never scrolls sideways at any of the four widths.
-- Open finding (plan decision 16): the v2 scroll motion dims section headings below the top
-  third of the viewport to 25% opacity, a contrast of 1.7:1 on 60 to 84 px text, until they
-  are scrolled to. The axe checks run with reduced motion until the owner decides; the
-  suggested fix is a 50% floor.
+- The v2 scroll motion dimmed section headings below the top third of the viewport to 25%
+  opacity, a contrast of 1.7:1 on 60 to 84 px text, until they were scrolled to. Decided on
+  2 November (plan decision 16): the dimmed words floor at 50%, which passes 3:1, and the
+  axe checks run with motion on.
 
 ## What was tested
 
