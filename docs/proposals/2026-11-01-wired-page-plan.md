@@ -168,6 +168,14 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   review script is the only path to `approved`, and a person drives it. Seven national drafts
   from 2 November sit in the review folder.
 
+### Deals freshness (2 November, savings brief step 6)
+
+- `scripts/check-deal-sources.ts` fetches every approved deal's page and looks for its quote;
+  `.github/workflows/check-deals.yml` runs it weekly with `check:deals` and posts the report
+  to one open issue, "Deals to re-check", when a quote has gone. Data changes only by a
+  reviewed commit. That closes the savings brief's steps 5 and 6; ADRs 013 and 014 were
+  already in place.
+
 ### Step 6
 
 - `meta.shareQuery` on the engine's estimate is the shared page's own query for the same

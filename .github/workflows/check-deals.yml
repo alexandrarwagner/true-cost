@@ -1,0 +1,44 @@
+name: Check deals
+
+# Weekly. Every approved deal is validated and re-checked against its source page. When a
+# quote has gone from its page, the report lands in one open issue for a person to act on;
+# nothing in data/deals changes without a reviewed commit (ADR 014).
+on:
+  schedule:
+    - cron: "40 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Validate the deal files and list approved deals past 90 days
+        run: npm run check:deals
+      - name: Re-check every approved deal against its source page
+        run: npm run check:deal-sources -- --report deals-report.md
+      - name: Open or update the issue when a quote has gone
+        run: |
+          if ! grep -q "Quote no longer on the page" deals-report.md; then
+            echo "Every quote is still on its page; no issue needed."
+            exit 0
+          fi
+          TITLE="Deals to re-check"
+          NUMBER=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title \
+            --jq '.[] | select(.title == "Deals to re-check") | .number' | head -n 1)
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --body-file deals-report.md
+          else
+            gh issue create --title "$TITLE" --body-file deals-report.md
+          fi

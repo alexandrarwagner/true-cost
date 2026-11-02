@@ -24,7 +24,8 @@
     "snapshot:scorecard": "NODE_OPTIONS=--conditions=react-server tsx scripts/snapshot-scorecard.ts",
     "snapshot:hud": "NODE_OPTIONS=--conditions=react-server tsx scripts/snapshot-hud.ts",
     "research:deals": "tsx scripts/research-deals.ts",
-    "review:deals": "tsx scripts/review-deals.ts"
+    "review:deals": "tsx scripts/review-deals.ts",
+    "check:deal-sources": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-deal-sources.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.3.0",

@@ -30,3 +30,12 @@ Rules (`lib/schema/deals.ts`, `npm run check:deals`):
   into the live file for its target with `status: "approved"` and today's `checkedOn`; reject
   marks it; skip leaves it. A person pressing "a" is the only way a deal becomes approved.
 - Then `npm run check:deals` and commit both files.
+
+## Weekly check
+
+`.github/workflows/check-deals.yml` runs every Monday: `npm run check:deals` validates the files
+and lists approved deals past 90 days, and `npm run check:deal-sources` fetches every approved
+deal's source page and looks for its quote. When a quote has gone, the report is posted to one
+open issue, "Deals to re-check", for a person: set the deal to `expired` if it ended, or update
+`sourceQuote` and `checkedOn` if only the wording moved. Pages that could not be read (some need
+a browser) are listed separately; nothing changes until someone commits.

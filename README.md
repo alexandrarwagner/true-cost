@@ -51,6 +51,7 @@ npm run dev
 | `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)                                              |
 | `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days                                             |
 | `npm run research:deals` / `npm run review:deals`             | Drafts student deals from official pages for a person to approve (data/deals/README.md)                                   |
+| `npm run check:deal-sources`                                  | Re-checks every approved deal's quote against its source page; weekly in CI, reports to an issue                          |
 | `npm run perf`                                                | Lighthouse on a phone profile against a running server, gated at 90 (CI)                                                  |
 | `npm run build:engine`                                        | Bundles the browser engine to `public/engine.js` (also runs before `npm run build`)                                       |
 
