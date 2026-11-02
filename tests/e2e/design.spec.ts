@@ -16,8 +16,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 const SECTIONS = ["results", "where", "fx", "save", "how", "share"] as const;
 
-/** The designer's sample: India, $37,500 a year, two years. Typed in, so the example can change. */
+/** The designer's sample: India, $37,500 a year, two years, and a school (v2 requires one). Typed in, so the example can change. */
 async function showMe(page: Page) {
+  await page.locator("#school").fill("Boston University");
   await page.locator("#tuition").fill("$37,500");
   await page.locator("#years").fill("2");
   await page.locator("#calc button[type=submit]").click();

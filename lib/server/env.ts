@@ -4,11 +4,12 @@ import { z } from "zod";
 // Every environment variable is validated here, once, and exposed as typed config.
 // Nothing in this module ever logs a value: errors list variable names only.
 
+// Empty strings (from a copied .env.example) count as unset, for flags as for strings.
 const flag = (defaultValue: boolean) =>
   z
-    .enum(["true", "false", "1", "0"])
+    .enum(["true", "false", "1", "0", ""])
     .optional()
-    .transform((v) => (v === undefined ? defaultValue : v === "true" || v === "1"));
+    .transform((v) => (!v ? defaultValue : v === "true" || v === "1"));
 
 // Empty strings (from a copied .env.example) count as unset.
 const optionalString = z
@@ -24,9 +25,9 @@ const RawEnvSchema = z.object({
   COMPARE_ENABLED: flag(false),
   // Unset means "follow DEMO_MODE": on for previews, off in production until the copy is reviewed.
   SAVINGS_ENABLED: z
-    .enum(["true", "false", "1", "0"])
+    .enum(["true", "false", "1", "0", ""])
     .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true" || v === "1")),
+    .transform((v) => (!v ? undefined : v === "true" || v === "1")),
 
   DATA_GOV_API_KEY: optionalString,
   HUD_API_TOKEN: optionalString,

@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Direction E — homepage</title>
 
+<script src="/wired/intro-flag.js"></script>
 <style>
 .dd{position:absolute;left:0;top:calc(100% + 30px);width:420px;max-height:340px;overflow:auto;margin:0;padding:8px;list-style:none;background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(17,20,30,.12);z-index:20;font-size:16px;box-sizing:border-box}
 .dd li{min-height:46px;padding:0 14px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--ink)}
@@ -24,15 +26,17 @@ body:not(.has-res) .res{display:none!important}
 #r-status.ok i{animation:none;background:#5FCDB8}
 @keyframes pulse{50%{opacity:.25}}
 .paused .bub{animation-play-state:paused}
-.fade{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.fade{opacity:0;transform:translateY(24px);transition:opacity var(--dur-lg) var(--ease-out),transform var(--dur-lg) var(--ease-out)}
 .fade.seen{opacity:1;transform:none}
 button[type=submit][aria-busy=true]{opacity:.85;cursor:progress}
-#tuition[aria-invalid=true]{color:#B3261E}
-#calc-err{font-size:15px;color:#B3261E;min-height:0}
-@media (prefers-reduced-motion: reduce){.fade{opacity:1;transform:none;transition:none}#r-status i{animation:none}}
+#calc [aria-invalid=true]{color:#B3261E}#calc [aria-invalid=true]::placeholder{color:#B3261E;opacity:1}#calc label.invalid>span:first-child{color:#B3261E}
+#calc-err{display:none;align-items:center;gap:8px;font-size:15px;color:#B3261E;min-height:24px}#calc-err.show{display:flex;animation:errin var(--dur-sm) var(--ease-out) backwards}@keyframes errin{from{opacity:0;transform:translateY(-6px)}}
+#calc-err::before{content:"!";width:18px;height:18px;border-radius:50%;background:#B3261E;color:#FFFFFF;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none}
+@media (prefers-reduced-motion: reduce){.fade{opacity:1;transform:none;transition:none}#r-status i{animation:none}#calc-err.show{animation:none}}
 </style>
 </head>
 <body>
+<div id="curtain" aria-hidden="true"></div>
 
 
 <link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -40,6 +44,42 @@ button[type=submit][aria-busy=true]{opacity:.85;cursor:progress}
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{--ink:#14151F;--dark:#2A2340;--one:#F7B9EE;--move:#9FEADA;--tui:#8F93F2}
+:root{--dur-xs:120ms;--dur-sm:300ms;--dur-md:500ms;--dur-lg:700ms;--dur-draw:1800ms;--ease-out:cubic-bezier(.2,.8,.2,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--ease-slide:cubic-bezier(.7,0,.3,1);--ease-pop:cubic-bezier(.175,.885,.32,1.275);--stagger-sm:60ms;--stagger-md:150ms;--stagger-lg:180ms}
+/* refine disclosure under the total */
+.refine-link{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 8px;border:none;background:none;font:inherit;font-size:16px;color:#4A4B63;cursor:pointer;transition:color var(--dur-xs)}
+.refine-link:hover{color:var(--ink)}
+.refine-link svg{transition:transform var(--dur-sm) var(--ease-out)}.refine-link[aria-expanded=true] svg{transform:rotate(180deg)}
+.rl-dot{width:12px;height:12px;border-radius:50%;border:2px dashed currentColor;box-sizing:border-box;flex:none}.rl-dot.mine{border:none;background:currentColor}
+.refine-panel{width:100%;display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows var(--dur-md) var(--ease-out),opacity var(--dur-md) var(--ease-out),visibility 0s var(--dur-md)}
+.refine-panel>div{overflow:hidden;min-height:0}
+.refine-panel.open{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows var(--dur-md) var(--ease-out),opacity var(--dur-md) var(--ease-out),visibility 0s}
+#sources.how-anim .how-mark[style*="dashed"]{background:#FFFFFF}
+@media (prefers-reduced-motion:reduce){.refine-panel,.refine-panel.open,.refine-link svg{transition:none}}
+/* opening: curtain lifts, hero words darken, fields land, placeholder types */
+#curtain{position:fixed;left:-10vw;right:-10vw;top:-30vh;height:140vh;background:var(--dark);z-index:200;border-radius:0 0 50% 50%/0 0 26vh 26vh;pointer-events:none;will-change:transform;transition:transform 650ms var(--ease-in-out)}
+html:not(.intro) #curtain{display:none}
+html.intro-go #curtain{transform:translateY(-150vh)}
+html.intro .in-w{animation:inw var(--dur-md) var(--ease-out) backwards}@keyframes inw{from{opacity:.25}}
+html.intro .in-el{animation:land var(--dur-md) var(--ease-out) backwards}
+/* motion: nav pill, card landing, reduced motion */
+#topnav .nav-pill{position:absolute;left:0;top:4px;height:40px;width:0;border-radius:20px;background:var(--dark);opacity:0;pointer-events:none;transition:transform var(--dur-md) var(--ease-slide),width var(--dur-md) var(--ease-slide),opacity var(--dur-xs)}
+#topnav .nav-post a[data-sec]{position:relative;z-index:1}
+.tile.pre,.deal.pre{opacity:0}
+.tile.seen,.deal.seen{animation:land var(--dur-md) var(--ease-out) backwards}
+.tile.seen:nth-child(4n+2),.deal.seen:nth-child(4n+2){animation-delay:var(--stagger-sm)}
+.tile.seen:nth-child(4n+3),.deal.seen:nth-child(4n+3){animation-delay:calc(var(--stagger-sm)*2)}
+.tile.seen:nth-child(4n+4),.deal.seen:nth-child(4n+4){animation-delay:calc(var(--stagger-sm)*3)}
+/* hover timings */
+button,a[href]{transition:background-color var(--dur-xs),color var(--dur-xs),border-color var(--dur-xs),box-shadow var(--dur-sm) var(--ease-out),transform var(--dur-sm) var(--ease-out)}
+.deal{transition:transform var(--dur-sm) var(--ease-out),box-shadow var(--dur-sm) var(--ease-out)}
+.deal:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(17,20,30,.08)}
+/* pop-in for the hidden-costs pill and source tags */
+.pop{animation:pop var(--dur-md) var(--ease-pop) backwards}@keyframes pop{from{opacity:0;transform:scale(.6)}}
+/* scroll-drawn line through the Type column */
+#sources .how-line{position:absolute;width:1.5px;background:var(--dark);transform-origin:top;transform:scaleY(0);pointer-events:none;will-change:transform}
+#sources.how-anim .how-mark{position:relative;z-index:1;box-shadow:0 0 0 4px #FFFFFF;transform:scale(0);transition:transform var(--dur-md) var(--ease-pop)}
+#sources.how-anim .how-mark.on{transform:scale(1)}
+@media (prefers-reduced-motion:reduce){#topnav .nav-pill{transition:none}.tile.pre,.deal.pre{opacity:1}.tile.seen,.deal.seen{animation:none}.pop{animation:none}.deal:hover{transform:none}#sources .how-line{display:none}#sources.how-anim .how-mark{transform:none;transition:none}}
 a:focus-visible,button:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid #3E43C8!important;outline-offset:3px}
 input:focus-visible{outline:2px solid #3E43C8!important;outline-offset:6px;border-radius:4px}
 label:focus-within{border-radius:28px}
@@ -47,14 +87,14 @@ body{margin:0;background:#F2F3F5}
 a{color:var(--ink)}a:hover{color:#4A4B63}
 .d{font-family:'Archivo','Archivo Fallback Wide',sans-serif;font-stretch:112%;font-weight:500;letter-spacing:-0.035em}
 .num{font-family:'Archivo','Archivo Fallback','Noto Sans Bengali',sans-serif;font-variant-numeric:tabular-nums}
-.draw{stroke-dasharray:1400;animation:draw 1.8s ease-out .2s backwards}
+.draw{stroke-dasharray:1400;animation:draw var(--dur-draw) var(--ease-out) .2s backwards}
 @keyframes draw{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
-.land{animation:land .5s ease-out backwards}
+.land{animation:land var(--dur-md) var(--ease-out) backwards}
 @keyframes land{from{opacity:0;transform:translateY(12px)}}
 .l1{animation-delay:.9s}.l2{animation-delay:1.05s}.l3{animation-delay:1.2s}.l4{animation-delay:1.35s}.l5{animation-delay:1.8s}
-.bub{animation:bub .7s cubic-bezier(.2,.8,.2,1) backwards}
+.bub{animation:bub var(--dur-lg) var(--ease-out) backwards}
 @keyframes bub{from{transform:scale(0)}}
-.bub{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;cursor:pointer}.bub:hover,.bub:focus-visible{transform:scale(1.08);z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 24px 60px rgba(0,0,0,.35);outline:none}
+.bub{transition:transform var(--dur-sm) var(--ease-out),box-shadow var(--dur-sm);cursor:pointer}.bub:hover,.bub:focus-visible{transform:scale(1.08);z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 24px 60px rgba(0,0,0,.35);outline:none}
 .b2{animation-delay:.12s}.b3{animation-delay:.24s}.b4{animation-delay:.36s}.b5{animation-delay:.48s}
 .ico{display:inline-block;vertical-align:-0.08em;width:0.86em;height:0.86em;margin:0 0.12em;border-radius:0.22em;transform-origin:50% 80%}
 .ico svg{display:block;width:100%;height:100%}
@@ -64,6 +104,100 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 .ln{stroke-dasharray:22;animation:ln 4s ease-in-out infinite}.ln2{animation-delay:.25s}.ln3{animation-delay:.5s}@keyframes ln{0%,15%{stroke-dashoffset:22}45%,100%{stroke-dashoffset:0}}
 @media (prefers-reduced-motion: reduce){.draw{animation:none;stroke-dashoffset:0}.land{animation:none;opacity:1}.bub{animation:none}.bub:hover,.bub:focus-visible{transform:none}.ib,.ir,.pg,.ln{animation:none}}
 .chip{height:46px;padding:0 18px;border-radius:23px;border:none;background:rgba(255,255,255,0.7);color:var(--ink);font:inherit;font-size:16px;display:flex;align-items:center;gap:8px}
+/* ---------- responsive: tablet and down ---------- */
+@media (max-width: 1180px){
+html,body{overflow-x:hidden}
+main{width:100%!important}
+main section[id]{scroll-margin-top:120px}
+#topnav{padding:0 24px!important}
+body.has-res #topnav{height:auto!important;padding:10px 24px 12px!important;grid-template-columns:auto 1fr!important;row-gap:10px}
+body.has-res #topnav .nav-post > [role=navigation]{grid-column:1 / -1;grid-row:2;overflow-x:auto;justify-self:stretch;min-width:0;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+body.has-res #topnav .nav-post > [role=navigation]::-webkit-scrollbar{display:none}
+body.has-res #topnav .nav-post > [role=navigation] a{flex:none;white-space:nowrap}
+body.has-res #topnav .nav-post > div:last-child{grid-column:2;grid-row:1}
+#hero{height:auto!important;padding-bottom:72px}
+#hero > div{padding:72px 24px 0!important}
+#hero h1{width:100%!important;font-size:64px!important}
+#hero p{width:100%!important;max-width:640px}
+#calc{width:100%!important;max-width:760px}
+#calc > div{height:auto!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-radius:28px!important;padding:8px!important;gap:0!important}
+#calc > div > label,#calc > div > [role=group]{padding:14px 16px!important;border-right:none!important;border-bottom:1.5px solid #E4E5EA}
+#calc > div > label:nth-child(1),#calc > div > label:nth-child(2){grid-column:1 / -1}
+#calc > div > label:nth-child(3){border-right:1.5px solid #E4E5EA!important}
+#calc > div input{min-height:32px}
+#calc > div > button[type=submit]{grid-column:1 / -1;width:100%;height:60px!important;margin-top:8px}
+.dd{width:min(420px,calc(100vw - 64px))!important}
+main > section{padding-left:24px!important;padding-right:24px!important}
+#results > svg{display:none!important}
+#results > div[style*="repeat(4"]{width:100%!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:16px!important;margin:24px 0}
+#results > .land.l5,#add-cost{width:100%!important;max-width:720px}
+#add-cost-form{height:auto!important;grid-template-columns:1fr auto!important;border-radius:24px!important;padding:8px!important;gap:8px!important}
+#add-cost-form > label{grid-column:1 / -1;padding:10px 12px!important;border-right:none!important;border-bottom:1.5px solid #E4E5EA}
+#add-cost-form > [role=group]{justify-self:start}
+#where{padding-top:88px!important;padding-bottom:88px!important;margin-top:96px!important}
+#where > div:first-child{flex-wrap:wrap}
+#r-bubbles{display:none!important}
+#where-list{display:block!important}
+#where-toggle{display:none!important}
+#fx > div{grid-template-columns:minmax(0,1fr)!important}
+#save div[style*="repeat(4"]:not(#deals){grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+#save div[style*="repeat(4"]:not(#deals) > div{border-left:none!important;padding:20px 20px 20px 0!important}
+#deals{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+#how > div:first-child{flex-direction:column;align-items:flex-start!important;gap:12px}
+#sources{padding:8px 24px 16px!important}
+#sources > div:first-child{display:none!important}
+#sources > div{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px 24px!important}
+#share{grid-template-columns:minmax(0,1fr)!important;gap:48px!important;padding-top:88px!important;padding-bottom:88px!important;margin-top:96px!important}
+#share > div[aria-hidden]{height:auto!important;display:flex;justify-content:center}
+#share > div[aria-hidden] > span{display:none}
+#share > div[aria-hidden] > div{position:relative!important;left:auto!important;top:auto!important}
+#share > div:first-child > div{flex-wrap:wrap}
+#empty > div{padding:40px 24px!important}
+footer{flex-direction:column;align-items:flex-start!important;gap:12px;padding:28px 24px 36px!important}
+}
+/* ---------- phones ---------- */
+@media (max-width: 640px){
+#topnav{padding:0 16px!important;height:64px!important}
+#topnav .nav-pre a[href="#how"]{display:none!important}
+body.has-res #topnav{padding:8px 16px 10px!important}
+body.has-res #topnav .nav-post > div:last-child > span{display:none}
+#hero > div{padding:40px 16px 0!important}
+#hero h1{font-size:40px!important;line-height:1.05!important}
+#hero p{font-size:17px!important}
+#calc > div > label:nth-child(3){grid-column:1 / -1;border-right:none!important}
+#calc > div > [role=group]{grid-column:1 / -1}
+main > section{padding-left:16px!important;padding-right:16px!important}
+main section:not(#hero):not(#where):not(#share){padding-top:80px!important}
+#results{padding-top:64px!important}
+main h2.d{font-size:36px!important;max-width:none!important}
+#share-h{font-size:42px!important}
+main h3.d{font-size:24px!important}
+#results > div[style*="repeat(4"]{grid-template-columns:minmax(0,1fr)!important}
+#results > .land{width:100%!important}
+#r-total{font-size:52px!important}
+#r-hidden{height:auto!important;padding:8px 14px!important;text-align:center}
+#add-cost-form{grid-template-columns:minmax(0,1fr)!important}
+#add-cost-form > [role=group]{justify-self:stretch}
+#add-cost-form > [role=group] button{flex:1}
+#add-cost-form > button[type=submit]{width:100%}
+#where{padding-top:64px!important;padding-bottom:64px!important;margin-top:72px!important}
+#fx p[style*="font-size: 21px"]{font-size:18px!important}
+#fx-fan{margin:0 -8px}
+#fx > div > div:last-child{padding:20px 14px 12px!important}
+#save div[style*="repeat(4"]:not(#deals){grid-template-columns:minmax(0,1fr)!important}
+#save div[style*="repeat(4"]:not(#deals) > div{padding:18px 0!important;border-top:1px solid #DCDDE3}
+#save div[style*="repeat(4"]:not(#deals) > div:first-child{border-top:none}
+#deals{grid-template-columns:minmax(0,1fr)!important}
+#save div[style*="justify-content: space-between"]{flex-direction:column;align-items:flex-start!important;gap:6px}
+#sources{padding:4px 18px 12px!important}
+#sources > div{grid-template-columns:minmax(0,1fr)!important;gap:6px!important}
+#share{padding-top:64px!important;padding-bottom:64px!important;margin-top:72px!important}
+#share > div[aria-hidden] > div{transform:rotate(-2deg)!important;zoom:.9}
+#empty > div{padding:32px 18px!important}
+#empty div[style*="repeat(4"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+#empty svg{display:none}
+}
+@media (max-width:400px){#share > div[aria-hidden] > div{zoom:.74}}
 </style>
 
 <main style="width: 1440px; margin: 0 auto; min-height: 100vh; overflow: clip; background: #F2F3F5; color: var(--ink); font-family: 'Archivo', 'Archivo Fallback', system-ui, sans-serif">
@@ -72,7 +206,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 <a href="#" class="d" aria-label="Tuition+ home" style="font-size: 30px; line-height: 1; text-decoration: none; display: flex; align-items: flex-start">tuition<span aria-hidden="true" style="font-size: 0.62em; font-weight: 600; color: var(--tui); margin-left: 2px">+</span></a>
 <div class="nav-pre" style="display: contents"><span></span><div style="display: flex; gap: 18px; justify-content: flex-end; align-items: center"><a href="#how" style="text-decoration: none">How we work it out</a><a href="#calc" class="to-form" style="height: 44px; padding: 0 20px; border-radius: 22px; background: var(--dark); color: #FFFFFF; display: flex; align-items: center; text-decoration: none">Get my estimate</a></div></div><div class="nav-post" style="display: none"><div role="navigation" aria-label="Your results" style="display: flex; gap: 4px; padding: 4px; border-radius: 24px; background: #FFFFFF"><a href="#results" data-sec="results" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px; background: var(--dark); color: #FFFFFF;">Breakdown</a><a href="#where" data-sec="where" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Where it goes</a><a href="#fx" data-sec="fx" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Exchange rate</a><a href="#save" data-sec="save" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Saving tips</a><a href="#how" data-sec="how" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">How we work it out</a><a href="#share" data-sec="share" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Share</a></div><div style="display: flex; gap: 14px; justify-content: flex-end; align-items: center"><span class="num" style="font-size: 15px; color: #4A4B63"><b id="nb-total" style="font-size: 18px; color: var(--ink)">₹1.27 crore</b> <span id="nb-meta">· 2 years</span></span><a href="#calc" class="to-form" style="height: 44px; padding: 0 18px; border-radius: 22px; border: 1.5px solid var(--ink); display: flex; align-items: center; text-decoration: none">Edit</a></div></div>
 </nav>
-<section style="position: relative; z-index: 2; height: 780px">
+<section id="hero" style="position: relative; z-index: 2; height: 780px">
 
 
 <div style="position: relative; padding-top: 150px; display: flex; flex-direction: column; align-items: center; gap: 22px">
@@ -113,15 +247,31 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 <span id="r-total-sub" class="num" style="font-size: 17px; color: #C4C6CE">₹1,27,48,295 · $133,700</span>
 <span id="r-hidden" style="margin-top: 10px; height: 40px; padding: 0 16px; border-radius: 20px; background: #C9CBFA; color: var(--ink); display: flex; align-items: center; font-size: 16px; font-weight: 600">Hidden costs: 78% on top of tuition</span>
 </div>
-<div id="add-cost" style="margin-top: 48px; width: 960px; display: flex; flex-direction: column; align-items: center; gap: 16px">
-<div style="text-align: center"><div style="font-size: 20px; font-weight: 600">Know a cost we missed?</div><div style="font-size: 15px; color: #4A4B63; margin-top: 4px">Add it and we’ll include it in your total, the charts and your family’s PDF.</div></div>
+<div id="add-cost" style="margin-top: 40px; width: 960px; display: flex; flex-direction: column; align-items: center; gap: 0">
+<button type="button" id="refine-toggle" class="refine-link" aria-expanded="false" aria-controls="refine-panel"><span class="rl-dot" aria-hidden="true"></span><span class="rl-text">Make this number more accurate</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5.5L7 9.5L11 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div id="refine-panel" class="refine-panel"><div>
+<div style="padding: 20px 0 8px; display: flex; flex-direction: column; gap: 22px">
+<p style="margin: 0; text-align: center; font-size: 15px; line-height: 1.5; color: #4A4B63">Rent is our biggest estimate. Add yours, or any cost we missed, and it goes into the total, the charts and your family’s PDF.</p>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600; color: #4A4B63; padding-left: 28px">Replace our rent estimate</span>
+<form id="rent-form" style="width: 100%; height: 76px; box-sizing: border-box; padding: 8px; border-radius: 38px; background: #FFFFFF; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(17, 20, 30, 0.06)">
+<label style="padding: 0 20px; display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">My rent per month</span><input name="rent" inputmode="numeric" placeholder="$1,500" class="num" style="border: none; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); padding: 0; height: 26px"></label>
+<button type="button" id="rent-reset" hidden style="border: none; background: none; font: inherit; font-size: 14px; color: #4A4B63; text-decoration: underline; cursor: pointer; padding: 0 8px">Back to our estimate</button>
+<button type="submit" style="height: 60px; padding: 0 28px; border: none; border-radius: 30px; background: var(--dark); color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Use my rent</button>
+</form>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600; color: #4A4B63; padding-left: 28px">Add a cost we missed</span>
 <form id="add-cost-form" style="width: 100%; height: 76px; box-sizing: border-box; padding: 8px; border-radius: 38px; background: #FFFFFF; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto auto; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(17, 20, 30, 0.06)">
 <label style="padding: 0 20px; display: flex; flex-direction: column; border-right: 1.5px solid #E4E5EA"><span style="font-size: 12px; font-weight: 600">What is it</span><input name="n" placeholder="e.g. Laptop, winter coat" style="height: 56px; border: none; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); padding: 0; height: 26px"></label>
 <label style="padding: 0 20px; display: flex; flex-direction: column; border-right: 1.5px solid #E4E5EA"><span style="font-size: 12px; font-weight: 600">Amount</span><input name="a" inputmode="numeric" placeholder="$0" class="num" style="height: 56px; border: none; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); padding: 0; height: 26px"></label>
 <div role="group" aria-label="How often" style="display: flex; gap: 4px; padding: 4px; border-radius: 26px; background: #F2F3F5"><button type="button" class="freq" data-f="once" aria-pressed="true" style="height: 44px; padding: 0 16px; border: none; border-radius: 22px; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer; box-shadow: 0 2px 6px rgba(17, 20, 30, 0.08)">One time</button><button type="button" class="freq" data-f="month" aria-pressed="false" style="height: 44px; padding: 0 16px; border: none; border-radius: 22px; background: transparent; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Monthly</button></div>
 <button type="submit" style="height: 60px; padding: 0 28px; border: none; border-radius: 30px; background: var(--dark); color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Add</button>
 </form>
+</div>
 <div id="extras-list" style="width: 100%; display: flex; flex-direction: column"></div>
+</div>
+</div></div>
 </div>
 </section>
 
@@ -185,7 +335,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 </div>
 <div role="group" aria-label="Filter deals" id="deal-chips" style="display: flex; gap: 8px; flex-wrap: wrap"></div>
 <div id="deals" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px"></div>
-<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; font-weight: 600; color: var(--ink)">Check before you go</span>Deals change and some depend on your school. Check the source before you go.</p>
+<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)">Check before you go</span>Deals change and some depend on your school. Check the source before you go.</p>
 </section>
 
 
@@ -243,7 +393,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 </div>
 </div>
 
-<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; font-weight: 600; color: var(--ink)">Prototype</span>The figures on this page are samples. The sources listed are the ones the live site will use.</p>
+<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)">Prototype</span>The figures on this page are samples. The sources listed are the ones the live site will use.</p>
 </section>
 <section id="share" class="res" aria-labelledby="share-h" style="margin-top: 160px; background: var(--dark); color: #FFFFFF; padding: 110px 120px; display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 80px; align-items: center">
 <div style="display: flex; flex-direction: column; gap: 22px">
@@ -272,6 +422,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 </main>
 
 
-<script src="/wired/typeahead.js"></script><script src="/wired/fan.js"></script><script src="/wired/nav-and-states.js"></script><script src="/engine.js"></script>
-<script src="/wired/ui-and-animation.js"></script><script src="/wired/deals.js"></script><script src="/wired/pdf-sheet.js"></script></body>
+<script src="/wired/typeahead.js"></script><script src="/wired/fan.js"></script><script src="/wired/nav-and-states.js"></script><script src="/engine.js"></script><script src="/wired/ui-and-animation.js"></script><script src="/wired/deals.js"></script><script src="/wired/pdf-sheet.js"></script><script src="/wired/scroll-motion.js"></script>
+<script src="/wired/intro.js"></script>
+</body>
 </html>

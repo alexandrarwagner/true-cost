@@ -15,8 +15,15 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
-    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "mobile-chromium", use: { ...devices["Pixel 7"] }, testIgnore: /design-v2/ },
+    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: /design-v2/ },
+    {
+      // The designer's v2 kit: screens and animation frames compared as delivered.
+      name: "design-v2",
+      testMatch: /design-v2/,
+      use: { ...devices["Desktop Chrome"] },
+      snapshotPathTemplate: "design/reference-v2/{arg}{ext}",
+    },
   ],
   webServer: {
     // e2e always runs the production build in DEMO_MODE with no real keys.

@@ -64,10 +64,14 @@ window.fxDraw.reset();
 // one nav: pre state before Show me, results links after
 (function(){
 const nav=document.getElementById('topnav');if(!nav)return;
-const st=document.createElement('style');st.textContent='main section[id]{scroll-margin-top:40px}body:not(.has-res) #empty{display:block!important}body.has-res #topnav .nav-pre{display:none!important}body.has-res #topnav .nav-post{display:contents!important}#topnav .nav-post a[data-sec]{color:var(--ink);transition:background .2s,color .2s}#topnav .nav-post a[aria-current=true]{background:var(--dark)!important;color:#fff!important}#topnav .nav-post a[data-sec]:not([aria-current=true]){background:transparent!important;color:var(--ink)!important}';document.head.appendChild(st);
+const st=document.createElement('style');st.textContent='main section[id]{scroll-margin-top:40px}body:not(.has-res) #empty{display:block!important}body.has-res #topnav .nav-pre{display:none!important}body.has-res #topnav .nav-post{display:contents!important}#topnav .nav-post a[data-sec]{color:var(--ink);transition:color var(--dur-sm) var(--ease-out)}#topnav .nav-post a[aria-current=true]{background:transparent!important;color:#fff!important}#topnav .nav-post a[data-sec]:not([aria-current=true]){background:transparent!important;color:var(--ink)!important}';document.head.appendChild(st);
 const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const links=[...nav.querySelectorAll('.nav-post a[data-sec]')];
-const set=id=>links.forEach(a=>a.dataset.sec===id?a.setAttribute('aria-current','true'):a.removeAttribute('aria-current'));
+links.forEach(a=>a.addEventListener('focus',()=>{const sc=a.parentElement;if(!sc)return;const l=a.offsetLeft-sc.offsetLeft;if(l<sc.scrollLeft||l+a.offsetWidth>sc.scrollLeft+sc.clientWidth)sc.scrollTo({left:Math.max(0,l-16),behavior:'auto'})}));
+const wrap=nav.querySelector('.nav-post [role=navigation]');const pill=document.createElement('span');pill.className='nav-pill';pill.setAttribute('aria-hidden','true');if(wrap){wrap.style.position='relative';wrap.prepend(pill)}
+let pillReady=false;const movePill=instant=>{if(!wrap)return;const a=links.find(x=>x.getAttribute('aria-current')==='true');if(!a||!a.offsetWidth){pill.style.opacity='0';pillReady=false;return}const jump=instant||!pillReady;if(jump)pill.style.transition='none';pill.style.transform='translateX('+a.offsetLeft+'px)';pill.style.width=a.offsetWidth+'px';pill.style.opacity='1';if(jump){void pill.offsetWidth;pill.style.transition='';pillReady=true}};
+if(wrap&&'ResizeObserver' in window)new ResizeObserver(()=>movePill(true)).observe(wrap);
+const set=id=>{links.forEach(a=>{if(a.dataset.sec===id){a.setAttribute('aria-current','true');const sc=a.parentElement;if(sc&&sc.scrollWidth>sc.clientWidth+2){const l=a.offsetLeft-sc.offsetLeft;sc.scrollTo({left:Math.max(0,l-(sc.clientWidth-a.offsetWidth)/2),behavior:'smooth'})}}else a.removeAttribute('aria-current')});movePill()};
 links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById(a.dataset.sec).scrollIntoView({behavior:RM()?'auto':'smooth',block:'start'});set(a.dataset.sec)}));
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)set(e.target.id)})},{rootMargin:'-90px 0px -60% 0px'});
 links.forEach(a=>io.observe(document.getElementById(a.dataset.sec)));set('results');
@@ -79,7 +83,7 @@ document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{
 const chips=[...document.querySelectorAll('.dchip')];const cards=[...document.querySelectorAll('#deals .deal')];
 chips.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
  chips.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
- cards.forEach(k=>k.style.display=(c==='All'||k.dataset.cat===c)?'':'none')}));
+ cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'':'none';k.classList.remove('pre');k.classList.add('seen')})}));
 })();
 
 // money plan checklist

@@ -43,4 +43,7 @@ npm-debug.log*
 design/*
 !design/wired/
 !design/reference/
+!design/source/
+!design/reference-v2/
+design/reference-v2/side-by-sides/
 .lighthouse/

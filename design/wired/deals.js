@@ -27,24 +27,27 @@ function sub(d){if(d.savingUsd!=null)return 'could save about '+headline(d)+' ov
   if(d.studentPrice&&d.regularPrice)return money(d.studentPrice)+' instead of '+money(d.regularPrice)+(d.period?' '+(PERIOD[d.period]||''):'');
   return 'The source doesn’t list a regular price, so we don’t show a figure.'}
 const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return 'source'}};
-function card(d){return `<article class="deal" data-cat="${esc(LABEL[d.category]||LABEL.other)}" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+function card(d){return `<article class="deal" data-cat="${esc(LABEL[d.category]||LABEL.other)}" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
 <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63">${tile(d.category)}${esc(LABEL[d.category]||LABEL.other)}</span>
-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">${esc(headline(d))}</span>
+<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">${esc(headline(d))}</span>
 <span style="font-size: 17px; font-weight: 600; line-height: 1.3">${esc(d.title)}</span>
 <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">${esc(sub(d))}</span>
 <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">${esc(d.howToGet)}</span>
 <span style="font-size: 13px; line-height: 1.5; color: #4A4B63">Who: ${esc(d.eligibility)}</span>
-<a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: ${esc(host(d.sourceUrl))}, checked ${esc(monthYear(d.checkedOn))}</a>
+<a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: ${esc(host(d.sourceUrl))}, checked ${esc(monthYear(d.checkedOn))}</a>
 </article>`}
 const chip=(cat,on)=>`<button type="button" class="dchip" data-cat="${esc(cat)}" aria-pressed="${on}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid ${on?'var(--dark)':'#DCDDE3'}; background: ${on?'var(--dark)':'#FFFFFF'}; color: ${on?'#FFFFFF':'var(--ink)'}; font: inherit; font-size: 15px; cursor: pointer">${esc(cat)}</button>`;
 function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];
  cs.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
   cs.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
-  cards.forEach(k=>k.style.display=(c==='All'||k.dataset.cat===c)?'':'none')}))}
+  cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'':'none';k.classList.remove('pre');k.classList.add('seen')})}))}
 function render(deals){
  const cats=[...new Set(deals.map(d=>LABEL[d.category]||LABEL.other))];
  chips.innerHTML=chip('All',true)+cats.map(c=>chip(c,false)).join('');
  grid.innerHTML=deals.length?deals.map(card).join(''):'<p style="margin: 0; font-size: 15px; color: #4A4B63">No checked deals for this school yet.</p>';
+ // The designer's staggered landing (v2): cards wait as .pre and land as .seen when scrolled
+ // into view, with the same observer settings as the page's own tiles.
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('pre');e.target.classList.add('seen');io.unobserve(e.target)}}),{threshold:.3,rootMargin:'0px 0px -10% 0px'});grid.querySelectorAll('.deal').forEach(c=>{c.classList.add('pre');io.observe(c)})}
  const latest=deals.map(d=>d.checkedOn).sort().pop();if(checked)checked.textContent=latest?`Checked ${monthYear(latest)} · No paid listings`:'No paid listings';
  wire()}
 let last='';

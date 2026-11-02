@@ -17,8 +17,15 @@ The home page is now the designer's HTML (ADR 016). Its checks, all in CI:
 - Reduced motion is the page's own: with `prefers-reduced-motion: reduce` the reveal, the
   count-ups and the chart draw show their final state at once, and the status line reads the
   final sentence.
-- The page is desktop-only by the designer's own account; the phone layout is a separate
-  piece of work the designer will propose.
+- Since the designer's v2 (2 November) the page has its own layout at 1180, 640 and 400 px:
+  axe runs at 1440 and 390 px, before and after "Show me" and with the refine panel open;
+  the panel's toggle updates `aria-expanded`, the form's error has `role="alert"` with the
+  field and its label marked, and the opening curtain is `aria-hidden` with no pointer events
+  (`tests/e2e/design-v2.spec.ts`). The page never scrolls sideways at any of the four widths.
+- Open finding (plan decision 16): the v2 scroll motion dims section headings below the top
+  third of the viewport to 25% opacity, a contrast of 1.7:1 on 60 to 84 px text, until they
+  are scrolled to. The axe checks run with reduced motion until the owner decides; the
+  suggested fix is a 50% floor.
 
 ## What was tested
 

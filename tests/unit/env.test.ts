@@ -39,6 +39,15 @@ describe("getEnv", () => {
     expect(env.rateLimit.backend).toBe("memory");
   });
 
+  it("treats an empty flag as unset too, so a copied .env.example starts", () => {
+    vi.stubEnv("DEMO_MODE", "true");
+    vi.stubEnv("SAVINGS_ENABLED", "");
+    vi.stubEnv("COMPARE_ENABLED", "");
+    const env = getEnv();
+    expect(env.savingsEnabled).toBe(true); // follows DEMO_MODE
+    expect(env.compareEnabled).toBe(false);
+  });
+
   it("enables fixtures-backed features in DEMO_MODE without keys", () => {
     vi.stubEnv("DEMO_MODE", "true");
     const env = getEnv();

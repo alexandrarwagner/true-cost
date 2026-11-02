@@ -1,0 +1,492 @@
+--- design/source/v1-index.html
++++ design/source/v2-index.html
+@@ -3,6 +3,8 @@
+ <head>
+ <meta charset="utf-8">
++<meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Direction E — homepage</title>
+ 
++<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro')</script>
+ <style>
+ .dd{position:absolute;left:0;top:calc(100% + 30px);width:420px;max-height:340px;overflow:auto;margin:0;padding:8px;list-style:none;background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(17,20,30,.12);z-index:20;font-size:16px;box-sizing:border-box}
+@@ -23,13 +25,15 @@
+ @keyframes pulse{50%{opacity:.25}}
+ .paused .bub{animation-play-state:paused}
+-.fade{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
++.fade{opacity:0;transform:translateY(24px);transition:opacity var(--dur-lg) var(--ease-out),transform var(--dur-lg) var(--ease-out)}
+ .fade.seen{opacity:1;transform:none}
+ button[type=submit][aria-busy=true]{opacity:.85;cursor:progress}
+-#tuition[aria-invalid=true]{color:#B3261E}
+-#calc-err{font-size:15px;color:#B3261E;min-height:0}
+-@media (prefers-reduced-motion: reduce){.fade{opacity:1;transform:none;transition:none}#r-status i{animation:none}}
++#calc [aria-invalid=true]{color:#B3261E}#calc [aria-invalid=true]::placeholder{color:#B3261E;opacity:1}#calc label.invalid>span:first-child{color:#B3261E}
++#calc-err{display:none;align-items:center;gap:8px;font-size:15px;color:#B3261E;min-height:24px}#calc-err.show{display:flex;animation:errin var(--dur-sm) var(--ease-out) backwards}@keyframes errin{from{opacity:0;transform:translateY(-6px)}}
++#calc-err::before{content:"!";width:18px;height:18px;border-radius:50%;background:#B3261E;color:#FFFFFF;font-size:12px;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none}
++@media (prefers-reduced-motion: reduce){.fade{opacity:1;transform:none;transition:none}#r-status i{animation:none}#calc-err.show{animation:none}}
+ </style>
+ </head>
+ <body>
++<div id="curtain" aria-hidden="true"></div>
+ 
+ 
+@@ -37,4 +41,40 @@
+ <style>
+ :root{--ink:#14151F;--dark:#2A2340;--one:#F7B9EE;--move:#9FEADA;--tui:#8F93F2}
++:root{--dur-xs:120ms;--dur-sm:300ms;--dur-md:500ms;--dur-lg:700ms;--dur-draw:1800ms;--ease-out:cubic-bezier(.2,.8,.2,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--ease-slide:cubic-bezier(.7,0,.3,1);--ease-pop:cubic-bezier(.175,.885,.32,1.275);--stagger-sm:60ms;--stagger-md:150ms;--stagger-lg:180ms}
++/* refine disclosure under the total */
++.refine-link{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 8px;border:none;background:none;font:inherit;font-size:16px;color:#4A4B63;cursor:pointer;transition:color var(--dur-xs)}
++.refine-link:hover{color:var(--ink)}
++.refine-link svg{transition:transform var(--dur-sm) var(--ease-out)}.refine-link[aria-expanded=true] svg{transform:rotate(180deg)}
++.rl-dot{width:12px;height:12px;border-radius:50%;border:2px dashed currentColor;box-sizing:border-box;flex:none}.rl-dot.mine{border:none;background:currentColor}
++.refine-panel{width:100%;display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows var(--dur-md) var(--ease-out),opacity var(--dur-md) var(--ease-out),visibility 0s var(--dur-md)}
++.refine-panel>div{overflow:hidden;min-height:0}
++.refine-panel.open{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows var(--dur-md) var(--ease-out),opacity var(--dur-md) var(--ease-out),visibility 0s}
++#sources.how-anim .how-mark[style*="dashed"]{background:#FFFFFF}
++@media (prefers-reduced-motion:reduce){.refine-panel,.refine-panel.open,.refine-link svg{transition:none}}
++/* opening: curtain lifts, hero words darken, fields land, placeholder types */
++#curtain{position:fixed;left:-10vw;right:-10vw;top:-30vh;height:140vh;background:var(--dark);z-index:200;border-radius:0 0 50% 50%/0 0 26vh 26vh;pointer-events:none;will-change:transform;transition:transform 650ms var(--ease-in-out)}
++html:not(.intro) #curtain{display:none}
++html.intro-go #curtain{transform:translateY(-150vh)}
++html.intro .in-w{animation:inw var(--dur-md) var(--ease-out) backwards}@keyframes inw{from{opacity:.25}}
++html.intro .in-el{animation:land var(--dur-md) var(--ease-out) backwards}
++/* motion: nav pill, card landing, reduced motion */
++#topnav .nav-pill{position:absolute;left:0;top:4px;height:40px;width:0;border-radius:20px;background:var(--dark);opacity:0;pointer-events:none;transition:transform var(--dur-md) var(--ease-slide),width var(--dur-md) var(--ease-slide),opacity var(--dur-xs)}
++#topnav .nav-post a[data-sec]{position:relative;z-index:1}
++.tile.pre,.deal.pre{opacity:0}
++.tile.seen,.deal.seen{animation:land var(--dur-md) var(--ease-out) backwards}
++.tile.seen:nth-child(4n+2),.deal.seen:nth-child(4n+2){animation-delay:var(--stagger-sm)}
++.tile.seen:nth-child(4n+3),.deal.seen:nth-child(4n+3){animation-delay:calc(var(--stagger-sm)*2)}
++.tile.seen:nth-child(4n+4),.deal.seen:nth-child(4n+4){animation-delay:calc(var(--stagger-sm)*3)}
++/* hover timings */
++button,a[href]{transition:background-color var(--dur-xs),color var(--dur-xs),border-color var(--dur-xs),box-shadow var(--dur-sm) var(--ease-out),transform var(--dur-sm) var(--ease-out)}
++.deal{transition:transform var(--dur-sm) var(--ease-out),box-shadow var(--dur-sm) var(--ease-out)}
++.deal:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(17,20,30,.08)}
++/* pop-in for the hidden-costs pill and source tags */
++.pop{animation:pop var(--dur-md) var(--ease-pop) backwards}@keyframes pop{from{opacity:0;transform:scale(.6)}}
++/* scroll-drawn line through the Type column */
++#sources .how-line{position:absolute;width:1.5px;background:var(--dark);transform-origin:top;transform:scaleY(0);pointer-events:none;will-change:transform}
++#sources.how-anim .how-mark{position:relative;z-index:1;box-shadow:0 0 0 4px #FFFFFF;transform:scale(0);transition:transform var(--dur-md) var(--ease-pop)}
++#sources.how-anim .how-mark.on{transform:scale(1)}
++@media (prefers-reduced-motion:reduce){#topnav .nav-pill{transition:none}.tile.pre,.deal.pre{opacity:1}.tile.seen,.deal.seen{animation:none}.pop{animation:none}.deal:hover{transform:none}#sources .how-line{display:none}#sources.how-anim .how-mark{transform:none;transition:none}}
+ a:focus-visible,button:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid #3E43C8!important;outline-offset:3px}
+ input:focus-visible{outline:2px solid #3E43C8!important;outline-offset:6px;border-radius:4px}
+@@ -44,12 +84,12 @@
+ .d{font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:500;letter-spacing:-0.035em}
+ .num{font-family:'Archivo','Noto Sans Bengali',sans-serif;font-variant-numeric:tabular-nums}
+-.draw{stroke-dasharray:1400;animation:draw 1.8s ease-out .2s backwards}
++.draw{stroke-dasharray:1400;animation:draw var(--dur-draw) var(--ease-out) .2s backwards}
+ @keyframes draw{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+-.land{animation:land .5s ease-out backwards}
++.land{animation:land var(--dur-md) var(--ease-out) backwards}
+ @keyframes land{from{opacity:0;transform:translateY(12px)}}
+ .l1{animation-delay:.9s}.l2{animation-delay:1.05s}.l3{animation-delay:1.2s}.l4{animation-delay:1.35s}.l5{animation-delay:1.8s}
+-.bub{animation:bub .7s cubic-bezier(.2,.8,.2,1) backwards}
++.bub{animation:bub var(--dur-lg) var(--ease-out) backwards}
+ @keyframes bub{from{transform:scale(0)}}
+-.bub{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;cursor:pointer}.bub:hover,.bub:focus-visible{transform:scale(1.08);z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 24px 60px rgba(0,0,0,.35);outline:none}
++.bub{transition:transform var(--dur-sm) var(--ease-out),box-shadow var(--dur-sm);cursor:pointer}.bub:hover,.bub:focus-visible{transform:scale(1.08);z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 24px 60px rgba(0,0,0,.35);outline:none}
+ .b2{animation-delay:.12s}.b3{animation-delay:.24s}.b4{animation-delay:.36s}.b5{animation-delay:.48s}
+ .ico{display:inline-block;vertical-align:-0.08em;width:0.86em;height:0.86em;margin:0 0.12em;border-radius:0.22em;transform-origin:50% 80%}
+@@ -61,4 +101,98 @@
+ @media (prefers-reduced-motion: reduce){.draw{animation:none;stroke-dashoffset:0}.land{animation:none;opacity:1}.bub{animation:none}.bub:hover,.bub:focus-visible{transform:none}.ib,.ir,.pg,.ln{animation:none}}
+ .chip{height:46px;padding:0 18px;border-radius:23px;border:none;background:rgba(255,255,255,0.7);color:var(--ink);font:inherit;font-size:16px;display:flex;align-items:center;gap:8px}
++/* ---------- responsive: tablet and down ---------- */
++@media (max-width: 1180px){
++html,body{overflow-x:hidden}
++main{width:100%!important}
++main section[id]{scroll-margin-top:120px}
++#topnav{padding:0 24px!important}
++body.has-res #topnav{height:auto!important;padding:10px 24px 12px!important;grid-template-columns:auto 1fr!important;row-gap:10px}
++body.has-res #topnav .nav-post > [role=navigation]{grid-column:1 / -1;grid-row:2;overflow-x:auto;justify-self:stretch;min-width:0;max-width:100%;scrollbar-width:none;-webkit-overflow-scrolling:touch}
++body.has-res #topnav .nav-post > [role=navigation]::-webkit-scrollbar{display:none}
++body.has-res #topnav .nav-post > [role=navigation] a{flex:none;white-space:nowrap}
++body.has-res #topnav .nav-post > div:last-child{grid-column:2;grid-row:1}
++#hero{height:auto!important;padding-bottom:72px}
++#hero > div{padding:72px 24px 0!important}
++#hero h1{width:100%!important;font-size:64px!important}
++#hero p{width:100%!important;max-width:640px}
++#calc{width:100%!important;max-width:760px}
++#calc > div{height:auto!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-radius:28px!important;padding:8px!important;gap:0!important}
++#calc > div > label,#calc > div > [role=group]{padding:14px 16px!important;border-right:none!important;border-bottom:1.5px solid #E4E5EA}
++#calc > div > label:nth-child(1),#calc > div > label:nth-child(2){grid-column:1 / -1}
++#calc > div > label:nth-child(3){border-right:1.5px solid #E4E5EA!important}
++#calc > div input{min-height:32px}
++#calc > div > button[type=submit]{grid-column:1 / -1;width:100%;height:60px!important;margin-top:8px}
++.dd{width:min(420px,calc(100vw - 64px))!important}
++main > section{padding-left:24px!important;padding-right:24px!important}
++#results > svg{display:none!important}
++#results > div[style*="repeat(4"]{width:100%!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:16px!important;margin:24px 0}
++#results > .land.l5,#add-cost{width:100%!important;max-width:720px}
++#add-cost-form{height:auto!important;grid-template-columns:1fr auto!important;border-radius:24px!important;padding:8px!important;gap:8px!important}
++#add-cost-form > label{grid-column:1 / -1;padding:10px 12px!important;border-right:none!important;border-bottom:1.5px solid #E4E5EA}
++#add-cost-form > [role=group]{justify-self:start}
++#where{padding-top:88px!important;padding-bottom:88px!important;margin-top:96px!important}
++#where > div:first-child{flex-wrap:wrap}
++#r-bubbles{display:none!important}
++#where-list{display:block!important}
++#where-toggle{display:none!important}
++#fx > div{grid-template-columns:minmax(0,1fr)!important}
++#save div[style*="repeat(4"]:not(#deals){grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
++#save div[style*="repeat(4"]:not(#deals) > div{border-left:none!important;padding:20px 20px 20px 0!important}
++#deals{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
++#how > div:first-child{flex-direction:column;align-items:flex-start!important;gap:12px}
++#sources{padding:8px 24px 16px!important}
++#sources > div:first-child{display:none!important}
++#sources > div{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px 24px!important}
++#share{grid-template-columns:minmax(0,1fr)!important;gap:48px!important;padding-top:88px!important;padding-bottom:88px!important;margin-top:96px!important}
++#share > div[aria-hidden]{height:auto!important;display:flex;justify-content:center}
++#share > div[aria-hidden] > span{display:none}
++#share > div[aria-hidden] > div{position:relative!important;left:auto!important;top:auto!important}
++#share > div:first-child > div{flex-wrap:wrap}
++#empty > div{padding:40px 24px!important}
++footer{flex-direction:column;align-items:flex-start!important;gap:12px;padding:28px 24px 36px!important}
++}
++/* ---------- phones ---------- */
++@media (max-width: 640px){
++#topnav{padding:0 16px!important;height:64px!important}
++#topnav .nav-pre a[href="#how"]{display:none!important}
++body.has-res #topnav{padding:8px 16px 10px!important}
++body.has-res #topnav .nav-post > div:last-child > span{display:none}
++#hero > div{padding:40px 16px 0!important}
++#hero h1{font-size:40px!important;line-height:1.05!important}
++#hero p{font-size:17px!important}
++#calc > div > label:nth-child(3){grid-column:1 / -1;border-right:none!important}
++#calc > div > [role=group]{grid-column:1 / -1}
++main > section{padding-left:16px!important;padding-right:16px!important}
++main section:not(#hero):not(#where):not(#share){padding-top:80px!important}
++#results{padding-top:64px!important}
++main h2.d{font-size:36px!important;max-width:none!important}
++#share-h{font-size:42px!important}
++main h3.d{font-size:24px!important}
++#results > div[style*="repeat(4"]{grid-template-columns:minmax(0,1fr)!important}
++#results > .land{width:100%!important}
++#r-total{font-size:52px!important}
++#r-hidden{height:auto!important;padding:8px 14px!important;text-align:center}
++#add-cost-form{grid-template-columns:minmax(0,1fr)!important}
++#add-cost-form > [role=group]{justify-self:stretch}
++#add-cost-form > [role=group] button{flex:1}
++#add-cost-form > button[type=submit]{width:100%}
++#where{padding-top:64px!important;padding-bottom:64px!important;margin-top:72px!important}
++#fx p[style*="font-size: 21px"]{font-size:18px!important}
++#fx-fan{margin:0 -8px}
++#fx > div > div:last-child{padding:20px 14px 12px!important}
++#save div[style*="repeat(4"]:not(#deals){grid-template-columns:minmax(0,1fr)!important}
++#save div[style*="repeat(4"]:not(#deals) > div{padding:18px 0!important;border-top:1px solid #DCDDE3}
++#save div[style*="repeat(4"]:not(#deals) > div:first-child{border-top:none}
++#deals{grid-template-columns:minmax(0,1fr)!important}
++#save div[style*="justify-content: space-between"]{flex-direction:column;align-items:flex-start!important;gap:6px}
++#sources{padding:4px 18px 12px!important}
++#sources > div{grid-template-columns:minmax(0,1fr)!important;gap:6px!important}
++#share{padding-top:64px!important;padding-bottom:64px!important;margin-top:72px!important}
++#share > div[aria-hidden] > div{transform:rotate(-2deg)!important;zoom:.9}
++#empty > div{padding:32px 18px!important}
++#empty div[style*="repeat(4"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
++#empty svg{display:none}
++}
++@media (max-width:400px){#share > div[aria-hidden] > div{zoom:.74}}
+ </style>
+ 
+@@ -69,5 +203,5 @@
+ <div class="nav-pre" style="display: contents"><span></span><div style="display: flex; gap: 18px; justify-content: flex-end; align-items: center"><a href="#how" style="text-decoration: none">How we work it out</a><a href="#calc" class="to-form" style="height: 44px; padding: 0 20px; border-radius: 22px; background: var(--dark); color: #FFFFFF; display: flex; align-items: center; text-decoration: none">Get my estimate</a></div></div><div class="nav-post" style="display: none"><div role="navigation" aria-label="Your results" style="display: flex; gap: 4px; padding: 4px; border-radius: 24px; background: #FFFFFF"><a href="#results" data-sec="results" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px; background: var(--dark); color: #FFFFFF;">Breakdown</a><a href="#where" data-sec="where" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Where it goes</a><a href="#fx" data-sec="fx" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Exchange rate</a><a href="#save" data-sec="save" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Saving tips</a><a href="#how" data-sec="how" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">How we work it out</a><a href="#share" data-sec="share" style="height: 40px; padding: 0 16px; border-radius: 20px; display: flex; align-items: center; text-decoration: none; font-size: 15px;">Share</a></div><div style="display: flex; gap: 14px; justify-content: flex-end; align-items: center"><span class="num" style="font-size: 15px; color: #4A4B63"><b id="nb-total" style="font-size: 18px; color: var(--ink)">₹1.27 crore</b> <span id="nb-meta">· 2 years</span></span><a href="#calc" class="to-form" style="height: 44px; padding: 0 18px; border-radius: 22px; border: 1.5px solid var(--ink); display: flex; align-items: center; text-decoration: none">Edit</a></div></div>
+ </nav>
+-<section style="position: relative; z-index: 2; height: 780px">
++<section id="hero" style="position: relative; z-index: 2; height: 780px">
+ 
+ 
+@@ -110,6 +244,19 @@
+ <span id="r-hidden" style="margin-top: 10px; height: 40px; padding: 0 16px; border-radius: 20px; background: #C9CBFA; color: var(--ink); display: flex; align-items: center; font-size: 16px; font-weight: 600">Hidden costs: 78% on top of tuition</span>
+ </div>
+-<div id="add-cost" style="margin-top: 48px; width: 960px; display: flex; flex-direction: column; align-items: center; gap: 16px">
+-<div style="text-align: center"><div style="font-size: 20px; font-weight: 600">Know a cost we missed?</div><div style="font-size: 15px; color: #4A4B63; margin-top: 4px">Add it and we’ll include it in your total, the charts and your family’s PDF.</div></div>
++<div id="add-cost" style="margin-top: 40px; width: 960px; display: flex; flex-direction: column; align-items: center; gap: 0">
++<button type="button" id="refine-toggle" class="refine-link" aria-expanded="false" aria-controls="refine-panel"><span class="rl-dot" aria-hidden="true"></span><span class="rl-text">Make this number more accurate</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 5.5L7 9.5L11 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
++<div id="refine-panel" class="refine-panel"><div>
++<div style="padding: 20px 0 8px; display: flex; flex-direction: column; gap: 22px">
++<p style="margin: 0; text-align: center; font-size: 15px; line-height: 1.5; color: #4A4B63">Rent is our biggest estimate. Add yours, or any cost we missed, and it goes into the total, the charts and your family’s PDF.</p>
++<div style="display: flex; flex-direction: column; gap: 8px">
++<span style="font-size: 13px; font-weight: 600; color: #4A4B63; padding-left: 28px">Replace our rent estimate</span>
++<form id="rent-form" style="width: 100%; height: 76px; box-sizing: border-box; padding: 8px; border-radius: 38px; background: #FFFFFF; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(17, 20, 30, 0.06)">
++<label style="padding: 0 20px; display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">My rent per month</span><input name="rent" inputmode="numeric" placeholder="$1,500" class="num" style="border: none; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); padding: 0; height: 26px"></label>
++<button type="button" id="rent-reset" hidden style="border: none; background: none; font: inherit; font-size: 14px; color: #4A4B63; text-decoration: underline; cursor: pointer; padding: 0 8px">Back to our estimate</button>
++<button type="submit" style="height: 60px; padding: 0 28px; border: none; border-radius: 30px; background: var(--dark); color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Use my rent</button>
++</form>
++</div>
++<div style="display: flex; flex-direction: column; gap: 8px">
++<span style="font-size: 13px; font-weight: 600; color: #4A4B63; padding-left: 28px">Add a cost we missed</span>
+ <form id="add-cost-form" style="width: 100%; height: 76px; box-sizing: border-box; padding: 8px; border-radius: 38px; background: #FFFFFF; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto auto; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(17, 20, 30, 0.06)">
+ <label style="padding: 0 20px; display: flex; flex-direction: column; border-right: 1.5px solid #E4E5EA"><span style="font-size: 12px; font-weight: 600">What is it</span><input name="n" placeholder="e.g. Laptop, health insurance" style="height: 56px; border: none; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); padding: 0; height: 26px"></label>
+@@ -118,5 +265,8 @@
+ <button type="submit" style="height: 60px; padding: 0 28px; border: none; border-radius: 30px; background: var(--dark); color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Add</button>
+ </form>
++</div>
+ <div id="extras-list" style="width: 100%; display: flex; flex-direction: column"></div>
++</div>
++</div></div>
+ </div>
+ </section>
+@@ -178,5 +328,5 @@
+ <div style="display: flex; flex-direction: column; gap: 6px">
+ <h3 class="d" style="margin: 0; font-size: 30px">General tips</h3>
+-<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1.5px solid var(--ink); margin-top: 14px"><div style="padding: 24px 28px 0 0px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: 19px; font-weight: 600; line-height: 1.3">Live further out on the T</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Rent usually drops away from the campus core. Many students share in Allston, Brighton or Somerville and take the train in.</span><span style="display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4B63"><span style="width: 9px; height: 9px; border-radius: 50%; background: #C9CBFA"></span>Housing</span></div><div style="padding: 24px 28px 0 28px; border-left: 1px solid #DCDDE3; display: flex; flex-direction: column; gap: 10px"><span style="font-size: 19px; font-weight: 600; line-height: 1.3">Plan around 1 September</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Most Boston leases start on 1 September. Students moving out often give away furniture that week, so wait before buying.</span><span style="display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4B63"><span style="width: 9px; height: 9px; border-radius: 50%; background: #C9CBFA"></span>Housing</span></div><div style="padding: 24px 28px 0 28px; border-left: 1px solid #DCDDE3; display: flex; flex-direction: column; gap: 10px"><span style="font-size: 19px; font-weight: 600; line-height: 1.3">Cook together, shop in bulk</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Splitting rice, dal and spices with flatmates goes much further than eating out.</span><span style="display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4B63"><span style="width: 9px; height: 9px; border-radius: 50%; background: #DDFF7A"></span>Living costs</span></div><div style="padding: 24px 28px 0 28px; border-left: 1px solid #DCDDE3; display: flex; flex-direction: column; gap: 10px"><span style="font-size: 19px; font-weight: 600; line-height: 1.3">Send fewer, larger transfers</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Each transfer has fees, and banks often add a markup to the rate. Compare against the mid-market rate before you send.</span><span style="display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4B63"><span style="width: 9px; height: 9px; border-radius: 50%; background: var(--move)"></span>Moving money</span></div></div>
++<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 18px"><article class="tile" style="background: #C9CBFA; border-radius: 24px; padding: 24px 24px 26px; min-height: 236px; display: flex; flex-direction: column; gap: 12px"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; background: #FFFFFF; border-radius: 999px; padding: 6px 12px 6px 9px; font-size: 13px; font-weight: 600; color: var(--ink)"><span style="width: 9px; height: 9px; border-radius: 50%; background: #C9CBFA"></span>Housing</span><span style="font-size: 21px; font-weight: 600; line-height: 1.3; margin-top: 6px">Live further out on the T</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Rent usually drops away from the campus core. Many students share in Allston, Brighton or Somerville and take the train in.</span></article><article class="tile" style="background: #C9CBFA; border-radius: 24px; padding: 24px 24px 26px; min-height: 236px; display: flex; flex-direction: column; gap: 12px"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; background: #FFFFFF; border-radius: 999px; padding: 6px 12px 6px 9px; font-size: 13px; font-weight: 600; color: var(--ink)"><span style="width: 9px; height: 9px; border-radius: 50%; background: #C9CBFA"></span>Housing</span><span style="font-size: 21px; font-weight: 600; line-height: 1.3; margin-top: 6px">Plan around 1 September</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Most Boston leases start on 1 September. Students moving out often give away furniture that week, so wait before buying.</span></article><article class="tile" style="background: #DDFF7A; border-radius: 24px; padding: 24px 24px 26px; min-height: 236px; display: flex; flex-direction: column; gap: 12px"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; background: #FFFFFF; border-radius: 999px; padding: 6px 12px 6px 9px; font-size: 13px; font-weight: 600; color: var(--ink)"><span style="width: 9px; height: 9px; border-radius: 50%; background: #DDFF7A"></span>Living costs</span><span style="font-size: 21px; font-weight: 600; line-height: 1.3; margin-top: 6px">Cook together, shop in bulk</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Splitting rice, dal and spices with flatmates goes much further than eating out.</span></article><article class="tile" style="background: #9FEADA; border-radius: 24px; padding: 24px 24px 26px; min-height: 236px; display: flex; flex-direction: column; gap: 12px"><span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; background: #FFFFFF; border-radius: 999px; padding: 6px 12px 6px 9px; font-size: 13px; font-weight: 600; color: var(--ink)"><span style="width: 9px; height: 9px; border-radius: 50%; background: #9FEADA"></span>Moving money</span><span style="font-size: 21px; font-weight: 600; line-height: 1.3; margin-top: 6px">Send fewer, larger transfers</span><span style="font-size: 15px; line-height: 1.55; color: #4A4B63">Each transfer has fees, and banks often add a markup to the rate. Compare against the mid-market rate before you send.</span></article></div>
+ </div>
+ <div style="margin-top: 48px; display: flex; justify-content: space-between; align-items: baseline; gap: 30px">
+@@ -185,54 +335,54 @@
+ </div>
+ <div role="group" aria-label="Filter deals" style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dchip" data-cat="All" aria-pressed="true" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid var(--dark); background: var(--dark); color: #FFFFFF; font: inherit; font-size: 15px; cursor: pointer">All</button><button type="button" class="dchip" data-cat="Gyms" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Gyms</button><button type="button" class="dchip" data-cat="Getting around" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Getting around</button><button type="button" class="dchip" data-cat="Museums" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Museums</button><button type="button" class="dchip" data-cat="Music & theatre" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Music & theatre</button><button type="button" class="dchip" data-cat="Sport" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Sport</button><button type="button" class="dchip" data-cat="Food & coffee" aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid #DCDDE3; background: #FFFFFF; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer">Food & coffee</button></div>
+-<div id="deals" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px"><article class="deal" data-cat="Gyms" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<div id="deals" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px"><article class="deal" data-cat="Gyms" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #DDFF7A; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9V15M7 7V17M17 7V17M20 9V15M7 12H17" stroke="#14151F" stroke-width="2" stroke-linecap="round"/></svg></span>Gyms</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">15% off</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">15% off</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Orangetheory Fitness, Fenway</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Off current membership rates for students.</span>
+-<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
+-</article><article class="deal" data-cat="Getting around" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
++</article><article class="deal" data-cat="Getting around" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #9FEADA; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="7" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><circle cx="17" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><path d="M7 16L10.5 9H15L17 16M9.5 7H12" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Getting around</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">11% off</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">11% off</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">MBTA Semester Pass</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Discounted T passes, bought through participating schools. Ask your student affairs or transport office.</span>
+-<a href="https://mbta.getanchor.io/fares/college-student-semester-passes.html" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: MBTA pass programme</a>
+-</article><article class="deal" data-cat="Getting around" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://mbta.getanchor.io/fares/college-student-semester-passes.html" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: MBTA pass programme</a>
++</article><article class="deal" data-cat="Getting around" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #9FEADA; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="7" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><circle cx="17" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><path d="M7 16L10.5 9H15L17 16M9.5 7H12" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Getting around</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">Cheaper bikes</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">Cheaper bikes</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Bluebikes, through your school</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Many schools, including BU and Tufts, offer discounted Bluebikes memberships. The price depends on your school.</span>
+-<a href="https://www.bu.edu/transportation/bicycling/bluebikes-discount/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: BU Transportation</a>
+-</article><article class="deal" data-cat="Museums" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://www.bu.edu/transportation/bicycling/bluebikes-discount/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: BU Transportation</a>
++</article><article class="deal" data-cat="Museums" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #C9CBFA; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9L12 4L20 9M6 10V17M10 10V17M14 10V17M18 10V17M4 20H20" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Museums</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">Free entry</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">Free entry</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Museum of Fine Arts</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Free admission with student ID if your school is in the MFA University Membership Program.</span>
+-<a href="https://mfa.org/programs/college-programs" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: mfa.org</a>
+-</article><article class="deal" data-cat="Museums" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://mfa.org/programs/college-programs" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: mfa.org</a>
++</article><article class="deal" data-cat="Museums" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #C9CBFA; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9L12 4L20 9M6 10V17M10 10V17M14 10V17M18 10V17M4 20H20" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Museums</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">Free entry</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">Free entry</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Isabella Stewart Gardner Museum</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Free admission with valid ID for students at University Membership schools.</span>
+-<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
+-</article><article class="deal" data-cat="Music & theatre" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
++</article><article class="deal" data-cat="Music & theatre" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #F7B9EE; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 17V6L19 4V15" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="17" r="2.5" stroke="#14151F" stroke-width="2"/><circle cx="17" cy="15" r="2.5" stroke="#14151F" stroke-width="2"/></svg></span>Music & theatre</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">$35 pass</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">$35 pass</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Boston Symphony Orchestra</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">The Student Pass gets college students into many BSO concerts, one ticket per series, booked week by week.</span>
+-<a href="https://bso.org/special-ticket-opportunities/bso-college-card" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: bso.org</a>
+-</article><article class="deal" data-cat="Sport" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://bso.org/special-ticket-opportunities/bso-college-card" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: bso.org</a>
++</article><article class="deal" data-cat="Sport" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #F7B9EE; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="#14151F" stroke-width="2"/><path d="M7 6C9 9 9 15 7 18M17 6C15 9 15 15 17 18" stroke="#14151F" stroke-width="2" stroke-linecap="round"/></svg></span>Sport</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">From $9</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">From $9</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Red Sox Student9s</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">Student tickets for select home games and events at Fenway Park. Register for the programme first.</span>
+-<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
+-</article><article class="deal" data-cat="Food & coffee" style="border-radius: 24px; background: #FFFFFF; padding: 22px; display: flex; flex-direction: column; gap: 8px">
++<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
++</article><article class="deal" data-cat="Food & coffee" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
+ <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63"><span style="width: 36px; height: 36px; border-radius: 11px; background: #DDFF7A; display: flex; align-items: center; justify-content: center; flex: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 9H17V13A5 5 0 0 1 12 18H10A5 5 0 0 1 5 13Z" stroke="#14151F" stroke-width="2" stroke-linejoin="round"/><path d="M17 10H18.5A2.5 2.5 0 0 1 18.5 15H16.5M8 4V6M12 4V6" stroke="#14151F" stroke-width="2" stroke-linecap="round"/></svg></span>Food & coffee</span>
+-<span class="d" style="margin-top: 6px; font-size: 32px; line-height: 1">Free coffee</span>
++<span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">Free coffee</span>
+ <span style="font-size: 17px; font-weight: 600; line-height: 1.3">Cafe Landwer, Back Bay and Cleveland Circle</span>
+ <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">For students studying there: bring a laptop and student ID and order at the coffee bar.</span>
+-<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 8px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
++<a href="https://www.boston.com/community/neighborhoods/2026/09/14/where-to-find-college-student-discounts-in-boston-2026/" target="_blank" rel="noopener" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: Boston.com, Sep 2026</a>
+ </article></div>
+-<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; font-weight: 600; color: var(--ink)">Check before you go</span>Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.</p>
++<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)">Check before you go</span>Deals change and some depend on your school. Tips are examples; the live site will check them with students in each city.</p>
+ </section>
+ 
+@@ -292,5 +442,5 @@
+ </div>
+ 
+-<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; font-weight: 600; color: var(--ink)">Prototype</span>The figures on this page are samples. The sources listed are the ones the live site will use.</p>
++<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; color: #4A4B63"><span style="height: 28px; padding: 0 12px; border-radius: 14px; background: #FFFFFF; border: 1.5px solid #DCDDE3; display: flex; align-items: center; flex: none; white-space: nowrap; font-weight: 600; color: var(--ink)">Prototype</span>The figures on this page are samples. The sources listed are the ones the live site will use.</p>
+ </section>
+ <section id="share" class="res" aria-labelledby="share-h" style="margin-top: 160px; background: var(--dark); color: #FFFFFF; padding: 110px 120px; display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 80px; align-items: center">
+@@ -371,5 +521,5 @@
+ }
+ function fanSVG(f,Y,opt){
+-  opt=opt||{};const W=780,Hh=470,L=52,R=16,T=30,B=44,pw=W-L-R,ph=Hh-T-B;
++  opt=opt||{};const cmp=opt.W&&opt.W<560;const W=cmp?Math.round(opt.W):780,Hh=cmp?Math.round(Math.max(250,W*.8)):470,L=cmp?38:52,R=cmp?8:16,T=30,B=cmp?36:44,pw=W-L-R,ph=Hh-T-B,FS=cmp?13:15;
+   const top=Math.max(...f.worst,...f.p90)*1.06;const unit=top>=1e7?1e7:1e5;const u=unit===1e7?'cr':'L';
+   const X=m=>L+pw*(m+1)/f.H,Yy=v=>T+ph*(1-v/top);const fx=v=>'₹'+(v/unit).toFixed(unit===1e7?2:1)+(u==='cr'?' cr':' L');
+@@ -377,9 +527,9 @@
+   let g='';
+   const raw=top/unit/4;const mag=Math.pow(10,Math.floor(Math.log10(raw)));const stp=[1,2,2.5,5,10].map(x=>x*mag).find(x=>x>=raw);const dec=stp<0.1?2:(stp<1?(String(stp).split('.')[1]||'').length:0);
+-  for(let i=0;i*stp*unit<=top;i++){const v=i*stp*unit;g+=`<line x1="${L}" x2="${L+pw}" y1="${Yy(v).toFixed(1)}" y2="${Yy(v).toFixed(1)}" stroke="${i?'#ECEDF1':'#CFD0D8'}"/><text x="${L-12}" y="${(Yy(v)+4).toFixed(1)}" text-anchor="end" font-size="15" fill="#4A4B63">${i?(v/unit).toFixed(dec):'0'}</text>`}
+-  g+=`<text x="0" y="${T-12}" text-anchor="start" font-size="14" fill="#4A4B63">₹ ${u==='cr'?'crore':'lakh'}</text>`;
++  for(let i=0;i*stp*unit<=top;i++){const v=i*stp*unit;g+=`<line x1="${L}" x2="${L+pw}" y1="${Yy(v).toFixed(1)}" y2="${Yy(v).toFixed(1)}" stroke="${i?'#ECEDF1':'#CFD0D8'}"/><text x="${L-(cmp?8:12)}" y="${(Yy(v)+4).toFixed(1)}" text-anchor="end" font-size="${FS}" fill="#4A4B63">${i?(v/unit).toFixed(dec):'0'}</text>`}
++  g+=`<text x="0" y="${T-12}" text-anchor="start" font-size="${cmp?13:14}" fill="#4A4B63">₹ ${u==='cr'?'crore':'lakh'}</text>`;
+   for(let y=1;y<Y;y++){const x=X(12*y-1);g+=`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${T}" y2="${T+ph}" stroke="#ECEDF1" stroke-dasharray="3 5"/>`}
+   const xl=[[L,'Start','start']];for(let y=1;y<Y;y++)xl.push([X(12*y-1),'Year '+y,'middle']);xl.push([L+pw,'Graduation','end']);
+-  xl.forEach(([x,t,a])=>g+=`<text x="${x.toFixed(1)}" y="${Hh-14}" text-anchor="${a}" font-size="15" fill="#4A4B63">${t}</text>`);
++  xl.forEach(([x,t,a])=>g+=`<text x="${x.toFixed(1)}" y="${Hh-(cmp?10:14)}" text-anchor="${a}" font-size="${FS}" fill="#4A4B63">${t}</text>`);
+   let s='';
+   s+=`<polygon points="${start} ${pts(f.today).join(' ')} ${(L+pw).toFixed(1)},${Yy(0).toFixed(1)}" fill="#EEEFFD"/>`;
+@@ -459,8 +609,12 @@
+ (function(){
+ const nav=document.getElementById('topnav');if(!nav)return;
+-const st=document.createElement('style');st.textContent='main section[id]{scroll-margin-top:40px}body:not(.has-res) #empty{display:block!important}body.has-res #topnav .nav-pre{display:none!important}body.has-res #topnav .nav-post{display:contents!important}#topnav .nav-post a[data-sec]{color:var(--ink);transition:background .2s,color .2s}#topnav .nav-post a[aria-current=true]{background:var(--dark)!important;color:#fff!important}#topnav .nav-post a[data-sec]:not([aria-current=true]){background:transparent!important;color:var(--ink)!important}';document.head.appendChild(st);
++const st=document.createElement('style');st.textContent='main section[id]{scroll-margin-top:40px}body:not(.has-res) #empty{display:block!important}body.has-res #topnav .nav-pre{display:none!important}body.has-res #topnav .nav-post{display:contents!important}#topnav .nav-post a[data-sec]{color:var(--ink);transition:color var(--dur-sm) var(--ease-out)}#topnav .nav-post a[aria-current=true]{background:transparent!important;color:#fff!important}#topnav .nav-post a[data-sec]:not([aria-current=true]){background:transparent!important;color:var(--ink)!important}';document.head.appendChild(st);
+ const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const links=[...nav.querySelectorAll('.nav-post a[data-sec]')];
+-const set=id=>links.forEach(a=>a.dataset.sec===id?a.setAttribute('aria-current','true'):a.removeAttribute('aria-current'));
++links.forEach(a=>a.addEventListener('focus',()=>{const sc=a.parentElement;if(!sc)return;const l=a.offsetLeft-sc.offsetLeft;if(l<sc.scrollLeft||l+a.offsetWidth>sc.scrollLeft+sc.clientWidth)sc.scrollTo({left:Math.max(0,l-16),behavior:'auto'})}));
++const wrap=nav.querySelector('.nav-post [role=navigation]');const pill=document.createElement('span');pill.className='nav-pill';pill.setAttribute('aria-hidden','true');if(wrap){wrap.style.position='relative';wrap.prepend(pill)}
++let pillReady=false;const movePill=instant=>{if(!wrap)return;const a=links.find(x=>x.getAttribute('aria-current')==='true');if(!a||!a.offsetWidth){pill.style.opacity='0';pillReady=false;return}const jump=instant||!pillReady;if(jump)pill.style.transition='none';pill.style.transform='translateX('+a.offsetLeft+'px)';pill.style.width=a.offsetWidth+'px';pill.style.opacity='1';if(jump){void pill.offsetWidth;pill.style.transition='';pillReady=true}};
++if(wrap&&'ResizeObserver' in window)new ResizeObserver(()=>movePill(true)).observe(wrap);
++const set=id=>{links.forEach(a=>{if(a.dataset.sec===id){a.setAttribute('aria-current','true');const sc=a.parentElement;if(sc&&sc.scrollWidth>sc.clientWidth+2){const l=a.offsetLeft-sc.offsetLeft;sc.scrollTo({left:Math.max(0,l-(sc.clientWidth-a.offsetWidth)/2),behavior:'smooth'})}}else a.removeAttribute('aria-current')});movePill()};
+ links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById(a.dataset.sec).scrollIntoView({behavior:RM()?'auto':'smooth',block:'start'});set(a.dataset.sec)}));
+ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)set(e.target.id)})},{rootMargin:'-90px 0px -60% 0px'});
+@@ -474,5 +628,5 @@
+ chips.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
+  chips.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
+- cards.forEach(k=>k.style.display=(c==='All'||k.dataset.cat===c)?'':'none')}));
++ cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'':'none';k.classList.remove('pre');k.classList.add('seen')})}));
+ })();
+ 
+@@ -499,4 +653,7 @@
+ tu.addEventListener('blur',()=>{const v=parseT();tu.value=v?'$'+v.toLocaleString('en-US'):''});
+ const err=document.createElement('span');err.id='calc-err';err.setAttribute('role','alert');$('example').before(err);
++const showErr=msg=>{err.textContent=msg;err.classList.remove('show');void err.offsetWidth;err.classList.add('show')};const clearErr=()=>{err.textContent='';err.classList.remove('show')};
++const setInvalid=(el,bad)=>{if(bad)el.setAttribute('aria-invalid','true');else el.removeAttribute('aria-invalid');const lab=el.closest('label');if(lab)lab.classList.toggle('invalid',bad)};
++[$('school'),tu].forEach(el=>el.addEventListener('input',()=>{if(el.getAttribute('aria-invalid')){setInvalid(el,false);if(!document.querySelector('#calc [aria-invalid=true]'))clearErr()}}));
+ // formatting
+ let CUR='INR';
+@@ -512,4 +669,5 @@
+   return '$'+(usd/1e3).toFixed(usd<1e4?1:0)+'k'}
+ const usd=v=>'$'+Math.round(v).toLocaleString('en-US');
++function pop(el,delay){if(!el||RM)return;el.classList.remove('pop');void el.offsetWidth;el.style.animationDelay=delay+'ms';el.classList.add('pop')}
+ function count(el,to,mode,delay,dur){
+   if(RM){el.textContent=fmt(to,mode);return}
+@@ -526,8 +684,10 @@
+ // flow
+ const btn=document.querySelector('#calc button[type=submit]');
+-function run(){
+-  const T=parseT(),Y=clampY(yrs.value);yrs.value=Y;
+-  if(!T){tu.setAttribute('aria-invalid','true');err.textContent='Add your tuition per year to work it out.';tu.focus();return}
+-  tu.removeAttribute('aria-invalid');err.textContent='';
++function run(ex){
++  const T=parseT(),Y=clampY(yrs.value);yrs.value=Y;const sc=$('school');
++  const missing=[];if(!ex&&!sc.value.trim())missing.push('school');if(!T)missing.push('tuition');
++  setInvalid(sc,missing.includes('school'));setInvalid(tu,missing.includes('tuition'));
++  if(missing.length){showErr(missing.length===2?'Add your school and your tuition per year to work it out.':missing[0]==='school'?'Add your school to work it out.':'Add your tuition per year to work it out.');(missing[0]==='school'?sc:tu).focus();return}
++  clearErr();
+   CUR=curCode();if(!(CUR in RATE))CUR='USD';
+   const K=costs(T,Y);const c=K.c,tot=K.tot;LAST={T,Y};
+@@ -554,6 +714,6 @@
+   if(!Q){set(cards[0],100);set(draws[0],600,900);[1,2,3,4].forEach((i,k)=>set(cards[i],1300+k*180));set(draws[1],2300,800);set(cards[5],3000);
+   count($('r-tui'),c.tui,'full',150*D,700);
+-  [['house',1350],['live',1530],['one',1710],['move',1890]].forEach(([k,d])=>count($('r-'+k),c[k],'full',d*D,700));
+-  count($('r-total'),tot,'big',3050*D,900);}else{$('r-tui').textContent=fmt(c.tui,'full');['house','live','one','move'].forEach(k=>$('r-'+k).textContent=fmt(c[k],'full'));$('r-total').textContent=fmt(tot,'big');}
++  [['house',1350],['live',1530],['one',1710],['move',1890]].forEach(([k,d],i)=>{count($('r-'+k),c[k],'full',d*D,700);const card=cards[i+1];if(card)pop(card.lastElementChild,(d+700)*D)});
++  count($('r-total'),tot,'big',3050*D,900);pop($('r-hidden'),3950*D);}else{$('r-tui').textContent=fmt(c.tui,'full');['house','live','one','move'].forEach(k=>$('r-'+k).textContent=fmt(c[k],'full'));$('r-total').textContent=fmt(tot,'big');}
+   $('r-total-sub').textContent=CUR==='INR'?fmt(tot,'full')+' · '+usd(tot):'About '+usd(tot/Y)+' a year';
+   $('r-hidden').textContent=`Hidden costs: ${Math.round((tot-c.tui)/c.tui*100)}% on top of tuition`;
+@@ -591,7 +751,13 @@
+   if(Q){fitAll();return}
+   // later sections reveal on scroll
+-  const later=res.filter(x=>!['results','where'].includes(x.id));later.forEach(x=>{x.classList.remove('seen');x.classList.add('fade')});
+-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');if(e.target.id==='fx'&&window.fxDraw)setTimeout(()=>window.fxDraw.play(),300);if(e.target.contains(bs))bs.classList.remove('paused');io.unobserve(e.target)}}),{threshold:.25});
+-  res.filter(x=>x.id!=='results').forEach(x=>io.observe(x));
++  const later=res.filter(x=>!['results','where'].includes(x.id));later.forEach(x=>x.classList.remove('fade','seen'));
++  const blocks=[];later.forEach(x=>[...x.children].forEach(ch=>{if(ch.querySelector('.tile,.deal'))return;ch.classList.remove('seen');ch.classList.add('fade');blocks.push(ch)}));
++  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');io.unobserve(e.target)}}),{threshold:0,rootMargin:'0px 0px -20% 0px'});
++  blocks.forEach(b=>io.observe(b));
++  const items=[...document.querySelectorAll('#save .tile,#deals .deal')];items.forEach(c=>{c.classList.remove('seen');c.classList.add('pre')});
++  const ioc=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('pre');e.target.classList.add('seen');ioc.unobserve(e.target)}}),{threshold:.3,rootMargin:'0px 0px -10% 0px'});
++  items.forEach(c=>ioc.observe(c));
++  const iob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){bs.classList.remove('paused');iob.unobserve(e.target)}}),{threshold:.3});iob.observe(bs);
++  const fc=$('fx-fan');if(fc&&window.fxDraw){const io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){setTimeout(()=>window.fxDraw.play(),300);io2.unobserve(e.target)}}),{threshold:.4});io2.observe(fc)}
+   setTimeout(()=>R.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'}),60);
+   if(!RM)setTimeout(()=>{const t=cards[5].getBoundingClientRect();if(t.bottom>innerHeight)window.scrollBy({top:t.bottom-innerHeight+60,behavior:'smooth'})},2900);
+@@ -606,8 +772,20 @@
+  fm.addEventListener('submit',e=>{e.preventDefault();const n=fm.n.value.trim()||'Other cost';const a=parseInt(amt.value.replace(/[^0-9]/g,''));if(!a){amt.focus();return}EX.push({name:n,amt:a,freq});fm.reset();draw();update();fm.n.focus()});
+ })();
++// "Make this number more accurate": disclosure, rent override, summary label
++(function(){const t=$('refine-toggle'),p=$('refine-panel');if(!t||!p)return;const label=t.querySelector('.rl-text'),dot=t.querySelector('.rl-dot');
++ const setOpen=o=>{t.setAttribute('aria-expanded',o);p.classList.toggle('open',o);if(o)setTimeout(()=>{const f=p.querySelector('input');if(f)f.focus({preventScroll:true})},RM?0:350)};
++ t.addEventListener('click',()=>setOpen(t.getAttribute('aria-expanded')!=='true'));
++ const relabel=()=>{const parts=[];if(OV.house!=null)parts.push('rent '+usd(OV.house)+' a month');if(EX.length)parts.push(EX.length+(EX.length>1?' costs added':' cost added'));const changed=parts.length>0;label.textContent=changed?'Your numbers: '+parts.join(', ')+'. Edit':'Make this number more accurate';dot.className='rl-dot'+(changed?' mine':'')};
++ const rf=$('rent-form'),ri=rf.querySelector('input'),reset=$('rent-reset');
++ ri.addEventListener('blur',()=>{const v=parseInt(ri.value.replace(/[^0-9]/g,''));ri.value=v?'$'+v.toLocaleString('en-US'):''});
++ rf.addEventListener('submit',e=>{e.preventDefault();const v=parseInt(ri.value.replace(/[^0-9]/g,''));if(!v){ri.focus();return}OV.house=v;reset.hidden=false;update();relabel()});
++ reset.addEventListener('click',()=>{OV.house=null;ri.value='';reset.hidden=true;update();relabel();ri.focus()});
++ document.addEventListener('tp-update',relabel);
++})();
+ // bubbles <-> list
+-(function(){const b=$('where-toggle');if(!b)return;b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);b.textContent=on?'See as bubbles':'See as chart';$('r-bubbles').style.display=on?'none':'';$('where-list').style.display=on?'block':'none'})})();
++(function(){const b=$('where-toggle');if(!b)return;const growBars=()=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const st=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stagger-sm'))||60;document.querySelectorAll('#where-list .wl-bar').forEach((bar,i)=>{const w=bar.style.width;bar.style.transition='none';bar.style.width='0%';void bar.offsetWidth;bar.style.transition='width var(--dur-md) var(--ease-in-out) '+(i*st)+'ms';bar.addEventListener('transitionend',()=>{bar.style.transition=''},{once:true});bar.style.width=w})};b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);b.textContent=on?'See as bubbles':'See as chart';$('r-bubbles').style.display=on?'none':'';$('where-list').style.display=on?'block':'none';if(on)growBars()})})();
+ // fan chart: draw left to right, with hover
+-function drawFan(F,Y,anim){const box=$('fx-fan');box.innerHTML=window.fanSVG(F,Y,{anim:anim&&!RM});const svg=box.querySelector('svg');const M=JSON.parse(svg.querySelector('metadata').textContent);
++let FAN=null;window.addEventListener('resize',()=>{clearTimeout(FAN&&FAN.t);if(FAN)FAN.t=setTimeout(()=>{const w=$('fx-fan').clientWidth;if((w<560)!==(FAN.w<560)||(w<560&&Math.abs(w-FAN.w)>8))drawFan(FAN.F,FAN.Y,false)},200)});
++function drawFan(F,Y,anim){const box=$('fx-fan');const bw=box.clientWidth||780;FAN={F,Y,w:bw};box.innerHTML=window.fanSVG(F,Y,{anim:anim&&!RM,W:bw});const svg=box.querySelector('svg');const M=JSON.parse(svg.querySelector('metadata').textContent);
+   const X=m=>M.L+M.pw*(m+1)/M.H,Yy=v=>M.T+M.ph*(1-v/M.top);
+   const r=svg.querySelector('#fanclip-r'),head=svg.querySelector('#fan-head');let raf,played=!anim||RM;
+@@ -619,5 +797,5 @@
+ }
+ document.getElementById('calc').addEventListener('submit',e=>{e.preventDefault();run()});
+-const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';tu.value='$37,500';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
++const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';tu.value='$37,500';yrs.value=2;run(true)};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
+ ($('cta')||{addEventListener(){}}).addEventListener('click',e=>{e.preventDefault();window.scrollTo({top:0,behavior:RM?'auto':'smooth'});setTimeout(()=>tu.focus({preventScroll:true}),400)});
+ })();
+@@ -668,4 +846,43 @@
+   host.classList.remove('cap');pb.removeAttribute('aria-busy');pb.innerHTML=lbl};
+ })();
+-</script></body>
++</script><script>
++// motion: line drawn by scroll through the Type column of "How we work it out"
++(function(){const box=document.getElementById('sources');if(!box||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
++const marks=[...box.querySelectorAll(':scope > div:not(:first-child) > span:last-child > span:first-child')];if(marks.length<2)return;
++box.style.position='relative';const line=document.createElement('div');line.className='how-line';line.setAttribute('aria-hidden','true');box.appendChild(line);box.classList.add('how-anim');marks.forEach(m=>m.classList.add('how-mark'));
++let y0=0,y1=0;const measure=()=>{const b=box.getBoundingClientRect();const f=marks[0].getBoundingClientRect(),l=marks[marks.length-1].getBoundingClientRect();const x=f.left-b.left+f.width/2;y0=f.top-b.top+f.height/2;y1=l.top-b.top+l.height/2;line.style.left=(x-.75)+'px';line.style.top=y0+'px';line.style.height=Math.max(0,y1-y0)+'px';marks.forEach(m=>{const r=m.getBoundingClientRect();m.dataset.y=r.top-b.top+r.height/2})};
++let tick=false;const update=()=>{tick=false;const b=box.getBoundingClientRect();const reach=innerHeight*0.72-b.top;const p=Math.max(0,Math.min(1,(reach-y0)/((y1-y0)||1)));line.style.transform='scaleY('+p+')';marks.forEach(m=>{if(reach>=+m.dataset.y-2)m.classList.add('on')})};
++const req=()=>{if(!tick){tick=true;requestAnimationFrame(update)}};
++measure();update();addEventListener('scroll',req,{passive:true});addEventListener('resize',()=>{measure();update()});if('ResizeObserver' in window)new ResizeObserver(()=>{measure();update()}).observe(box);
++})();
++// motion: section headlines reveal word by word as they scroll toward the top third
++(function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
++const hs=[...document.querySelectorAll('section h2.d')].filter(h=>h.id!=='empty-h');if(!hs.length)return;
++const items=hs.map(h=>{const words=[];[...h.childNodes].forEach(n=>{if(n.nodeType===3){const frag=document.createDocumentFragment();n.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t))frag.appendChild(document.createTextNode(t));else{const sp=document.createElement('span');sp.className='wd';sp.textContent=t;frag.appendChild(sp);words.push(sp)}});h.replaceChild(frag,n)}else if(n.nodeType===1){n.classList.add('wd');words.push(n)}});return{h,words}});
++let tick=false;const update=()=>{tick=false;const vh=innerHeight;items.forEach(({h,words})=>{const r=h.getBoundingClientRect();const p=Math.max(0,Math.min(1,(vh-r.top)/(vh*0.7)));const N=words.length;words.forEach((w,i)=>{const st=N>1?i/N*0.6:0;const k=Math.max(0,Math.min(1,(p-st)/0.4));w.style.opacity=(0.25+0.75*k).toFixed(3)})})};
++const req=()=>{if(!tick){tick=true;requestAnimationFrame(update)}};
++update();addEventListener('scroll',req,{passive:true});addEventListener('resize',req);document.addEventListener('tp-update',()=>setTimeout(update,80));
++})();
++</script>
++<script>
++// opening sequence, first paint only
++(function(){const root=document.documentElement;if(!root.classList.contains('intro'))return;const cur=document.getElementById('curtain');const hero=document.getElementById('hero');
++const bail=()=>{root.classList.remove('intro','intro-go');if(cur)cur.remove()};
++if(!cur||!hero||document.body.classList.contains('has-res')){bail();return}
++const h1=hero.querySelector('h1');const units=[];
++[...h1.childNodes].forEach(n=>{if(n.nodeType===3){const frag=document.createDocumentFragment();n.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t))frag.appendChild(document.createTextNode(t));else{const sp=document.createElement('span');sp.className='in-w';sp.textContent=t;frag.appendChild(sp);units.push(sp)}});h1.replaceChild(frag,n)}else if(n.nodeType===1)units.push(null)});
++const sub=h1.nextElementSibling;const form=document.getElementById('calc');const pill=form&&form.firstElementChild;const fields=pill?[...pill.children]:[];const link=document.getElementById('example');const school=document.getElementById('school');
++const at=(el,ms,cls)=>{if(!el)return;el.classList.add(cls||'in-el');el.style.animationDelay=ms+'ms'};
++const full=school?school.placeholder:'';let typing=true;const stopTyping=()=>{typing=false;if(school)school.placeholder=full};
++if(school){school.placeholder='';school.addEventListener('focus',stopTyping,{once:true})}
++let started=false;const run=()=>{ // first rendered frame: every clock starts here
++ units.forEach((u,i)=>{if(u)at(u,250+i*45,'in-w')});at(sub,450);at(pill,550);fields.forEach((f,i)=>at(f,650+i*80));at(link,1000);
++ root.classList.add('intro-go');cur.addEventListener('transitionend',()=>cur.remove(),{once:true});
++ setTimeout(()=>{let i=0;const t0=performance.now();const tick=()=>{if(!typing)return;i=Math.min(full.length,Math.max(i+1,Math.floor((performance.now()-t0)/35)));school.placeholder=full.slice(0,i);if(i<full.length)setTimeout(tick,35);else typing=false};if(school)tick()},850);
++ setTimeout(()=>{root.classList.remove('intro','intro-go');if(cur.parentNode)cur.remove();[sub,pill,link,...fields,...units].forEach(e=>{if(e){e.classList.remove('in-el','in-w');e.style.animationDelay=''}})},2300)};
++const start=()=>{if(started)return;started=true;const go=()=>requestAnimationFrame(()=>requestAnimationFrame(run));if(document.visibilityState==='hidden')document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')go()},{once:true});else go()};
++if(document.fonts&&document.fonts.ready)document.fonts.ready.then(start);setTimeout(start,900);
++})();
++</script>
++</body>
+ </html>

@@ -47,6 +47,10 @@ and the data adapters with the home page.
   designer adds one; the shared page keeps the levers as links.
 - Share links of the form `/?c=…` redirect to the shared page; the home page does not read the
   query string yet, so "Edit" from the shared page opens an empty form (plan decision 12).
+- A new drop from the designer is a file swap: `scripts/build-wired.mjs` rebuilds the served
+  page from the export and re-applies the approved edits; the page scripts under `design/wired`
+  are merged three ways by hand when the designer's version changed (v2, 2 November: plan
+  decisions 13 to 15).
 - The pixel baselines are per platform (`design/reference/screens-served/<platform>`); a change
   to the page's markup means re-capturing them, on macOS here and on Linux from the CI
   artifact.

@@ -29,6 +29,14 @@ difference from `tests/design/baseline.html`. With `?engine=prototype` (not in p
 page runs on the prototype's fixed numbers, which is how the pixel comparison in
 `tests/e2e/design.spec.ts` sees the design unchanged.
 
+The served page is built from the designer's export by `node scripts/build-wired.mjs`
+(`design/source/v2-index.html` today): each inline script goes to its file under
+`design/wired`, each approved edit applies exactly once, and the build stops if an inline script
+is left or a designer's script changed since the live file was merged from it. The v2 kit's
+screens and animation frames under `design/reference-v2` are compared by the `design-v2`
+Playwright project (`tests/e2e/design-v2*.spec.ts`); `node scripts/side-by-sides.mjs` renders
+reference, build and diff side by side from a run's results.
+
 ## Quick start
 
 Requires Node 24 (`.nvmrc`) and, for the pre-commit hook, [gitleaks](https://github.com/gitleaks/gitleaks)
@@ -52,6 +60,8 @@ npm run dev
 | `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days                                             |
 | `npm run research:deals` / `npm run review:deals`             | Drafts student deals from official pages for a person to approve (data/deals/README.md)                                   |
 | `npm run check:deal-sources`                                  | Re-checks every approved deal's quote against its source page; weekly in CI, reports to an issue                          |
+| `node scripts/build-wired.mjs`                                | Builds the served home page from the designer's export, with the approved edits; `--accept-blocks` after a hand merge     |
+| `node scripts/side-by-sides.mjs`                              | Reference, build and diff images side by side, from a design-v2 test run                                                  |
 | `npm run perf`                                                | Lighthouse on a phone profile against a running server, gated at 90 (CI)                                                  |
 | `npm run build:engine`                                        | Bundles the browser engine to `public/engine.js` (also runs before `npm run build`)                                       |
 
