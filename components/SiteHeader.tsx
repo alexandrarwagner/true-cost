@@ -15,13 +15,13 @@ export function SiteHeader() {
         <nav aria-label={t.nav} className="peer-[:not(:empty)]:hidden">
           <ul className="flex items-center gap-4">
             <li className="hidden sm:block">
-              <Link href="/react#how" className="underline-offset-4 hover:underline">
+              <Link href="/#how" className="underline-offset-4 hover:underline">
                 {t.how}
               </Link>
             </li>
             <li>
               <Link
-                href="/react#estimate"
+                href="/#calc"
                 className="inline-flex h-11 items-center rounded-pill bg-dark px-5 text-[15px] text-white hover:bg-ink"
               >
                 {t.cta}

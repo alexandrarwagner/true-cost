@@ -2,7 +2,6 @@ import { copy } from "@/content/copy";
 import type { LeverId } from "@/lib/core/levers";
 import { homeFromUsd, homeShort, usdFmt } from "@/lib/ui/format";
 import type { EstimateResponse } from "@/services/estimate";
-import { CustomCosts, type CustomCostInput } from "./CustomCosts";
 import { RangeSection } from "./RangeSection";
 import { ResultNav } from "./ResultNav";
 import { Savings } from "./Savings";
@@ -20,7 +19,6 @@ export function ResultView({
   shareQuery = response.shareQuery,
   editHref = "#estimate",
   onToggleLevers,
-  onCustomCosts,
   busy = false,
 }: {
   response: EstimateResponse;
@@ -32,8 +30,6 @@ export function ResultView({
   editHref?: string;
   /** Switches the savings levers; absent on the server-rendered page, where rows are links. */
   onToggleLevers?: (ids: LeverId[]) => void;
-  /** Re-runs the estimate with the user's own added costs; absent on the shared page. */
-  onCustomCosts?: (costs: CustomCostInput[]) => void;
   busy?: boolean;
 }) {
   const { estimate: e, currency: cur } = response;
@@ -43,12 +39,6 @@ export function ResultView({
     ? homeShort(homeFromUsd(e.totals.total, rate, cur), cur)
     : usdFmt(e.totals.total);
   const breakdownHref = `/estimate/breakdown?${shareQuery}`;
-  const customCosts: CustomCostInput[] = (e.input.options.customCosts ?? []).map((c) => ({
-    label: c.label,
-    amount: c.converted ? c.converted.amountHome : c.amountUsd / 100,
-    currency: c.converted ? "home" : "USD",
-    frequency: c.frequency === "monthly" ? "monthly" : "one_off",
-  }));
   return (
     <article>
       <ResultNav
@@ -60,14 +50,6 @@ export function ResultView({
       {/* No key: a lever or an added cost updates the figures in place, so the tree lands and
           the total counts up once. */}
       <Tree response={response} breakdownHref={breakdownHref} />
-      {onCustomCosts && (
-        <CustomCosts
-          value={customCosts}
-          homeCurrency={cur.code}
-          busy={busy}
-          onChange={onCustomCosts}
-        />
-      )}
       <Shares response={response} breakdownHref={breakdownHref} />
       <RangeSection response={response} />
       <Savings response={response} onToggle={onToggleLevers} busy={busy} />

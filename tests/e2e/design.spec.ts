@@ -112,7 +112,7 @@ test.describe("the designer's page, as served", () => {
     await page.goto("/?engine=prototype");
     await page.evaluate(() => document.fonts.ready);
     await expect(page.getByRole("heading", { name: /What will your/ })).toBeVisible();
-    expect(await page.screenshot({ fullPage: true })).toMatchSnapshot("home-full.png", {
+    expect.soft(await page.screenshot({ fullPage: true })).toMatchSnapshot("home-full.png", {
       maxDiffPixelRatio: RATIO,
     });
 
@@ -122,12 +122,12 @@ test.describe("the designer's page, as served", () => {
     for (const id of SECTIONS) {
       const section = page.locator(`#${id}`);
       await section.scrollIntoViewIfNeeded();
-      expect(await section.screenshot()).toMatchSnapshot(`section-${id}.png`, {
+      expect.soft(await section.screenshot()).toMatchSnapshot(`section-${id}.png`, {
         maxDiffPixelRatio: RATIO,
       });
     }
     await page.evaluate(() => window.scrollTo(0, 0));
-    expect(await page.screenshot({ fullPage: true })).toMatchSnapshot("results-full.png", {
+    expect.soft(await page.screenshot({ fullPage: true })).toMatchSnapshot("results-full.png", {
       maxDiffPixelRatio: RATIO,
     });
   });

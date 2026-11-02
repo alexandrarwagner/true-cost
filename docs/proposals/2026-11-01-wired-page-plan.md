@@ -144,6 +144,14 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   link to `/estimate/breakdown?…#<category>`, the full calculation's rows for that cost, with
   an aria-label saying so. The prototype adapter has no query, so its figures stay plain.
 
+### Step 7
+
+- ADR 016 records the decision. The React home page and the components only it used are
+  gone; the shared page, the full calculation and the privacy page keep theirs. The header's
+  "Get my estimate" and "How we work it out" point at the home page's form and method; "Back
+  to the result" on the full calculation goes to the shared page. The wired page gets axe,
+  zero violations, before and after "Show me".
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.
@@ -260,3 +268,7 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     "Check before you go" line under the deals is markup and still describes the prototype.
     Suggested: "Deals change and some depend on your school. Check the source before you go."
     A one-line copy edit, with your OK.
+12. **"Edit" from the shared page.** The home page does not read the query string, so "Edit
+    the inputs" on `/r` opens an empty form. Reading `/?c=…&edit=1` into the bar (country,
+    currency, school, tuition, years) is a small script edit outside the brief's list.
+    Recommended, with your OK.

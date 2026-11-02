@@ -12,7 +12,7 @@ const share =
   "c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1";
 const pages = [
   { name: "home", path: "/" },
-  { name: "result", path: `/?${share}` },
+  { name: "result", path: `/r?${share}` },
   { name: "breakdown", path: `/estimate/breakdown?${share}` },
 ];
 const floors = { performance: 0.9, accessibility: 0.95, "best-practices": 0.9 };

@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 /*
@@ -206,6 +207,20 @@ test.describe("the designer's page: school search", () => {
     await expect(page).toHaveURL(/\/estimate\/breakdown\?/);
     await expect(page.getByRole("heading", { name: "Your full calculation" })).toBeVisible();
     await expect(page.locator("#housing-heading")).toContainText(figure);
+  });
+
+  test("passes axe with no violations, before and after Show me", async ({ page }) => {
+    const tags = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
+    await page.goto("/");
+    const before = await new AxeBuilder({ page }).withTags(tags).analyze();
+    expect(before.violations, JSON.stringify(before.violations, null, 2)).toEqual([]);
+    await page.locator("#example").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    // The page keeps a few looping animations (the sheet's tilt), so wait for the reveal's own
+    // "done" mark rather than for every animation to finish.
+    await expect(page.locator("#r-status.ok")).toBeVisible({ timeout: 10_000 });
+    const after = await new AxeBuilder({ page }).withTags(tags).analyze();
+    expect(after.violations, JSON.stringify(after.violations, null, 2)).toEqual([]);
   });
 
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({

@@ -8,15 +8,26 @@ and a date, and AI never invents a figure.
 
 ## Status
 
-The engine, adapters, AI features and hardening from the original brief are done, as are the
-savings levers and student deals (steps 1 to 4 of the savings brief) and the Tuition+ redesign
-(all eight steps): design-system tokens and fonts, the hero and one-bar input, example mode,
-the tuition tree with staged reveal, the sticky result nav, user-added costs, the shares view,
-the exchange-rate section, the deals grid, the full-calculation page built from the engine's
-derivation traces, the methodology table generated from the source registry, and the
+The home page is the designer's own HTML, served as written, with every number coming from
+the cost engine bundled for the browser (ADR 016). Behind it: the engine, the adapters and the
+hardening from the original brief; the savings levers and student deals; the shared page and
+the full-calculation page built from the engine's derivation traces; a design lock, a pixel
+comparison and a computed-style check that keep the page as the designer delivered it; and the
 accessibility, print and Lighthouse checks in CI. Still to come: the deals research and review
-scripts with the weekly freshness job (savings brief steps 5 and 6). `COMPARE_ENABLED` and
-`SAVINGS_ENABLED` stay off in production until their copy has been reviewed.
+scripts with the weekly freshness job (savings brief steps 5 and 6), and the open decisions in
+`docs/proposals/2026-11-01-wired-page-plan.md`. `COMPARE_ENABLED` and `SAVINGS_ENABLED` stay
+off in production until their copy has been reviewed.
+
+## The home page
+
+`design/wired/E-homepage-wired.html` is the front end. `app/route.ts` serves it at `/` with the
+security nonce on each script tag; its scripts live under `design/wired` and are served by
+`app/wired/[...path]/route.ts`. `lib/browser` is the engine behind `window.TPEngine`, bundled
+to `public/engine.js` by `scripts/build-engine.mjs` before every build. The page may change only
+by the edits listed in `tests/design/allowed-diffs.json`; `npm test` fails on any other
+difference from `tests/design/baseline.html`. With `?engine=prototype` (not in production) the
+page runs on the prototype's fixed numbers, which is how the pixel comparison in
+`tests/e2e/design.spec.ts` sees the design unchanged.
 
 ## Quick start
 
@@ -31,15 +42,16 @@ npm run dev
 
 ## Scripts
 
-| Script                                                        | What it does                                                                      |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `npm run dev` / `npm run build` / `npm start`                 | Development server; production build and server                                   |
-| `npm run lint` / `npm run typecheck` / `npm run format:check` | Static checks (all run in CI)                                                     |
-| `npm test`                                                    | Unit, property, golden, adapter (mocked HTTP) and AI-contract tests               |
-| `npm run test:e2e`                                            | Playwright flow tests with an axe scan, against the production build in DEMO_MODE |
-| `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)      |
-| `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days     |
-| `npm run perf`                                                | Lighthouse on a phone profile against a running server, gated at 90 (CI)          |
+| Script                                                        | What it does                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev` / `npm run build` / `npm start`                 | Development server; production build and server                                                                           |
+| `npm run lint` / `npm run typecheck` / `npm run format:check` | Static checks (all run in CI)                                                                                             |
+| `npm test`                                                    | Unit, property, golden, adapter, AI-contract, engine-contract and design-lock tests                                       |
+| `npm run test:e2e`                                            | Playwright: the home page (real engine, pixel and style checks), shared page and full calculation, with axe, in DEMO_MODE |
+| `npm run check:constants`                                     | Fails if any constant in `data/constants.ts` is older than 180 days (step 3)                                              |
+| `npm run check:deals`                                         | Validates every file under `data/deals` and lists approved deals past 90 days                                             |
+| `npm run perf`                                                | Lighthouse on a phone profile against a running server, gated at 90 (CI)                                                  |
+| `npm run build:engine`                                        | Bundles the browser engine to `public/engine.js` (also runs before `npm run build`)                                       |
 
 ## Keys
 
@@ -79,6 +91,8 @@ Things only an account owner can do, in the order they matter:
 ## Documentation
 
 - `docs/data-sources.md`: every source, what was verified, licence and refresh.
-- `docs/decisions/`: Architecture Decision Records.
+- `docs/decisions/`: Architecture Decision Records (016: the designer's HTML is the front end).
+- `docs/proposals/2026-11-01-wired-page-plan.md`: the plan behind the home page, with what
+  changed on the way and the decisions still open.
 - `SECURITY.md`: threat model, protections, how to report a problem.
 - `docs/ARCHITECTURE.md` and `docs/cost-model.md` arrive with the engine in step 3.

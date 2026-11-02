@@ -4,6 +4,22 @@ Format per the Tuition+ design system, section 6. Run on 1 November 2026 against
 production build in DEMO_MODE, on the Playwright Pixel 7 and desktop profiles, after redesign
 step 8. Everything under "automated" re-runs in CI on every push.
 
+## The home page, since 2 November
+
+The home page is now the designer's HTML (ADR 016). Its checks, all in CI:
+
+- axe with the full WCAG 2.2 tag set, zero violations of any impact, before and after
+  "Show me" (`tests/e2e/wired.spec.ts`).
+- Computed styles of the eight key elements against the designer's `computed-styles.json`
+  and the seven keyframes as the designer's browser parsed them; a pixel comparison of every
+  section against a capture of the page served unchanged, per platform
+  (`tests/e2e/design.spec.ts`).
+- Reduced motion is the page's own: with `prefers-reduced-motion: reduce` the reveal, the
+  count-ups and the chart draw show their final state at once, and the status line reads the
+  final sentence.
+- The page is desktop-only by the designer's own account; the phone layout is a separate
+  piece of work the designer will propose.
+
 ## What was tested
 
 **Automated, in CI**
