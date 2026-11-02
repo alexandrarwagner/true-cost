@@ -176,6 +176,23 @@ test.describe("the designer's page: school search", () => {
     );
   });
 
+  test("the PDF library loads only when Download PDF is pressed, and a PDF is produced", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.locator("#example").click();
+    await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    expect(await page.evaluate(() => typeof (window as { html2pdf?: unknown }).html2pdf)).toBe(
+      "undefined",
+    );
+    const download = page.waitForEvent("download", { timeout: 60_000 });
+    await page.locator("#pdf-btn").click();
+    expect((await download).suggestedFilename()).toBe("tuition-plus-full-cost.pdf");
+    expect(await page.evaluate(() => typeof (window as { html2pdf?: unknown }).html2pdf)).toBe(
+      "function",
+    );
+  });
+
   test("?engine=prototype brings the prototype's numbers back for the pixel tests", async ({
     page,
   }) => {

@@ -30,9 +30,9 @@
     "to": "<script src=\"/wired/ui-and-animation.js\"></script><script src=\"/wired/deals.js\"></script>"
   },
   {
-    "change": "Change 1: the html2pdf bundle moves to public/vendor/html2pdf.bundle.min.js, with its licence file.",
+    "change": "Change 7: the html2pdf bundle is no longer loaded with the page; public/vendor/html2pdf.bundle.min.js loads when \"Download PDF\" is pressed (pdf-sheet.js).",
     "block": "html2pdf.bundle.min.js",
-    "to": "<script src=\"/vendor/html2pdf.bundle.min.js\"></script>"
+    "to": ""
   },
   {
     "change": "Change 1: the family PDF sheet builder moves to design/wired/pdf-sheet.js.",

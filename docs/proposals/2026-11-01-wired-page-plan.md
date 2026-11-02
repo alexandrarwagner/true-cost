@@ -133,6 +133,10 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   checklist lived in the rate-history script that change 2 stopped loading; the chips are
   back in deals.js, the checklist had no markup left to drive.
 
+- Change 7: the page no longer loads the html2pdf bundle; `pdf-sheet.js` inserts it from
+  `public/vendor` when "Download PDF" is first pressed and falls back to the print view if it
+  cannot load.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.
