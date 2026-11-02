@@ -118,6 +118,12 @@ plan waits for the owner's OK. Line numbers refer to `design/wired/E-homepage-wi
   message under it. Not changed, because it is markup: the
   section heading still reads "If the rupee moves." for every currency; see section F.
 
+- Change 5: each cost card's icon and words come from the confidence of its biggest line
+  (`lines` from the engine): solid square for government or school data, dashed circle for
+  our estimate, solid dot for the student's number, with the words "Government data", "From
+  your school", "Our estimate", "Your number". With the prototype adapter the page's own
+  labels stay, so the pixel baseline holds.
+
 ## C. The changes to the page, one by one
 
 Only these; each is one commit, with the design lock re-run after it.

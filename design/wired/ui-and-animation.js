@@ -69,10 +69,21 @@ function reveal(T,Y,c,tot,K,Q){
   const metas=[...document.querySelectorAll('#results .land.l1,#results .land.l2,#results .land.l3,#results .land.l4')].map(cd=>cd.querySelectorAll(':scope > span')[2]);
   const mine='<span style="width:12px;height:12px;flex:none;border-radius:50%;background:var(--ink)"></span>';const est='<span style="width:12px;height:12px;flex:none;border-radius:50%;border:2px dashed var(--ink);box-sizing:border-box"></span>';const off='<span style="width:12px;height:12px;flex:none;border-radius:3px;background:var(--dark)"></span>';
   const nM=EX.filter(e=>e.freq==='month').length,nO=EX.filter(e=>e.freq==='once').length;
+  if(!K.lines){ // the prototype adapter: the page's own labels, unchanged
   metas[0].innerHTML=OV.house!=null?`${mine}Your number · ${usd(OV.house)} a month`:`${est}<span id="r-house-meta">Our estimate · ${12*Y} months</span>`;
   metas[1].innerHTML=(OV.live!=null?`${mine}Your number · ${usd(OV.live)} a month`:`${off}Government data`)+(nM?` · +${nM} of yours`:'');
   metas[2].innerHTML=(OV.one!=null?`${mine}Your number`:`${off}Visa, deposits, flights`)+(nO?` · +${nO} of yours`:'');
   metas[3].innerHTML=OV.move!=null?`${mine}Your number`:`${est}Our estimate · bank fees`;
+  }else{ // the real engine: each card's icon and words come from the confidence of its biggest line
+  const CONF={user:[mine,'Your number'],school:[off,'From your school'],government:[off,'Government data'],estimate:[est,'Our estimate']};
+  const lead=cats=>{const ls=K.lines.filter(l=>cats.includes(l.category));return ls.length?ls.reduce((a,b)=>b.degreeUsd>a.degreeUsd?b:a).confidence:'estimate'};
+  const tag=cats=>CONF[lead(cats)]||CONF.estimate;
+  const h=tag(['housing']),lv=tag(['living','health_insurance']),on=tag(['one_off']),mv=tag(['money_moving']);
+  metas[0].innerHTML=OV.house!=null?`${mine}Your number · ${usd(OV.house)} a month`:`${h[0]}<span id="r-house-meta">${h[1]} · ${12*Y} months</span>`;
+  metas[1].innerHTML=(OV.live!=null?`${mine}Your number · ${usd(OV.live)} a month`:`${lv[0]}${lv[1]}`)+(nM?` · +${nM} of yours`:'');
+  metas[2].innerHTML=(OV.one!=null?`${mine}Your number`:`${on[0]}${on[1]} · visa, deposits, flights`)+(nO?` · +${nO} of yours`:'');
+  metas[3].innerHTML=OV.move!=null?`${mine}Your number`:`${mv[0]}${mv[1]} · bank fees`;
+  }
   if(!Q){res.forEach(s=>s.classList.add('pre'));void document.body.offsetWidth;res.forEach(s=>s.classList.remove('pre'));}
   const R=document.getElementById('results');
   const cards=[...R.querySelectorAll('.land')];const draws=[...R.querySelectorAll('.draw')];

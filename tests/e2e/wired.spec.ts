@@ -70,8 +70,13 @@ test.describe("the designer's page: school search", () => {
     expect(tp.c.tui).toBe(28_794 * 2);
     expect(tp.c.house).toBeGreaterThan(0);
     expect(tp.tot).toBeGreaterThan(tp.c.tui);
-    // The engine says where its figures came from (demo fixtures here).
+    // The engine says where its figures came from (demo fixtures here), card by card.
     await expect(page.locator("#r-sample")).toContainText("Sample rent and living costs");
+    await expect(page.locator("#results .land.l1")).toContainText("From your school · 24 months");
+    await expect(page.locator("#results .land.l2")).toContainText(
+      /From your school|Our estimate|Government data/,
+    );
+    await expect(page.locator("#results .land.l4")).toContainText("Our estimate · bank fees");
     // Adding a cost re-runs the engine, not the page's own arithmetic.
     await page.locator("#add-cost-form input[name=n]").fill("Laptop");
     await page.locator("#add-cost-form input[name=a]").fill("1200");
