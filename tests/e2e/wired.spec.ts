@@ -210,6 +210,10 @@ test.describe("the designer's page: school search", () => {
     await page.goto("/");
     await page.locator("#example").click();
     await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
+    // The line under "How we work it out" names the full calculation (decision 18).
+    const full = page.locator("#full-calc");
+    await expect(full).toBeVisible();
+    await expect(full).toHaveAttribute("href", /^\/estimate\/breakdown\?/);
     const link = page.locator("#r-house a");
     await expect(link).toHaveAttribute("href", /^\/estimate\/breakdown\?.*#housing$/, {
       timeout: 10_000,
@@ -256,6 +260,11 @@ test.describe("the designer's page: school search", () => {
     expect(tp.Y).toBe(2);
     await page.goto(`/?${share}`);
     await expect(page).toHaveURL(/^http:\/\/[^/]+\/r\?c=IN/);
+  });
+
+  test("the full-calculation link is hidden until there is a result", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#full-calc")).toBeHidden();
   });
 
   test("the empty state shows until Show me, and the sticky nav switches to the result links", async ({

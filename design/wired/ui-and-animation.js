@@ -140,6 +140,8 @@ function reveal(T,Y,c,tot,K,Q){
   fitAll();setTimeout(fitAll,2700*D+60);
   // Each figure links to its rows on the full calculation, once the count-up has finished.
   const bh=K.meta&&K.meta.shareQuery?'/estimate/breakdown?'+K.meta.shareQuery:null;
+  // The line under "How we work it out" links to the whole calculation (decision 18).
+  const fullCalc=$('full-calc');if(fullCalc){if(bh){fullCalc.href=bh;fullCalc.hidden=false}else fullCalc.hidden=true}
   const linkCards=()=>[['r-tui','tuition'],['r-house','housing'],['r-live','living'],['r-one','one_off'],['r-move','money_moving']].forEach(([id,cat])=>{const el=$(id);if(!el)return;
     const a=el.querySelector('a');const txt=el.textContent;if(!bh){if(a)el.textContent=txt;return}
     el.innerHTML='';const l=document.createElement('a');l.href=bh+'#'+cat;l.style.cssText='color:inherit;text-decoration:none';l.setAttribute('aria-label',txt+' — see how this was worked out');l.textContent=txt;el.appendChild(l)});

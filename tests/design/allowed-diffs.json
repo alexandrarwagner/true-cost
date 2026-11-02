@@ -132,5 +132,10 @@
     "block": "intro.js",
     "sig": "opening sequence, first paint only",
     "to": "<script src=\"/wired/intro.js\"></script>"
+  },
+  {
+    "change": "Decision 18: the line under \"How we work it out\" carries a link to the full calculation (every row with its figure and source), shown once there is a result; the script sets its address to the current estimate.",
+    "from": "<p style=\"margin: 0; max-width: 460px; font-size: 18px; line-height: 1.55; color: #4A4B63\">Five costs, added up in dollars, then turned into your currency at today’s rate.</p>",
+    "to": "<p style=\"margin: 0; max-width: 460px; font-size: 18px; line-height: 1.55; color: #4A4B63\">Five costs, added up in dollars, then turned into your currency at today’s rate. <a id=\"full-calc\" href=\"/estimate/breakdown\" hidden>See your full calculation.</a></p>"
   }
 ]

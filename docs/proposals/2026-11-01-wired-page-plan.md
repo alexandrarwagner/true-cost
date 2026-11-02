@@ -361,3 +361,8 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     The comparison is measured and recorded with side-by-sides (`tests/e2e/helpers/compare.ts`,
     `scripts/side-by-sides.mjs`), not gated; the served baselines per platform stay the pixel
     gate. Suggested: ask the designer to re-capture with the font loaded.
+18. **A way into the full calculation.** The cost cards' figures link to their rows, but
+    nothing on the page says the full calculation exists. The owner asked (2 November) for a
+    link in the line under "How we work it out": "See your full calculation." appears once
+    there is a result and opens `/estimate/breakdown` for the current estimate. One markup
+    edit under the lock; the card links stay.
