@@ -95,9 +95,9 @@
     "to": "Deals change and some depend on your school. Check the source before you go."
   },
   {
-    "change": "Two rules in the head stylesheet so the first layout is the final one: the designer's empty-state rule (with !important, since the section's inline style hides it, as the designer's injected rule had) and the result sections kept out of layout until there is a result. Without them a slow phone paints the page, then the script hides the result sections and shows the empty state, and everything below moves (Lighthouse CLS 0.8 on the CI runner).",
+    "change": "Two rules in the head stylesheet so the first layout is the final one: the designer's empty-state rule (with !important, since the section's inline style hides it, as the designer's injected rule had) and the result sections kept out of layout until there is a result (with !important too, since they carry display:flex inline). Without them a slow phone paints the page, then the script hides the result sections and shows the empty state, and everything below moves (Lighthouse CLS 0.8 on the CI runner).",
     "from": ".res.pre{display:none!important}\n",
-    "to": ".res.pre{display:none!important}\nbody:not(.has-res) #empty{display:block!important}\nbody:not(.has-res) .res{display:none}\n"
+    "to": ".res.pre{display:none!important}\nbody:not(.has-res) #empty{display:block!important}\nbody:not(.has-res) .res{display:none!important}\n"
   },
   {
     "change": "Metrics-matched fallback faces (public/fonts/fonts.css) in the font stacks, so text drawn before Archivo arrives takes the same space and the swap moves nothing (the swap moved everything below the hero on a slow phone: Lighthouse CLS 0.39).",

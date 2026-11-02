@@ -62,6 +62,7 @@
 }
 /* Fallback faces with Archivo's metrics (size, ascent, descent from the same table Next.js
    uses), so text drawn before Archivo arrives takes the same space and the swap moves
-   nothing. The wide one stands in for the 112% headline setting. */
-@font-face{font-family:"Archivo Fallback";src:local("Arial");size-adjust:98.70%;ascent-override:88.96%;descent-override:21.28%;line-gap-override:0%}
-@font-face{font-family:"Archivo Fallback Wide";src:local("Arial");size-adjust:110.54%;ascent-override:79.43%;descent-override:19.00%;line-gap-override:0%}
+   nothing. The wide one stands in for the 112% headline setting. Liberation Sans is Arial's
+   metric twin and Roboto's average width is within 0.3% of it, so Linux and Android fit too. */
+@font-face{font-family:"Archivo Fallback";src:local("Arial"),local("Liberation Sans"),local("Helvetica"),local("Roboto");size-adjust:98.70%;ascent-override:88.96%;descent-override:21.28%;line-gap-override:0%}
+@font-face{font-family:"Archivo Fallback Wide";src:local("Arial"),local("Liberation Sans"),local("Helvetica"),local("Roboto");size-adjust:110.54%;ascent-override:79.43%;descent-override:19.00%;line-gap-override:0%}
