@@ -165,6 +165,12 @@ test.describe("the designer's page: school search", () => {
     await expect(grid).toContainText("Spotify Premium Student");
     await expect(grid).toContainText("Free entry to New York museums");
     await expect(grid).toContainText("checked Oct 2026");
+    // How to get it and who qualifies sit behind a disclosure (decision 23).
+    const details = grid.locator(".deal").first().locator("details");
+    await expect(details).toHaveJSProperty("open", false);
+    await details.locator("summary").click();
+    await expect(details).toHaveJSProperty("open", true);
+    await expect(details).toContainText("Who:");
     await expect(page.locator("#deals-checked")).toHaveText("Checked Oct 2026 · No paid listings");
     await expect(page.locator("#save-city")).toHaveText("New York");
     // No generic tips, no Boston cards.

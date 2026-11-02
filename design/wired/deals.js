@@ -1,6 +1,7 @@
 // Student deals, from this site's approved data (change 6). The prototype's Boston cards and
 // its "general tips" are gone; the cards keep the page's own markup, icon tile, figure, title,
-// text and source line. Renders after each estimate (the tp-update event) for the chosen
+// one line and source line, with "how to get it" and "who qualifies" behind a disclosure
+// (decision 23), so a card reads like the designer's. Renders after each estimate (the tp-update event) for the chosen
 // school, its city and the national list; the chips filter by category as before.
 (function(){
 const $=id=>document.getElementById(id);
@@ -32,8 +33,7 @@ function card(d){return `<article class="deal" data-cat="${esc(LABEL[d.category]
 <span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">${esc(headline(d))}</span>
 <span style="font-size: 17px; font-weight: 600; line-height: 1.3">${esc(d.title)}</span>
 <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">${esc(sub(d))}</span>
-<span style="font-size: 14px; line-height: 1.5; color: #4A4B63">${esc(d.howToGet)}</span>
-<span style="font-size: 13px; line-height: 1.5; color: #4A4B63">Who: ${esc(d.eligibility)}</span>
+<details style="font-size: 14px; line-height: 1.5; color: #4A4B63"><summary style="cursor: pointer; font-weight: 600; color: var(--ink); min-height: 28px; display: list-item">How to get it</summary><span style="display: block; margin-top: 6px">${esc(d.howToGet)}</span><span style="display: block; margin-top: 6px">Who: ${esc(d.eligibility)}</span></details>
 <a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: ${esc(host(d.sourceUrl))}, checked ${esc(monthYear(d.checkedOn))}</a>
 </article>`}
 const chip=(cat,on)=>`<button type="button" class="dchip" data-cat="${esc(cat)}" aria-pressed="${on}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid ${on?'var(--dark)':'#DCDDE3'}; background: ${on?'var(--dark)':'#FFFFFF'}; color: ${on?'#FFFFFF':'var(--ink)'}; font: inherit; font-size: 15px; cursor: pointer">${esc(cat)}</button>`;

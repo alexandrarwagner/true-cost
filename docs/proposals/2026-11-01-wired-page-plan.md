@@ -385,3 +385,8 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     between the two was laid out for 1440 and clipped on the right. Decided on 2 November:
     the tablet layout, which is fluid, applies up to 1439 px. One CSS edit under the lock; a
     test checks there is no sideways scroll at 1181 and 1300 px.
+23. **A deal card reads like the designer's.** The designer's card is a figure, a title, one
+    line and a source; ours also carried how to get the deal and who qualifies, which a real
+    deal needs. Decided on 2 November: those two lines sit behind a "How to get it"
+    disclosure inside the card (a native details element, keyboard-reachable), so the card
+    keeps the designer's density without losing the information (`deals.js`).
