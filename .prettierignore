@@ -8,3 +8,7 @@ package-lock.json
 eval/results.json
 AGENTS.md
 data/snapshots/*.json
+# The designer's page, scripts and screens: kept exactly as delivered
+design/
+tests/design/baseline.html
+public/fonts/fonts.css

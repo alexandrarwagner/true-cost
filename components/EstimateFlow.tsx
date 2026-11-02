@@ -72,7 +72,7 @@ export function EstimateFlow({
           : { kind, data: json as CompareResponse };
       setResult(next);
       if (kind === "single") setLastReq(body as EstimateRequest);
-      window.history.replaceState(null, "", `/?${next.data.shareQuery}`);
+      window.history.replaceState(null, "", `${window.location.pathname}?${next.data.shareQuery}`);
       if (focus)
         requestAnimationFrame(() => {
           const el = resultRef.current;

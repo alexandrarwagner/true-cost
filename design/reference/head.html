@@ -1,0 +1,28 @@
+<meta charset="utf-8">
+<title>Direction E — homepage</title>
+
+<style>
+.dd{position:absolute;left:0;top:calc(100% + 30px);width:420px;max-height:340px;overflow:auto;margin:0;padding:8px;list-style:none;background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(17,20,30,.12);z-index:20;font-size:16px;box-sizing:border-box}
+.dd li{min-height:46px;padding:0 14px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--ink)}
+.dd li[aria-selected=true],.dd li:hover{background:#F2F3F5}
+.dd li b{font-weight:700}.dd .code{font-size:14px;color:#4A4B63;font-variant-numeric:tabular-nums}
+.dd .foot{border-top:1px solid #E4E5EA;border-radius:0;margin-top:6px;padding-top:6px;color:#4A4B63;font-size:15px}
+.sw{position:fixed;right:16px;bottom:16px;z-index:50;background:#fff;border-radius:999px;padding:6px;display:flex;gap:6px;box-shadow:0 6px 24px rgba(17,20,30,.15);font:13px Archivo,sans-serif;align-items:center}
+.sw button{border:1px solid #DCDDE3;border-radius:999px;background:#fff;height:32px;padding:0 10px 0 6px;font:inherit;cursor:pointer;display:flex;align-items:center;gap:6px}
+.sw button[aria-pressed=true]{border-color:#14151F;box-shadow:inset 0 0 0 1px #14151F}
+.sw i{display:inline-flex}.sw i span{width:12px;height:12px;border-radius:50%;margin-left:-3px;border:1.5px solid #fff}
+</style><style>
+.res.pre{display:none!important}
+.fxhide{display:none!important}
+#r-status{margin:-30px 0 34px;min-height:24px;font-size:15px;color:#4A4B63;display:flex;gap:8px;align-items:center}
+#r-status i{width:8px;height:8px;border-radius:50%;background:var(--tui);animation:pulse 1s ease-in-out infinite}
+#r-status.ok i{animation:none;background:#5FCDB8}
+@keyframes pulse{50%{opacity:.25}}
+.paused .bub{animation-play-state:paused}
+.fade{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.fade.seen{opacity:1;transform:none}
+button[type=submit][aria-busy=true]{opacity:.85;cursor:progress}
+#tuition[aria-invalid=true]{color:#B3261E}
+#calc-err{font-size:15px;color:#B3261E;min-height:0}
+@media (prefers-reduced-motion: reduce){.fade{opacity:1;transform:none;transition:none}#r-status i{animation:none}}
+</style>

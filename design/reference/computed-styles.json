@@ -1,0 +1,117 @@
+{
+  "elements": [
+    {
+      "sel": "h1",
+      "font": "Archivo, sans-serif",
+      "size": "84px",
+      "weight": "500",
+      "stretch": "112%",
+      "ls": "-2.94px",
+      "lh": "84px",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": "#calc",
+      "font": "Archivo, system-ui, sans-serif",
+      "size": "16px",
+      "weight": "400",
+      "stretch": "100%",
+      "ls": "normal",
+      "lh": "normal",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": "#r-total",
+      "font": "Archivo, \"Noto Sans Bengali\", sans-serif",
+      "size": "72px",
+      "weight": "600",
+      "stretch": "100%",
+      "ls": "-2.88px",
+      "lh": "72px",
+      "color": "rgb(221, 255, 122)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": "#r-tui",
+      "font": "Archivo, \"Noto Sans Bengali\", sans-serif",
+      "size": "50px",
+      "weight": "600",
+      "stretch": "100%",
+      "ls": "-1.5px",
+      "lh": "normal",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": ".bub",
+      "font": "Archivo, system-ui, sans-serif",
+      "size": "16px",
+      "weight": "400",
+      "stretch": "100%",
+      "ls": "normal",
+      "lh": "normal",
+      "color": "rgb(244, 245, 247)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "50%",
+      "shadow": "none"
+    },
+    {
+      "sel": "#topnav",
+      "font": "Archivo, system-ui, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "stretch": "100%",
+      "ls": "normal",
+      "lh": "normal",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(242, 243, 245, 0.86)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": "#example",
+      "font": "Archivo, system-ui, sans-serif",
+      "size": "16px",
+      "weight": "400",
+      "stretch": "100%",
+      "ls": "normal",
+      "lh": "normal",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    {
+      "sel": "#how-h",
+      "font": "Archivo, sans-serif",
+      "size": "60px",
+      "weight": "500",
+      "stretch": "112%",
+      "ls": "-2.1px",
+      "lh": "61.2px",
+      "color": "rgb(20, 21, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    }
+  ],
+  "keyframes": [
+    "@keyframes pulse { \n  50% { opacity: 0.25; }\n}",
+    "@keyframes draw { \n  0% { stroke-dashoffset: 1400; }\n  100% { stroke-dashoffset: 0; }\n}",
+    "@keyframes land { \n  0% { opacity: 0; transform: translateY(12px); }\n}",
+    "@keyframes bub { \n  0% { transform: scale(0); }\n}",
+    "@keyframes tilt { \n  0%, 100% { transform: rotate(-5deg); }\n  50% { transform: rotate(4deg); }\n}",
+    "@keyframes pg { \n  0%, 30%, 100% { transform: scaleX(1); }\n  55%, 75% { transform: scaleX(-1); }\n}",
+    "@keyframes ln { \n  0%, 15% { stroke-dashoffset: 22; }\n  45%, 100% { stroke-dashoffset: 0; }\n}"
+  ]
+}

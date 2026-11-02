@@ -21,7 +21,7 @@ function Frame({
       <h1 className="text-2xl font-semibold">{copy.siteName}</h1>
       <p className="mt-1 mb-6">
         {title} ·{" "}
-        <Link href={`/?${shareQuery}`} className="underline print:hidden">
+        <Link href={`/react?${shareQuery}`} className="underline print:hidden">
           {copy.result.edit}
         </Link>
       </p>
@@ -69,7 +69,7 @@ export default async function SharedResultPage({
   const response = await runEstimate(req, req.example ? exampleSources() : buildSources());
   return (
     <Frame title={req.school.name} shareQuery={response.shareQuery}>
-      <ResultView editHref={`/?${response.shareQuery}`} response={response} />
+      <ResultView editHref={`/react?${response.shareQuery}`} response={response} />
     </Frame>
   );
 }

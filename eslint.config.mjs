@@ -5,6 +5,9 @@ import tseslint from "typescript-eslint";
 
 const eslintConfig = defineConfig([
   globalIgnores([
+    // The designer's page and scripts are source as delivered, not ours to lint.
+    "design/**",
+    "tests/design/baseline.html",
     ".next/**",
     "out/**",
     "build/**",

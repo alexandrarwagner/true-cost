@@ -4,6 +4,8 @@ const port = 3000;
 
 export default defineConfig({
   testDir: "tests/e2e",
+  // Baselines for the pixel comparison (design.spec.ts), captured from the served page per platform.
+  snapshotPathTemplate: "design/reference/screens-served/{platform}/{arg}{ext}",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

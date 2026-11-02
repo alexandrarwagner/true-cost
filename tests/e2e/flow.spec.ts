@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 async function threeInputs(page: Page) {
-  await page.goto("/");
+  await page.goto("/react");
   await page.getByLabel("I'm from").selectOption("IN");
   await page.getByLabel("My school").fill("purdue");
   await page.getByRole("option", { name: /Purdue University-Main Campus/ }).click();
@@ -98,7 +98,7 @@ test.describe("Tuition+ flow (DEMO_MODE)", () => {
   });
 
   test("the form is keyboard reachable and asks for the programme length", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/react");
     // The skip link comes first; activating it jumps past the header to the form.
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
@@ -162,7 +162,7 @@ test.describe("AI features (DEMO_MODE mock)", () => {
   });
 
   test("a smarter search resolves a nickname to a real school", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/react");
     await page.getByLabel("My school").fill("nyu");
     await expect(page.getByText("No schools found. Try a different spelling.")).toBeVisible();
     await page.getByRole("button", { name: "Try a smarter search" }).click();
@@ -239,7 +239,7 @@ test.describe("where the money goes and the deals grid", () => {
   });
 
   test("the school field is a combobox that works from the keyboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/react");
     const box = page.getByRole("combobox", { name: "My school" });
     await box.fill("purdue");
     await expect(page.getByRole("option", { name: /Purdue University-Main Campus/ })).toBeVisible();
@@ -291,7 +291,7 @@ test.describe("example mode", () => {
   test("shows sample figures with a persistent badge, keeps them on reload, and links them", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/react");
     await expect(
       page.getByRole("heading", { name: "Your estimate will appear here." }),
     ).toBeVisible();
@@ -328,7 +328,7 @@ test.describe("the full calculation", () => {
     await ctx.close();
 
     // The result page's figures link to the page, and each category subtotal matches.
-    await page.goto(`/?${share}`);
+    await page.goto(`/react?${share}`);
     const tree = page.locator("#breakdown");
     const housingOnResult =
       (await tree.getByRole("link", { name: /^₹/ }).nth(1).textContent()) ?? "";
@@ -368,7 +368,7 @@ test.describe("accessibility across pages", () => {
   test("the empty home page and the shared page pass axe with the full WCAG 2.2 tag set", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/react");
     const home = await new AxeBuilder({ page }).withTags(tags).analyze();
     expect(home.violations.filter(serious), JSON.stringify(home.violations, null, 2)).toEqual([]);
     await page.goto(`/r?${share}`);
@@ -380,7 +380,7 @@ test.describe("accessibility across pages", () => {
   });
 
   test("every keyboard stop on the result page shows a visible focus ring", async ({ page }) => {
-    await page.goto(`/?${share}`);
+    await page.goto(`/react?${share}`);
     await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
     const seen = new Set<string>();
     for (let i = 0; i < 40; i++) {
@@ -408,7 +408,7 @@ test.describe("page shell", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto("/");
+    await page.goto("/react");
     const widths = await page.evaluate(() => [
       document.documentElement.scrollWidth,
       document.documentElement.clientWidth,
@@ -429,7 +429,7 @@ test.describe("page shell", () => {
     await expect(page.getByRole("row", { name: /Exchange rate.*Frankfurter/ })).toBeVisible();
     // The result page, with its nav, tree and tables, must reflow at 320px too (WCAG 1.4.10).
     await page.goto(
-      "/?c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1",
+      "/react?c=IN&cur=INR&s=193900&sn=New+York+University&sc=New+York&st=NY&sz=10012&t=65622&ts=school&y=2&sy=2027&ss=fall&ex=1",
     );
     await expect(page.getByText("Your degree: about", { exact: true })).toBeVisible();
     await page.getByText("The same range as a table").click();

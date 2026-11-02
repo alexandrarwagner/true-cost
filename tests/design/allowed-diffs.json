@@ -1,0 +1,7 @@
+[
+  {
+    "change": "Fonts served from this site (plan section F.2); the stylesheet is a copy of Google's with local file URLs.",
+    "from": "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&amp;family=Noto+Sans+Bengali:wght@500&amp;display=swap\">",
+    "to": "<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
+  }
+]

@@ -36,5 +36,8 @@ next-env.d.ts
 # logs
 *.log
 npm-debug.log*
-design/
+# The designer's page and reference screens are source; the rest of design/ is scratch.
+design/*
+!design/wired/
+!design/reference/
 .lighthouse/

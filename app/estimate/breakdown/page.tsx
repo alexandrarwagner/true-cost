@@ -39,7 +39,7 @@ export default async function BreakdownPage({
     <Breakdown
       response={response}
       reportUrl={getEnv().dealReportUrl}
-      backHref={`/?${response.shareQuery}`}
+      backHref={`/react?${response.shareQuery}`}
       aiEnabled={flags().AI_ENABLED}
     />
   );
