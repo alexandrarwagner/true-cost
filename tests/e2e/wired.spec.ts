@@ -329,6 +329,12 @@ test.describe("the designer's page: school search", () => {
     await expect(page.locator("#r-tui")).toHaveText(/^£[\d,]+$/);
     await expect(page.locator("#fx h2")).toHaveText("If the pound moves.");
     await expect(page.locator("#fx-fan svg")).toContainText("£ thousand");
+    // The range comes back in pounds; it once went through the rupee rate and read ~1/100 too low.
+    const pounds = async (sel: string) =>
+      Number(((await page.locator(sel).textContent()) ?? "").replace(/[^\d.]/g, ""));
+    const tuition = await pounds("#r-tui");
+    expect(await pounds("#fx-lo")).toBeGreaterThan(tuition * 0.8);
+    expect(await pounds("#fx-hi")).toBeLessThan(tuition * 5);
   });
 
   test("a currency the engine cannot calculate in is an error at input, not dollars by surprise", async ({
