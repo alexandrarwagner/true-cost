@@ -427,3 +427,7 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     `overflow-x: hidden` on html and body, which makes the body a scroll container and stops
     `position: sticky` working; the 1220 to 1439 px range had copied the rule. Both are
     `overflow-x: clip` now (2 November), which clips without creating a scroll container.
+30. **Nav spacing.** The running total never wraps, and in the stacked layout the link row
+    hugs its links instead of stretching across the page (3 November, owner's screenshot).
+31. **Deals in two rows.** The grid shows eight cards and a "Show N more deals" button for
+    the rest; a filter chip applies the same limit to its matches (3 November, `deals.js`).

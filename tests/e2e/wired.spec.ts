@@ -187,7 +187,13 @@ test.describe("the designer's page: school search", () => {
     await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();
     await expect(grid.locator(".deal:visible")).toHaveCount(1);
     await page.locator("#deal-chips .dchip", { hasText: "All" }).click();
+    // Two rows of four, then the rest behind "Show more" (decision 31).
+    await expect(grid.locator(".deal:visible")).toHaveCount(8);
+    const more = page.locator("#deals-more");
+    await expect(more).toHaveText("Show 3 more deals");
+    await more.click();
     await expect(grid.locator(".deal:visible")).toHaveCount(11);
+    await expect(more).toBeHidden();
     // The copy fixes.
     await expect(page.locator("#fx")).toContainText(
       "Frankfurter (European Central Bank reference rates)",

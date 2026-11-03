@@ -37,10 +37,20 @@ function card(d){return `<article class="deal" data-cat="${esc(LABEL[d.category]
 <a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: ${esc(host(d.sourceUrl))}, checked ${esc(monthYear(d.checkedOn))}</a>
 </article>`}
 const chip=(cat,on)=>`<button type="button" class="dchip" data-cat="${esc(cat)}" aria-pressed="${on}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid ${on?'var(--dark)':'#DCDDE3'}; background: ${on?'var(--dark)':'#FFFFFF'}; color: ${on?'#FFFFFF':'var(--ink)'}; font: inherit; font-size: 15px; cursor: pointer">${esc(cat)}</button>`;
-function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];
- cs.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
+// Two rows of cards (eight at full width) and a "Show N more" button for the rest (decision 31).
+const LIMIT=8;let expanded=false;
+const more=document.createElement('button');more.type='button';more.id='deals-more';more.hidden=true;
+more.style.cssText='align-self: center; height: 48px; padding: 0 22px; border: 1.5px solid var(--ink); border-radius: 24px; background: transparent; color: var(--ink); font: inherit; font-size: 16px; font-weight: 600; cursor: pointer';
+grid.insertAdjacentElement('afterend',more);
+function show(cards,cat){const vis=cards.filter(k=>cat==='All'||k.dataset.cat===cat);
+ cards.forEach(k=>{k.style.display='none'});vis.forEach((k,i)=>{k.style.display=(expanded||i<LIMIT)?'flex':'none'});
+ const rest=vis.length-LIMIT;more.hidden=expanded||rest<=0;more.textContent=`Show ${rest} more deal${rest===1?'':'s'}`;more.setAttribute('aria-expanded',String(expanded))}
+function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];let cat='All';
+ cs.forEach(ch=>ch.addEventListener('click',()=>{cat=ch.dataset.cat;
   cs.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
-  cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'flex':'none';k.classList.remove('pre');k.classList.add('seen')})}))}
+  cards.forEach(k=>{k.classList.remove('pre');k.classList.add('seen')});show(cards,cat)}));
+ more.onclick=()=>{expanded=true;show(cards,cat);const first=cards.filter(k=>k.style.display==='flex')[LIMIT];if(first)first.querySelector('a,summary,button')?.focus({preventScroll:true})};
+ expanded=false;show(cards,cat)}
 function render(deals){
  const cats=[...new Set(deals.map(d=>LABEL[d.category]||LABEL.other))];
  chips.innerHTML=chip('All',true)+cats.map(c=>chip(c,false)).join('');
