@@ -5,10 +5,10 @@
     "to": "<link rel=\"preload\" href=\"/fonts/archivo-latin.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/archivo-latin-ext.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
   },
   {
-    "change": "Decision 13: the designer's one-line head script that marks the first paint for the opening sequence moves to design/wired/intro-flag.js, loaded synchronously in the head so it runs before the first style is computed. The lock allows no inline script. fit.js follows it: the canvas scaled to the window between 1180 and 1439 px (decision 22, revised).",
+    "change": "Decision 13: the designer's one-line head script that marks the first paint for the opening sequence moves to design/wired/intro-flag.js, loaded synchronously in the head so it runs before the first style is computed. The lock allows no inline script.",
     "block": "intro-flag.js",
     "sig": "classList.add('intro')",
-    "to": "<script src=\"/wired/intro-flag.js\"></script><script src=\"/wired/fit.js\"></script>"
+    "to": "<script src=\"/wired/intro-flag.js\"></script>"
   },
   {
     "change": "Change 1: the country list, palette switcher and typeahead move to design/wired/typeahead.js.",
@@ -169,8 +169,13 @@
     "to": "<title>Tuition+ · What will your US degree really cost?</title>\n<meta name=\"description\" content=\"What studying in the US will really cost you, in your own money.\">\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Tuition+\">\n<meta property=\"og:title\" content=\"What will your US degree really cost?\">\n<meta property=\"og:description\" content=\"What studying in the US will really cost you, in your own money.\">\n<meta property=\"og:url\" content=\"https://tuition-plus.com/\">\n<meta name=\"twitter:card\" content=\"summary\">"
   },
   {
-    "change": "Decision 22 (revised): between 1180 and 1439 px the 1440 px canvas is scaled to the window (fit.js, CSS zoom) so the desktop layout stays whole; any sub-pixel overflow is clipped. Decision 27: in the stacked layout the scroll-drawn line through the sources table is hidden, since the Type column no longer stands apart there. Decision 26 (the one-row bar) is met by the scaling and needs no rule of its own.",
+    "change": "Decision 22 (final): the designer's stacked layout applies up to 1219 px, not 1180 px, because the 1200 px results grid overflows a narrower window.",
+    "from": "@media (max-width: 1180px){",
+    "to": "@media (max-width: 1219px){"
+  },
+  {
+    "change": "Decision 22 (final): between 1220 and 1439 px the desktop layout runs at the window's width (the 1440 px canvas is the only fixed width that matters there), with no scaling, so the branch lines, the sticky nav, the one-row bar and the scroll-drawn line behave as at 1440. Decision 27: in the stacked layout the scroll-drawn line is hidden, since the Type column no longer stands apart there. Decision 26 (the one-row bar) is met by this and needs no rule of its own.",
     "from": "@media (max-width: 640px){",
-    "to": "@media (min-width: 1180px) and (max-width: 1439px){\nhtml,body{overflow-x:hidden}\n}\n@media (max-width: 1179px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (max-width: 640px){"
+    "to": "@media (min-width: 1220px) and (max-width: 1439px){\nmain{width:100%!important}\nhtml,body{overflow-x:hidden}\n}\n@media (max-width: 1219px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (max-width: 640px){"
   }
 ]
