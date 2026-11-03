@@ -438,3 +438,9 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 33. **The hero's dotted background.** A dotted field with sixteen slowly pulsing coloured dots
     sits behind the hero; `hero-bg.js`, the designer's own, fits it behind the nav and down to
     the next section, and reduced motion stills the dots (3 November, same file).
+34. **Dots on the whole page, and the tree at every width above a phone.** The owner asked
+    (3 November) why the tree should ever be dropped, and for the dotted field to span the
+    page. The field is now the page background (the designer's 32 px grid), showing through
+    every section without a background of its own; the hero keeps its pulsing coloured dots.
+    From 641 px up the results tree keeps its four cards and branch lines, overriding the
+    designer's tablet rule; the figures already fit themselves to their cards.
