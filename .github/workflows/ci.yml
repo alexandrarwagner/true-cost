@@ -54,7 +54,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: next-build
           path: .next
@@ -89,7 +89,7 @@ jobs:
           npm run perf
       # The runner's own capture of the designer's page: the first run on a new platform has no
       # baseline, so this is what gets committed as design/reference/screens-served/linux.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: design-screens-served
@@ -97,7 +97,7 @@ jobs:
           retention-days: 14
       # When a baseline is stale, Playwright writes the runner's capture next to a diff under
       # test-results; the *-actual.png files become the new Linux baseline.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-test-results
@@ -105,20 +105,20 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       # Only the runner's captures, without traces: a few hundred KB to fetch on a slow line.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: screenshot-actuals
           path: test-results/**/*-actual.png
           retention-days: 7
           if-no-files-found: ignore
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
           path: playwright-report
           retention-days: 7
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: lighthouse-reports
