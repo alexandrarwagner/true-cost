@@ -387,10 +387,13 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     tablet layout drops the branch lines and restyles the nav, which the owner saw as broken
     on a laptop. A scaled canvas (CSS zoom) was tried and dropped the same evening: the
     scroll-drawn line and the nav pill measure in one coordinate space and draw in another.
-    Final: the stacked layout applies up to 1219 px (the 1200 px results grid is the widest
-    fixed piece), and from 1220 to 1439 px the desktop layout runs at the window's width,
-    which is enough since nothing else is wider than 1200 px. A test checks there is no
-    sideways scroll at 1181 and 1300 px.
+    Final: the stacked layout applies up to 1099 px. From 1100 to 1439 px the desktop layout
+    runs at the window's width, and from 1100 to 1219 px its few fixed widths give way: hero
+    padding and heading, the bar, the 1200 px results grid with its line drawings (they scale
+    by their viewBox, so the tree stays on its cards), a tighter one-row nav, and the where
+    section's list in place of the fixed-size bubbles, as the designer's tablet layout does.
+    Below 1100 px the nav links would wrap, which is where the stacked layout earns its
+    place. A test checks there is no sideways scroll at 1181 and 1300 px.
 23. **A deal card reads like the designer's.** The designer's card is a figure, a title, one
     line and a source; ours also carried how to get the deal and who qualifies, which a real
     deal needs. Decided on 2 November: those two lines sit behind a "How to get it"
@@ -407,11 +410,11 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 26. **The bar keeps one row down to 1040 px.** The owner prefers the one-row bar to the
     stacked one (2 November). Between 1040 and 1439 px the bar keeps its desktop shape,
     fluid up to 1160 px. Superseded the same evening by the final decision 22: the desktop
-    layout keeps the one-row bar down to 1220 px, and the designer's stacked bar applies below.
+    layout keeps the one-row bar down to 1100 px, and the designer's stacked bar applies below.
 27. **No scroll-drawn line in the fluid layout.** The line through the sources table's Type
     column is drawn between the type marks, which only stand apart on the 1440 canvas; in
     the stacked rows it ran through the text (owner's screenshot, 2 November). Hidden below
-    1220 px (the stacked layout), as the designer hides it under reduced motion.
+    1100 px (the stacked layout), as the designer hides it under reduced motion.
 28. **Tips written by Claude, unreviewed.** The owner's call for the design challenge
     (2 November): "ignore the review rule for now, people won't be using it." `/api/tips`
     asks Claude for two housing tips, one living-costs tip and one moving-money tip for the
