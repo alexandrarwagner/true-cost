@@ -155,7 +155,8 @@ for (const width of [1440, 390]) {
       await page.locator("#calc button[type=submit]").click();
       const err = page.locator("#calc-err");
       await expect(err).toHaveAttribute("role", "alert");
-      await expect(err).toContainText("Add where you’re from, your school and your tuition per year");
+      // The tuition has a default, so only the country and the school are missing.
+      await expect(err).toContainText("Add where you’re from and your school to work it out.");
       await expect(page.locator("#school")).toHaveAttribute("aria-invalid", "true");
       await settled(page, "#calc-err"); // its 300 ms fade-in
       expect((await axe().analyze()).violations).toEqual([]);
