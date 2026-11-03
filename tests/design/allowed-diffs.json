@@ -176,6 +176,11 @@
   {
     "change": "Decision 22 (final): between 1220 and 1439 px the desktop layout runs at the window's width (the 1440 px canvas is the only fixed width that matters there), with no scaling, so the branch lines, the sticky nav, the one-row bar and the scroll-drawn line behave as at 1440. Decision 27: in the stacked layout the scroll-drawn line is hidden, since the Type column no longer stands apart there. Decision 26 (the one-row bar) is met by this and needs no rule of its own.",
     "from": "@media (max-width: 640px){",
-    "to": "@media (min-width: 1220px) and (max-width: 1439px){\nmain{width:100%!important}\nhtml,body{overflow-x:hidden}\n}\n@media (max-width: 1219px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (max-width: 640px){"
+    "to": "@media (min-width: 1220px) and (max-width: 1439px){\nmain{width:100%!important}\nhtml,body{overflow-x:clip}\n}\n@media (max-width: 1219px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (max-width: 640px){"
+  },
+  {
+    "change": "Decision 29: overflow-x on html and body is clip, not hidden, in the stacked layout and in the 1220 to 1439 px range: hidden makes the body a scroll container and stops the nav sticking, which is why the sticky nav was missing on laptops and tablets.",
+    "from": "html,body{overflow-x:hidden}\nmain{width:100%!important}",
+    "to": "html,body{overflow-x:clip}\nmain{width:100%!important}"
   }
 ]

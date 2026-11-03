@@ -6,7 +6,7 @@ import type { Cents, SchoolCosts, Source } from "@/lib/core/types";
 import { TtlCache } from "@/lib/server/cache";
 import { readJsonCapped, safeFetch, UpstreamError } from "@/lib/server/http";
 import { readSnapshot } from "./snapshotFiles";
-import { rankSchools } from "./scorecardRank";
+import { rankSchools, searchQuery } from "./scorecardRank";
 
 // College Scorecard (US Dept. of Education) via api.data.gov. The key travels in a header,
 // never in the URL. Search is live and cached; cost fields come from the snapshot first and
@@ -124,12 +124,13 @@ export function scorecardSource(
 
   return {
     async search(q, signal) {
-      const key = q.trim().toLowerCase();
+      const key = searchQuery(q);
       const hit = searchCache.get(key);
       if (hit) return hit;
-      // Twenty biggest matches from the API, then the ones that start with the text first.
+      // The fifty biggest matches from the API, then the ones that start with the text first,
+      // so a small school whose name starts with the text is not buried by big ones.
       const rows = await query(
-        { "school.name": key, per_page: "20", sort: "latest.student.size:desc" },
+        { "school.name": key, per_page: "50", sort: "latest.student.size:desc" },
         signal,
       );
       const out = rankSchools(key, rows.map(rowToSummary)).slice(0, 10);

@@ -113,7 +113,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 .chip{height:46px;padding:0 18px;border-radius:23px;border:none;background:rgba(255,255,255,0.7);color:var(--ink);font:inherit;font-size:16px;display:flex;align-items:center;gap:8px}
 /* ---------- responsive: tablet and down ---------- */
 @media (max-width: 1219px){
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 main{width:100%!important}
 main section[id]{scroll-margin-top:120px}
 #topnav{padding:0 24px!important}
@@ -165,7 +165,7 @@ footer{flex-direction:column;align-items:flex-start!important;gap:12px;padding:2
 /* ---------- phones ---------- */
 @media (min-width: 1220px) and (max-width: 1439px){
 main{width:100%!important}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 }
 @media (max-width: 1219px){
 .how-line{display:none}

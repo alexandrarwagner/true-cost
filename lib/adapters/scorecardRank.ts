@@ -5,6 +5,11 @@
  * then a word in the name that starts with it, then any match; ties keep the API's size order.
  * Punctuation and spacing are ignored on both sides ("A&M" matches "A & M").
  */
+/** What is sent to the API: "&" as "and" (the API does not match the two), single spaces. */
+export function searchQuery(q: string): string {
+  return q.replace(/&/g, " and ").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
 export function normaliseName(s: string): string {
   return s
     .toLowerCase()

@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { matchRank, normaliseName, rankSchools } from "@/lib/adapters/scorecardRank";
+import { matchRank, normaliseName, rankSchools, searchQuery } from "@/lib/adapters/scorecardRank";
 
 describe("school search ranking", () => {
+  it("sends an ampersand to the API as 'and', since the API matches only the word", () => {
+    expect(searchQuery("Washington & Lee")).toBe("washington and lee");
+    expect(searchQuery("  Texas A&M ")).toBe("texas a and m");
+  });
+
   it("ignores punctuation and spacing", () => {
     expect(normaliseName("Texas A&M University-College Station")).toBe(
       "texas a and m university college station",

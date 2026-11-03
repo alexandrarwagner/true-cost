@@ -122,22 +122,17 @@ test.describe("the designer's page, as served", () => {
     await showMe(page);
     await expect(page.locator("#r-total")).not.toHaveText("");
     await page.evaluate(() => document.fonts.ready);
+    // The sticky nav overlaps whichever section is captured, at a position that drifts by a
+    // few pixels between runs; it has its own test, so it is hidden for the section shots.
+    const hideNav = await page.addStyleTag({ content: "#topnav{visibility:hidden}" });
     for (const id of SECTIONS) {
       const section = page.locator(`#${id}`);
-      // Put the section at a fixed place under the sticky nav, instantly, and let the nav's
-      // observer mark it, so the nav inside the capture is always in the same state and place.
-      await page.evaluate((sel) => {
-        const el = document.querySelector(sel);
-        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40 });
-      }, `#${id}`);
-      await expect(page.locator('#topnav .nav-post a[aria-current="true"]')).toHaveAttribute(
-        "data-sec",
-        id,
-      );
+      await section.scrollIntoViewIfNeeded();
       expect.soft(await section.screenshot()).toMatchSnapshot(`section-${id}.png`, {
         maxDiffPixelRatio: RATIO,
       });
     }
+    await hideNav.evaluate((el) => el.remove());
     await page.evaluate(() => window.scrollTo(0, 0));
     expect.soft(await page.screenshot({ fullPage: true })).toMatchSnapshot("results-full.png", {
       maxDiffPixelRatio: RATIO,

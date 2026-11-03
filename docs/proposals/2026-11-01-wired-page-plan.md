@@ -420,3 +420,7 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     laws and named companies, and the tiles keep their hand-written text in demo mode, with
     no key, or on any failure. This is the one place the site shows text no person checked;
     it should go back behind a review file before real students use it (ADR 014).
+29. **The sticky nav on laptops and tablets.** The designer's stacked layout sets
+    `overflow-x: hidden` on html and body, which makes the body a scroll container and stops
+    `position: sticky` working; the 1220 to 1439 px range had copied the rule. Both are
+    `overflow-x: clip` now (2 November), which clips without creating a scroll container.
