@@ -383,8 +383,12 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 22. **Cut off between 1181 and 1439 px.** The desktop layout is a fixed 1440 px canvas
     (`main{width:1440px}`) and the tablet layout took over only at 1180 px, so a window
     between the two was laid out for 1440 and clipped on the right. Decided on 2 November:
-    the tablet layout, which is fluid, applies up to 1439 px. One CSS edit under the lock; a
-    test checks there is no sideways scroll at 1181 and 1300 px.
+    the tablet layout, which is fluid, applies up to 1439 px. Revised the same evening: the
+    tablet layout drops the branch lines and restyles the nav, which the owner saw as broken
+    on a laptop. Now the designer's 1180 px breakpoint stands, and between 1180 and 1439 px
+    the 1440 px canvas is scaled to the window with CSS zoom (`design/wired/fit.js`, loaded
+    in the head), so the desktop layout stays whole. A test checks there is no sideways
+    scroll at 1181 and 1300 px.
 23. **A deal card reads like the designer's.** The designer's card is a figure, a title, one
     line and a source; ours also carried how to get the deal and who qualifies, which a real
     deal needs. Decided on 2 November: those two lines sit behind a "How to get it"
@@ -400,12 +404,12 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     lock entry. City-specific tips can follow as data once a city has its deals.
 26. **The bar keeps one row down to 1040 px.** The owner prefers the one-row bar to the
     stacked one (2 November). Between 1040 and 1439 px the bar keeps its desktop shape,
-    fluid up to 1160 px; below 1040 px the designer's stacked layout takes over, where five
-    fields in one row would be cramped. One CSS block under the lock.
+    fluid up to 1160 px. Superseded the same evening by the revised decision 22: the scaled
+    canvas keeps the one-row bar down to 1180 px, and the designer's stacked bar applies below.
 27. **No scroll-drawn line in the fluid layout.** The line through the sources table's Type
     column is drawn between the type marks, which only stand apart on the 1440 canvas; in
     the stacked rows it ran through the text (owner's screenshot, 2 November). Hidden below
-    1440 px, as the designer hides it under reduced motion.
+    1180 px (the stacked layout), as the designer hides it under reduced motion.
 28. **Tips written by Claude, unreviewed.** The owner's call for the design challenge
     (2 November): "ignore the review rule for now, people won't be using it." `/api/tips`
     asks Claude for two housing tips, one living-costs tip and one moving-money tip for the

@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://tuition-plus.com/">
 <meta name="twitter:card" content="summary">
 
-<script src="/wired/intro-flag.js"></script>
+<script src="/wired/intro-flag.js"></script><script src="/wired/fit.js"></script>
 <style>
 .dd{position:absolute;left:0;top:calc(100% + 30px);width:420px;max-height:340px;overflow:auto;margin:0;padding:8px;list-style:none;background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(17,20,30,.12);z-index:20;font-size:16px;box-sizing:border-box}
 .dd li{min-height:46px;padding:0 14px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--ink)}
@@ -112,7 +112,7 @@ a{color:var(--ink)}a:hover{color:#4A4B63}
 @media (prefers-reduced-motion: reduce){.draw{animation:none;stroke-dashoffset:0}.land{animation:none;opacity:1}.bub{animation:none}.bub:hover,.bub:focus-visible{transform:none}.ib,.ir,.pg,.ln{animation:none}}
 .chip{height:46px;padding:0 18px;border-radius:23px;border:none;background:rgba(255,255,255,0.7);color:var(--ink);font:inherit;font-size:16px;display:flex;align-items:center;gap:8px}
 /* ---------- responsive: tablet and down ---------- */
-@media (max-width: 1439px){
+@media (max-width: 1180px){
 html,body{overflow-x:hidden}
 main{width:100%!important}
 main section[id]{scroll-margin-top:120px}
@@ -163,17 +163,12 @@ main > section{padding-left:24px!important;padding-right:24px!important}
 footer{flex-direction:column;align-items:flex-start!important;gap:12px;padding:28px 24px 36px!important}
 }
 /* ---------- phones ---------- */
-@media (max-width: 1439px){
+@media (min-width: 1180px) and (max-width: 1439px){
+html,body{overflow-x:hidden}
+}
+@media (max-width: 1179px){
 .how-line{display:none}
 .how-mark{transform:none;transition:none}
-}
-@media (min-width: 1040px) and (max-width: 1439px){
-#calc{max-width:1160px}
-#calc > div{height:92px!important;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,.95fr) minmax(0,.8fr) auto!important;border-radius:46px!important;padding:10px!important}
-#calc > div > label,#calc > div > [role=group]{padding:0 20px!important;border-bottom:none!important;border-right:1.5px solid #E4E5EA!important}
-#calc > div > label:nth-child(1),#calc > div > label:nth-child(2){grid-column:auto}
-#calc > div > [role=group]{border-right:none!important}
-#calc > div > button[type=submit]{grid-column:auto;width:auto;height:72px!important;margin-top:0}
 }
 @media (max-width: 640px){
 #topnav{padding:0 16px!important;height:64px!important}

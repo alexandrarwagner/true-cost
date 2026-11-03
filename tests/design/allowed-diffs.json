@@ -5,10 +5,10 @@
     "to": "<link rel=\"preload\" href=\"/fonts/archivo-latin.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/archivo-latin-ext.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"stylesheet\" href=\"/fonts/fonts.css\">"
   },
   {
-    "change": "Decision 13: the designer's one-line head script that marks the first paint for the opening sequence moves to design/wired/intro-flag.js, loaded synchronously in the head so it runs before the first style is computed. The lock allows no inline script.",
+    "change": "Decision 13: the designer's one-line head script that marks the first paint for the opening sequence moves to design/wired/intro-flag.js, loaded synchronously in the head so it runs before the first style is computed. The lock allows no inline script. fit.js follows it: the canvas scaled to the window between 1180 and 1439 px (decision 22, revised).",
     "block": "intro-flag.js",
     "sig": "classList.add('intro')",
-    "to": "<script src=\"/wired/intro-flag.js\"></script>"
+    "to": "<script src=\"/wired/intro-flag.js\"></script><script src=\"/wired/fit.js\"></script>"
   },
   {
     "change": "Change 1: the country list, palette switcher and typeahead move to design/wired/typeahead.js.",
@@ -164,18 +164,13 @@
     "to": "input:focus-visible{outline:none!important}\nlabel:focus-within{outline:2px solid #3E43C8;outline-offset:2px;border-radius:28px}"
   },
   {
-    "change": "Decision 22: the tablet layout applies up to 1439 px, not 1180 px. The desktop layout is a fixed 1440 px canvas (main{width:1440px}), so between 1181 and 1439 px it was laid out for 1440 and cut off on the right.",
-    "from": "@media (max-width: 1180px){",
-    "to": "@media (max-width: 1439px){"
-  },
-  {
     "change": "Decision 24 (launch): the designer's placeholder title becomes the site's, with a description and the sharing tags; the tagline is the one in content/copy.ts.",
     "from": "<title>Direction E — homepage</title>",
     "to": "<title>Tuition+ · What will your US degree really cost?</title>\n<meta name=\"description\" content=\"What studying in the US will really cost you, in your own money.\">\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Tuition+\">\n<meta property=\"og:title\" content=\"What will your US degree really cost?\">\n<meta property=\"og:description\" content=\"What studying in the US will really cost you, in your own money.\">\n<meta property=\"og:url\" content=\"https://tuition-plus.com/\">\n<meta name=\"twitter:card\" content=\"summary\">"
   },
   {
-    "change": "Decision 26: between 1040 and 1439 px the bar keeps its one-row desktop shape (fluid up to 1160 px) instead of stacking; below 1040 px the stacked layout takes over, where one row would be cramped. Decision 27: in the fluid layout the scroll-drawn line through the sources table is hidden, since the Type column no longer stands apart there and the line ran through the text.",
+    "change": "Decision 22 (revised): between 1180 and 1439 px the 1440 px canvas is scaled to the window (fit.js, CSS zoom) so the desktop layout stays whole; any sub-pixel overflow is clipped. Decision 27: in the stacked layout the scroll-drawn line through the sources table is hidden, since the Type column no longer stands apart there. Decision 26 (the one-row bar) is met by the scaling and needs no rule of its own.",
     "from": "@media (max-width: 640px){",
-    "to": "@media (max-width: 1439px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (min-width: 1040px) and (max-width: 1439px){\n#calc{max-width:1160px}\n#calc > div{height:92px!important;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,.95fr) minmax(0,.8fr) auto!important;border-radius:46px!important;padding:10px!important}\n#calc > div > label,#calc > div > [role=group]{padding:0 20px!important;border-bottom:none!important;border-right:1.5px solid #E4E5EA!important}\n#calc > div > label:nth-child(1),#calc > div > label:nth-child(2){grid-column:auto}\n#calc > div > [role=group]{border-right:none!important}\n#calc > div > button[type=submit]{grid-column:auto;width:auto;height:72px!important;margin-top:0}\n}\n@media (max-width: 640px){"
+    "to": "@media (min-width: 1180px) and (max-width: 1439px){\nhtml,body{overflow-x:hidden}\n}\n@media (max-width: 1179px){\n.how-line{display:none}\n.how-mark{transform:none;transition:none}\n}\n@media (max-width: 640px){"
   }
 ]
