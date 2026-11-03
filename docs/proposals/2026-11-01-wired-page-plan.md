@@ -427,7 +427,14 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     `overflow-x: hidden` on html and body, which makes the body a scroll container and stops
     `position: sticky` working; the 1220 to 1439 px range had copied the rule. Both are
     `overflow-x: clip` now (2 November), which clips without creating a scroll container.
-30. **Nav spacing.** The running total never wraps, and in the stacked layout the link row
-    hugs its links instead of stretching across the page (3 November, owner's screenshot).
+30. **Nav spacing.** The running total never wraps; a 20 px gap separates the nav's columns
+    so the total never touches the links; in the stacked layout the link row is centred and
+    hugs its links instead of stretching across the page (3 November, owner's screenshots).
 31. **Deals in two rows.** The grid shows eight cards and a "Show N more deals" button for
     the rest; a filter chip applies the same limit to its matches (3 November, `deals.js`).
+32. **The new wordmark.** The designer's "tuition" with three layered plus marks (ink, lime,
+    mint) as an inline SVG replaces the plain plus in the nav, the footer, the share card and
+    the family PDF (3 November, from the designer's `E-homepage-preview (1).html`).
+33. **The hero's dotted background.** A dotted field with sixteen slowly pulsing coloured dots
+    sits behind the hero; `hero-bg.js`, the designer's own, fits it behind the nav and down to
+    the next section, and reduced motion stills the dots (3 November, same file).
