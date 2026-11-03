@@ -51,20 +51,23 @@ describe("scorecard adapter", () => {
         return ok([purdue]);
       }),
     );
+    // A name that is in no school of the snapshot, so the search has to ask the API.
     const src = scorecardSource("k-test");
-    const first = await src.search("purdue", sig());
-    const second = await src.search("Purdue ", sig());
+    const first = await src.search("zzqx", sig());
+    const second = await src.search("ZZQX ", sig());
     expect(first[0]?.unitId).toBe(243780);
     expect(second).toEqual(first);
     expect(calls).toBe(1);
     const u = new URL(seen?.url ?? "");
-    expect(u.searchParams.get("school.name")).toBe("purdue");
+    expect(u.searchParams.get("school.name")).toBe("zzqx");
     expect(u.searchParams.has("api_key")).toBe(false);
     expect(seen?.headers.get("x-api-key")).toBe("k-test");
   });
 
   it("throws without a key and on a 429, and returns null for an unknown school", async () => {
-    await expect(scorecardSource(undefined).search("x", sig())).rejects.toMatchObject({
+    // The snapshot still answers without a key; only a name it lacks needs the API.
+    expect(await scorecardSource(undefined).search("university", sig())).toHaveLength(10);
+    await expect(scorecardSource(undefined).search("zzqx", sig())).rejects.toMatchObject({
       kind: "blocked_host",
     });
     server.use(
@@ -74,7 +77,7 @@ describe("scorecard adapter", () => {
           : new HttpResponse(null, { status: 429 }),
       ),
     );
-    await expect(scorecardSource("k").search("rate", sig())).rejects.toMatchObject({
+    await expect(scorecardSource("k").search("zzqx rate", sig())).rejects.toMatchObject({
       kind: "http",
       status: 429,
     });
