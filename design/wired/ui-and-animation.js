@@ -135,7 +135,7 @@ function reveal(T,Y,c,tot,K,Q){
     const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
   if(K.fx){fxSec.querySelectorAll(':scope > div').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
     const F=K.fx;drawFan(F,Y,!Q);
-    lo=F.lo/RATE.INR;hi=F.hi/RATE.INR;buf=F.buf/RATE.INR;
+    const fr=RATE[CUR]||1;lo=F.lo/fr;hi=F.hi/fr;buf=F.buf/fr; // the engine answers in the home currency
     const loT=fmt(lo,'big'),hiT=fmt(hi,'big');$('fx-lo').textContent=(loT.endsWith('crore')&&hiT.endsWith('crore'))?loT.replace(' crore',''):loT;$('fx-hi').textContent=hiT;
     $('r-buf').textContent=fmt(buf,'big');$('fx-len').textContent=Y+'-year';$('fx-n').textContent=F.n;
   }else{fxSec.querySelectorAll(':scope > div > div:last-child, :scope > div > div:first-child > :not(h2)').forEach(x=>x.classList.add('fxhide'));if(!fxSec.querySelector('.fx-none')){const n=document.createElement('p');n.className='fx-none';n.style.cssText='margin:0;font-size:18px;color:#4A4B63';n.textContent=`We don’t have enough rate history for ${cc} to show a range. This section shows how a currency has moved against the dollar over past periods, and how much to set aside.`;fxSec.appendChild(n)}}
