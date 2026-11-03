@@ -132,7 +132,7 @@ test.describe("the designer's page, as served", () => {
         maxDiffPixelRatio: RATIO,
       });
     }
-    await hideNav.evaluate((el) => el.remove());
+    await hideNav.evaluate((el) => el.parentNode?.removeChild(el));
     await page.evaluate(() => window.scrollTo(0, 0));
     expect.soft(await page.screenshot({ fullPage: true })).toMatchSnapshot("results-full.png", {
       maxDiffPixelRatio: RATIO,
