@@ -75,6 +75,12 @@ history snapshots, the rest of the 99 countries' currencies use a live Frankfurt
 place by Claude and cached for a day; without the key the hand-written tiles show). In
 production, Upstash and Turnstile are required too (see `.env.example`).
 
+## Changing main
+
+`main` takes pull requests only, and each must pass the five CI jobs (lint, typecheck and unit
+tests; build; secret scan; dependency audit; end-to-end). Work on a branch, open a pull request,
+let CI finish, then merge. Force-pushes and deletion of `main` are blocked.
+
 ## Deployment (Vercel)
 
 1. Import the repository. The build is `next build`; no extra configuration.
@@ -103,7 +109,8 @@ Things only an account owner can do, in the order they matter:
 - [ ] Anthropic key with a spend limit and an alert set in the console; paste one real offer
       letter and check the extraction.
 - [ ] Upstash Redis database and Cloudflare Turnstile site for production.
-- [ ] GitHub: secret scanning and push protection on; branch protection on `main`.
+- [x] GitHub: secret scanning and push protection on; `main` protected (2 November: public
+      repository, no force-push or deletion, pull requests with the five CI checks required).
 - [ ] Read Frankfurter's licence page and confirm the commercial-use wording (ADR 002).
 - [ ] Review every estimate in `data/constants.ts` and update `checkedOn`.
 
