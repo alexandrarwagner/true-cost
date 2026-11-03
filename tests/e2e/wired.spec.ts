@@ -59,6 +59,8 @@ test.describe("the designer's page: school search", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.locator("#from").fill("India");
+    await page.getByRole("option", { name: /^India/ }).click();
     await page.locator("#school").fill("purdue");
     await page.getByRole("option", { name: /Purdue University-Main Campus/ }).click();
     await page.locator("#years").fill("2");
@@ -165,16 +167,12 @@ test.describe("the designer's page: school search", () => {
     await expect(grid.locator(".deal")).toHaveCount(11);
     await expect(grid).toContainText("Spotify Premium Student");
     await expect(grid).toContainText("Free entry to New York museums");
-    await expect(grid).toContainText(/checked [A-Z][a-z]{2} 20\d\d/);
     // How to get it and who qualifies sit behind a disclosure (decision 23).
     const details = grid.locator(".deal").first().locator("details");
     await expect(details).toHaveJSProperty("open", false);
     await details.locator("summary").click();
     await expect(details).toHaveJSProperty("open", true);
     await expect(details).toContainText("Who:");
-    await expect(page.locator("#deals-checked")).toHaveText(
-      /^Checked [A-Z][a-z]{2} 20\d\d · No paid listings$/,
-    );
     await expect(page.locator("#save-city")).toHaveText("New York");
     // No generic tips, no Boston cards.
     // The four general tips are back, campus-neutral (decision 25); the Boston cards are not.
@@ -338,9 +336,13 @@ test.describe("the designer's page: school search", () => {
   }) => {
     await page.goto("/");
     // No country in the list is unsupported any more, so stand in for one through the chip.
+    await page.locator("#from").fill("Atlantis");
     await page.evaluate(() => {
       const chip = document.getElementById("cur");
-      if (chip) chip.textContent = "XXX";
+      if (chip) {
+        chip.textContent = "XXX";
+        chip.hidden = false;
+      }
     });
     await page.locator("#school").fill("Boston University");
     await page.locator("#tuition").fill("$30,000");

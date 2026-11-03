@@ -32,6 +32,8 @@ async function load(page: Page) {
 
 /** Show me, then the reveal run to its end on the fake clock. */
 async function results(page: Page) {
+  await page.locator("#from").fill("India");
+  await page.getByRole("option", { name: /^India/ }).click();
   await page.locator("#school").fill("Boston University");
   await page.locator("#tuition").fill("$37,500");
   await page.locator("#years").fill("2");

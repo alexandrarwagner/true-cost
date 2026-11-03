@@ -81,6 +81,18 @@ describe("scorecard adapter", () => {
     expect(await scorecardSource("k").costs(1, sig())).toBeNull();
   });
 
+  it("finds a school in the snapshot before asking the API, ranked by how the name matches", async () => {
+    // One local match, so the API is asked to fill the list; it has nothing to add.
+    server.use(http.get(SCORECARD_URL, () => ok([])));
+    const one = await scorecardSource("k").search("washington and lee", sig());
+    expect(one[0]?.name).toBe("Washington and Lee University");
+    // Ten or more local matches: the API is not asked at all.
+    server.use(http.get(SCORECARD_URL, () => new HttpResponse(null, { status: 500 })));
+    const many = await scorecardSource("k").search("university", sig());
+    expect(many).toHaveLength(10);
+    expect(many.every((s) => /university/i.test(s.name))).toBe(true);
+  });
+
   it("fetches costs live when the school is not in the snapshot", async () => {
     // 243780 (Purdue) is in data/snapshots/scorecard-costs.json since 2 November; an id that
     // is not forces the live call, which the mock answers with Purdue's record.

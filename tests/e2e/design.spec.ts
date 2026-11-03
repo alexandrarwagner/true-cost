@@ -18,6 +18,8 @@ const SECTIONS = ["results", "where", "fx", "save", "how", "share"] as const;
 
 /** The designer's sample: India, $37,500 a year, two years, and a school (v2 requires one). Typed in, so the example can change. */
 async function showMe(page: Page) {
+  await page.locator("#from").fill("India");
+  await page.getByRole("option", { name: /^India/ }).click();
   await page.locator("#school").fill("Boston University");
   await page.locator("#tuition").fill("$37,500");
   await page.locator("#years").fill("2");

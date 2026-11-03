@@ -81,7 +81,7 @@ test.describe("the shared page (DEMO_MODE)", () => {
       document.documentElement.clientWidth,
     ]);
     expect(after[0]).toBeLessThanOrEqual(after[1] ?? 320);
-    await expect(page.getByRole("contentinfo")).toContainText("Not a prediction");
+    await expect(page.getByRole("contentinfo")).toContainText("Just an estimate");
     // On a result the header carries the result nav; the plain shell's links point home.
     await page.setViewportSize({ width: 1024, height: 800 });
     await page.goto("/privacy");

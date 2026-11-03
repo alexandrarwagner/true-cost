@@ -92,9 +92,9 @@
     "to": ""
   },
   {
-    "change": "Change 6: the checked line is set from the data.",
+    "change": "Change 6, then decision 36: the \"Checked … · No paid listings\" line under the deals heading is removed (owner, 3 November).",
     "from": "<span style=\"font-size: 14px; color: #4A4B63\">Checked October 2026 · No paid listings</span>",
-    "to": "<span id=\"deals-checked\" style=\"font-size: 14px; color: #4A4B63\">Checked October 2026 · No paid listings</span>"
+    "to": ""
   },
   {
     "change": "Decision 19: the \"Check before you go\" line under the deals is removed (it replaced decision 11's rewording).",
@@ -202,5 +202,25 @@
     "change": "Decision 33: the designer's dotted hero background with sixteen slowly pulsing coloured dots, behind the hero content (3 November, from E-homepage-preview (1).html); hero-bg.js fits it behind the nav and down to the next section. Decision 34: the dotted field itself moved to the page background, so the hero block keeps only the pulsing dots.",
     "from": "<section id=\"hero\" style=\"position: relative; z-index: 2; height: 780px\">",
     "to": "<section id=\"hero\" style=\"position: relative; z-index: 2; height: 780px\">\n<div aria-hidden=\"true\" class=\"hero-bg\" style=\"position: absolute; top: -81px; bottom: -120px; left: calc(50% - 50vw); right: calc(50% - 50vw); z-index: 0; pointer-events: none; overflow: hidden\"><svg width=\"100%\" height=\"100%\" style=\"display:block\"><circle class=\"hd\" cx=\"5.56%\" cy=\"14.36%\" r=\"5.5\" fill=\"#F7B9EE\" style=\"animation-delay:0.0s\"/><circle class=\"hd\" cx=\"12.22%\" cy=\"38.97%\" r=\"5.5\" fill=\"#DDFF7A\" style=\"animation-delay:0.6s\"/><circle class=\"hd\" cx=\"3.33%\" cy=\"59.49%\" r=\"5.5\" fill=\"#9FEADA\" style=\"animation-delay:1.2s\"/><circle class=\"hd\" cx=\"16.67%\" cy=\"80.00%\" r=\"4.5\" fill=\"#8F93F2\" style=\"animation-delay:1.8s\"/><circle class=\"hd\" cx=\"7.78%\" cy=\"92.31%\" r=\"5.5\" fill=\"#DDFF7A\" style=\"animation-delay:2.4s\"/><circle class=\"hd\" cx=\"23.33%\" cy=\"22.56%\" r=\"5.5\" fill=\"#C9CBFA\" style=\"animation-delay:3.0s\"/><circle class=\"hd\" cx=\"94.44%\" cy=\"10.26%\" r=\"5.5\" fill=\"#9FEADA\" style=\"animation-delay:3.6s\"/><circle class=\"hd\" cx=\"87.78%\" cy=\"34.87%\" r=\"5.5\" fill=\"#DDFF7A\" style=\"animation-delay:4.2s\"/><circle class=\"hd\" cx=\"98.89%\" cy=\"55.38%\" r=\"5.5\" fill=\"#F7B9EE\" style=\"animation-delay:4.8s\"/><circle class=\"hd\" cx=\"83.33%\" cy=\"71.79%\" r=\"5.5\" fill=\"#C9CBFA\" style=\"animation-delay:5.4s\"/><circle class=\"hd\" cx=\"92.22%\" cy=\"88.21%\" r=\"4.5\" fill=\"#8F93F2\" style=\"animation-delay:6.0s\"/><circle class=\"hd\" cx=\"76.67%\" cy=\"18.46%\" r=\"5.5\" fill=\"#F7B9EE\" style=\"animation-delay:6.6s\"/><circle class=\"hd\" cx=\"27.78%\" cy=\"96.41%\" r=\"5.5\" fill=\"#9FEADA\" style=\"animation-delay:7.2s\"/><circle class=\"hd\" cx=\"70.00%\" cy=\"96.41%\" r=\"5.5\" fill=\"#DDFF7A\" style=\"animation-delay:7.8s\"/><circle class=\"hd\" cx=\"50.00%\" cy=\"6.15%\" r=\"4.5\" fill=\"#8F93F2\" style=\"animation-delay:8.4s\"/><circle class=\"hd\" cx=\"61.11%\" cy=\"100.51%\" r=\"5.5\" fill=\"#F7B9EE\" style=\"animation-delay:9.0s\"/></svg></div>"
+  },
+  {
+    "change": "Decision 35: no default country. The \"I'm from\" field starts empty with its placeholder; the visitor picks their country.",
+    "from": "<input id=\"from\" value=\"India\" placeholder=\"Start typing your country\"",
+    "to": "<input id=\"from\" placeholder=\"Start typing your country\""
+  },
+  {
+    "change": "Decision 35: the currency chip is hidden until a country is picked; the script shows it with the picked currency.",
+    "from": "<span id=\"cur\" class=\"num\" style=\"flex: none; font-size: 14px; font-weight: 600; padding: 3px 9px; border-radius: 10px; background: #F2F3F5\">INR ₹</span>",
+    "to": "<span id=\"cur\" class=\"num\" hidden style=\"flex: none; font-size: 14px; font-weight: 600; padding: 3px 9px; border-radius: 10px; background: #F2F3F5\"></span>"
+  },
+  {
+    "change": "Decision 35: the saving heading's country is filled at run time; its markup no longer names India.",
+    "from": "<span id=\"save-country\">India</span>",
+    "to": "<span id=\"save-country\">your country</span>"
+  },
+  {
+    "change": "Decision 36: the footer line reads \"Free. Just an estimate.\" (owner, 3 November).",
+    "from": "<span style=\"color: #4A4B63\">Free. Not a prediction. Every number shows its source.</span>",
+    "to": "<span style=\"color: #4A4B63\">Free. Just an estimate.</span>"
   }
 ]

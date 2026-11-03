@@ -444,3 +444,10 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     every section without a background of its own; the hero keeps its pulsing coloured dots.
     From 641 px up the results tree keeps its four cards and branch lines, overriding the
     designer's tablet rule; the figures already fit themselves to their cards.
+35. **No default country.** The owner did not want India pre-filled (3 November). The
+    "I'm from" field starts empty with its placeholder, the currency chip appears once a
+    country is picked, and "Show me" asks for the country as it asks for the school and the
+    tuition; the tuition keeps its $37,500 default. The example still picks India.
+36. **Three copy cuts** (owner, 3 November): the deal card drops its "Source: … checked …"
+    line, the "Checked … · No paid listings" line under the deals heading goes, and the
+    footer reads "Free. Just an estimate." on the home page and the React pages alike.

@@ -168,7 +168,7 @@ export const copy = {
     skip: "Skip to main content",
     how: "How we work it out",
     cta: "Get my estimate",
-    footerLine: "Free. Not a prediction. Every number shows its source.",
+    footerLine: "Free. Just an estimate.",
   },
   disclaimer:
     "This is an estimate, not financial advice. We don't predict exchange rates and we don't recommend any bank or transfer service.",
