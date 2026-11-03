@@ -82,9 +82,11 @@ describe("scorecard adapter", () => {
   });
 
   it("fetches costs live when the school is not in the snapshot", async () => {
+    // 243780 (Purdue) is in data/snapshots/scorecard-costs.json since 2 November; an id that
+    // is not forces the live call, which the mock answers with Purdue's record.
     server.use(http.get(SCORECARD_URL, () => ok([purdue])));
     const r = await scorecardSource("k", { now: () => new Date("2026-10-30T00:00:00Z") }).costs(
-      243780,
+      999999,
       sig(),
     );
     expect(r?.summary.name).toBe("Purdue University-Main Campus");

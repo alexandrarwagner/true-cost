@@ -20,6 +20,9 @@ const optionalString = z
 
 const RawEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  // Set by Vercel on every deployment: "production" for the production domain, "preview" for
+  // pull-request previews. A production deployment can never run on fixtures.
+  VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
   DEMO_MODE: flag(false),
   AI_ENABLED: flag(true),
   COMPARE_ENABLED: flag(false),
@@ -81,7 +84,13 @@ export class EnvError extends Error {
 function buildEnv(raw: RawEnv): AppEnv {
   const isProd = raw.NODE_ENV === "production";
   const isDemo = raw.DEMO_MODE;
-  const live = isProd && !isDemo;
+  if (raw.VERCEL_ENV === "production" && isDemo) {
+    throw new EnvError(
+      "DEMO_MODE is on in the production deployment (VERCEL_ENV=production). " +
+        "Set DEMO_MODE=false in Vercel's Production environment; previews may keep it on.",
+    );
+  }
+  const live = (isProd || raw.VERCEL_ENV === "production") && !isDemo;
   const missing: string[] = [];
   const warnings: string[] = [];
 
@@ -159,6 +168,9 @@ export function getEnv(): AppEnv {
   cached = buildEnv(result.data);
   return cached;
 }
+
+/** Every variable the schema knows, for the test that keeps .env.example in step with it. */
+export const ENV_NAMES: readonly string[] = Object.keys(RawEnvSchema.shape);
 
 /** Tests only: forget the cached config so the next getEnv() re-reads process.env. */
 export function resetEnvForTests(): void {

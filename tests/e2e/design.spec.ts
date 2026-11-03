@@ -124,7 +124,13 @@ test.describe("the designer's page, as served", () => {
     await page.evaluate(() => document.fonts.ready);
     for (const id of SECTIONS) {
       const section = page.locator(`#${id}`);
-      await section.scrollIntoViewIfNeeded();
+      // Go to the section through its nav link, which marks it and scrolls to it, so the
+      // sticky nav in the capture always shows the same state.
+      await page.locator(`#topnav .nav-post a[data-sec="${id}"]`).click();
+      await expect(page.locator('#topnav .nav-post a[aria-current="true"]')).toHaveAttribute(
+        "data-sec",
+        id,
+      );
       expect.soft(await section.screenshot()).toMatchSnapshot(`section-${id}.png`, {
         maxDiffPixelRatio: RATIO,
       });

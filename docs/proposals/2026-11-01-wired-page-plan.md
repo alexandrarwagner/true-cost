@@ -390,3 +390,27 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
     deal needs. Decided on 2 November: those two lines sit behind a "How to get it"
     disclosure inside the card (a native details element, keyboard-reachable), so the card
     keeps the designer's density without losing the information (`deals.js`).
+24. **Launch metadata.** The export's head says "Direction E — homepage" and nothing else.
+    For launch (2 November) the title is the site's, with a description and the sharing tags
+    for tuition-plus.com, under the lock; the React pages get the same through
+    `metadataBase`, and robots and sitemap routes name the domain.
+25. **General tips are back.** The owner found the saving section thin without them
+    (2 November). The designer's four tiles return, reworded to hold for any campus: no
+    Boston neighbourhoods, no 1 September. Same markup, same stagger; the copy is in the
+    lock entry. City-specific tips can follow as data once a city has its deals.
+26. **The bar keeps one row down to 1040 px.** The owner prefers the one-row bar to the
+    stacked one (2 November). Between 1040 and 1439 px the bar keeps its desktop shape,
+    fluid up to 1160 px; below 1040 px the designer's stacked layout takes over, where five
+    fields in one row would be cramped. One CSS block under the lock.
+27. **No scroll-drawn line in the fluid layout.** The line through the sources table's Type
+    column is drawn between the type marks, which only stand apart on the 1440 canvas; in
+    the stacked rows it ran through the text (owner's screenshot, 2 November). Hidden below
+    1440 px, as the designer hides it under reduced motion.
+28. **Tips written by Claude, unreviewed.** The owner's call for the design challenge
+    (2 November): "ignore the review rule for now, people won't be using it." `/api/tips`
+    asks Claude for two housing tips, one living-costs tip and one moving-money tip for the
+    student's country, school and city (`lib/server/tips.ts`), cached per place for a day;
+    `tips.js` fills the four tiles once a result is shown. The prompt forbids prices, dates,
+    laws and named companies, and the tiles keep their hand-written text in demo mode, with
+    no key, or on any failure. This is the one place the site shows text no person checked;
+    it should go back behind a review file before real students use it (ADR 014).

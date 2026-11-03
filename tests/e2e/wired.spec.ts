@@ -161,20 +161,24 @@ test.describe("the designer's page: school search", () => {
     await page.locator("#example").click();
     await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
     const grid = page.locator("#deals");
-    await expect(grid.locator(".deal")).toHaveCount(2);
+    // Ten approved national deals plus NYU's museum deal (2 November).
+    await expect(grid.locator(".deal")).toHaveCount(11);
     await expect(grid).toContainText("Spotify Premium Student");
     await expect(grid).toContainText("Free entry to New York museums");
-    await expect(grid).toContainText("checked Oct 2026");
+    await expect(grid).toContainText(/checked [A-Z][a-z]{2} 20\d\d/);
     // How to get it and who qualifies sit behind a disclosure (decision 23).
     const details = grid.locator(".deal").first().locator("details");
     await expect(details).toHaveJSProperty("open", false);
     await details.locator("summary").click();
     await expect(details).toHaveJSProperty("open", true);
     await expect(details).toContainText("Who:");
-    await expect(page.locator("#deals-checked")).toHaveText("Checked Oct 2026 · No paid listings");
+    await expect(page.locator("#deals-checked")).toHaveText(
+      /^Checked [A-Z][a-z]{2} 20\d\d · No paid listings$/,
+    );
     await expect(page.locator("#save-city")).toHaveText("New York");
     // No generic tips, no Boston cards.
-    await expect(page.getByText("General tips")).toHaveCount(0);
+    // The four general tips are back, campus-neutral (decision 25); the Boston cards are not.
+    await expect(page.getByText("General tips")).toHaveCount(1);
     await expect(page.getByText("Orangetheory")).toHaveCount(0);
     // The "Check before you go" line is gone (decision 19).
     await expect(page.locator("#save")).not.toContainText("Check before you go");
@@ -183,7 +187,7 @@ test.describe("the designer's page: school search", () => {
     await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();
     await expect(grid.locator(".deal:visible")).toHaveCount(1);
     await page.locator("#deal-chips .dchip", { hasText: "All" }).click();
-    await expect(grid.locator(".deal:visible")).toHaveCount(2);
+    await expect(grid.locator(".deal:visible")).toHaveCount(11);
     // The copy fixes.
     await expect(page.locator("#fx")).toContainText(
       "Frankfurter (European Central Bank reference rates)",

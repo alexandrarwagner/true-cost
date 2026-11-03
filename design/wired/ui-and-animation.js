@@ -127,11 +127,12 @@ function reveal(T,Y,c,tot,K,Q){
   const sem=T/2+1500*6;const n=2*Y;
   // exchange rate: replay past moves on your payments (INR only)
   const fxSec=$('fx');let lo=null,hi=null,buf=null;
+  // The heading and the chart's title name the chosen currency (the markup says rupees),
+  // whether or not the rate history is there.
+  if(window.TPEngine.currencyName){const h=fxSec.querySelector('h2');if(h)h.textContent=`If the ${window.TPEngine.currencyName(CUR)} moves.`;
+    const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
   if(K.fx){fxSec.querySelectorAll(':scope > div').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
     const F=K.fx;drawFan(F,Y,!Q);
-    // The heading and the chart's title name the chosen currency (the markup says rupees).
-    if(window.TPEngine.currencyName){const h=fxSec.querySelector('h2');if(h)h.textContent=`If the ${window.TPEngine.currencyName(CUR)} moves.`;
-      const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
     lo=F.lo/RATE.INR;hi=F.hi/RATE.INR;buf=F.buf/RATE.INR;
     const loT=fmt(lo,'big'),hiT=fmt(hi,'big');$('fx-lo').textContent=(loT.endsWith('crore')&&hiT.endsWith('crore'))?loT.replace(' crore',''):loT;$('fx-hi').textContent=hiT;
     $('r-buf').textContent=fmt(buf,'big');$('fx-len').textContent=Y+'-year';$('fx-n').textContent=F.n;

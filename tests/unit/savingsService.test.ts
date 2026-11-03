@@ -76,11 +76,13 @@ describe("runEstimate with SAVINGS_ENABLED", () => {
     const s = r.savings;
     if (!s) return;
     expect(s.levers[0]?.id).toBe("roommates-2");
-    // Tips last: the waiver question, then NYU's museum deal, which has no figure.
-    expect(s.levers.slice(-2).map((l) => [l.id, l.hasFigure])).toEqual([
-      ["insurance-waiver", false],
-      ["deal:nyu-museum-gateway", false],
-    ]);
+    // Tips last: every lever with a figure comes before every one without, the waiver
+    // question leads the tips, and NYU's museum deal (no figure) is among them.
+    const firstTip = s.levers.findIndex((l) => !l.hasFigure);
+    expect(firstTip).toBeGreaterThan(0);
+    expect(s.levers.slice(firstTip).every((l) => !l.hasFigure)).toBe(true);
+    expect(s.levers[firstTip]?.id).toBe("insurance-waiver");
+    expect(s.levers.slice(firstTip).map((l) => l.id)).toContain("deal:nyu-museum-gateway");
     expect(s.levers.find((l) => l.id === "deal:nyu-museum-gateway")?.deal?.scope).toBe("school");
     expect(s.deals).toMatchObject({ schoolChecked: true });
     expect(s.deals.reportUrl).toMatch(/^https:\/\//);

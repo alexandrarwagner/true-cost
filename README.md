@@ -71,8 +71,9 @@ Without `DEMO_MODE`, school search needs `DATA_GOV_API_KEY` (free at api.data.go
 fields and rent come from the snapshots in `data/snapshots/`, falling back to live calls when
 the key or `HUD_API_TOKEN` is set. Exchange rates need no key: the ten launch currencies have
 history snapshots, the rest of the 99 countries' currencies use a live Frankfurter query. The AI features (step 6) need
-`ANTHROPIC_API_KEY`. In production, Upstash and Turnstile are required too (see
-`.env.example`).
+`ANTHROPIC_API_KEY`, as do the four saving tips on the home page (`/api/tips`, written per
+place by Claude and cached for a day; without the key the hand-written tiles show). In
+production, Upstash and Turnstile are required too (see `.env.example`).
 
 ## Deployment (Vercel)
 
@@ -82,10 +83,15 @@ history snapshots, the rest of the 99 countries' currencies use a live Frankfurt
 3. **Production** environment: `DEMO_MODE=false`, `DATA_GOV_API_KEY`, the Upstash pair,
    `ANTHROPIC_API_KEY` with the Turnstile pair, and `HUD_API_TOKEN` if rent should fall back to
    live calls. Use different keys for preview and production. The server refuses to start with a
-   required variable missing and names it.
+   required variable missing and names it, and refuses `DEMO_MODE=true` on the production
+   deployment (Vercel sets `VERCEL_ENV=production` there; previews may keep demo mode).
+   `lib/server/env.ts` is the one place variables are read; a unit test keeps it and
+   `.env.example` in step.
 4. Add `DATA_GOV_API_KEY` and `HUD_API_TOKEN` as GitHub Actions secrets so the weekly snapshot
    refresh covers all three sources.
 5. `GET /api/health` reports flags, configured services (booleans) and snapshot freshness.
+6. The site's address is `lib/site.ts` (tuition-plus.com): `metadataBase`, the sharing tags,
+   `/robots.txt` and `/sitemap.xml` use it.
 
 ## Manual checklist
 

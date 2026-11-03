@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { copy } from "@/content/copy";
+import { SITE_URL } from "@/lib/site";
 import { archivo, notoBengali } from "./fonts";
 import "./globals.css";
 
@@ -10,8 +11,16 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: copy.siteName,
   description: copy.tagline,
+  openGraph: {
+    type: "website",
+    siteName: copy.siteName,
+    title: copy.siteName,
+    description: copy.tagline,
+  },
+  twitter: { card: "summary" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
