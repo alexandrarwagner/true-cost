@@ -6,6 +6,7 @@ import type { Cents, SchoolCosts, Source } from "@/lib/core/types";
 import { TtlCache } from "@/lib/server/cache";
 import { readJsonCapped, safeFetch, UpstreamError } from "@/lib/server/http";
 import { readSnapshot } from "./snapshotFiles";
+import { normaliseName, rankSchools, searchQuery } from "./scorecardRank";
 
 // College Scorecard (US Dept. of Education) via api.data.gov. The key travels in a header,
 // never in the URL. Search is live and cached; cost fields come from the snapshot first and
@@ -123,14 +124,33 @@ export function scorecardSource(
 
   return {
     async search(q, signal) {
-      const key = q.trim().toLowerCase();
+      const key = searchQuery(q);
       const hit = searchCache.get(key);
       if (hit) return hit;
-      const rows = await query(
-        { "school.name": key, per_page: "10", sort: "latest.student.size:desc" },
-        signal,
-      );
-      const out = rows.map(rowToSummary);
+      // Our snapshot first: every school with a published out-of-state tuition, searched
+      // instantly and ranked by how the name matches, so a small school is never buried.
+      const snap = snapshot();
+      const needle = normaliseName(key);
+      const local = snap
+        ? rankSchools(
+            key,
+            snap.schools
+              .filter((r) => normaliseName(r["school.name"]).includes(needle))
+              .map(rowToSummary),
+          )
+        : [];
+      let out = local.slice(0, 10);
+      // Then the API's fifty biggest matches fill the rest, for schools outside the snapshot.
+      if (out.length < 10) {
+        const rows = await query(
+          { "school.name": key, per_page: "50", sort: "latest.student.size:desc" },
+          signal,
+        );
+        const more = rankSchools(key, rows.map(rowToSummary)).filter(
+          (m) => !out.some((o) => o.unitId === m.unitId),
+        );
+        out = out.concat(more).slice(0, 10);
+      }
       searchCache.set(key, out);
       return out;
     },

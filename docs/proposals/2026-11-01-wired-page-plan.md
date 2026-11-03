@@ -383,10 +383,71 @@ Nothing else: no class renames, no restyling, no reordering, no React on the hom
 22. **Cut off between 1181 and 1439 px.** The desktop layout is a fixed 1440 px canvas
     (`main{width:1440px}`) and the tablet layout took over only at 1180 px, so a window
     between the two was laid out for 1440 and clipped on the right. Decided on 2 November:
-    the tablet layout, which is fluid, applies up to 1439 px. One CSS edit under the lock; a
-    test checks there is no sideways scroll at 1181 and 1300 px.
+    the tablet layout, which is fluid, applies up to 1439 px. Revised the same evening: the
+    tablet layout drops the branch lines and restyles the nav, which the owner saw as broken
+    on a laptop. A scaled canvas (CSS zoom) was tried and dropped the same evening: the
+    scroll-drawn line and the nav pill measure in one coordinate space and draw in another.
+    Final: the stacked layout applies up to 1099 px. From 1100 to 1439 px the desktop layout
+    runs at the window's width, and from 1100 to 1219 px its few fixed widths give way: hero
+    padding and heading, the bar, the 1200 px results grid with its line drawings (they scale
+    by their viewBox, so the tree stays on its cards), a tighter one-row nav, and the where
+    section's list in place of the fixed-size bubbles, as the designer's tablet layout does.
+    Below 1100 px the nav links would wrap, which is where the stacked layout earns its
+    place. A test checks there is no sideways scroll at 1181 and 1300 px.
 23. **A deal card reads like the designer's.** The designer's card is a figure, a title, one
     line and a source; ours also carried how to get the deal and who qualifies, which a real
     deal needs. Decided on 2 November: those two lines sit behind a "How to get it"
     disclosure inside the card (a native details element, keyboard-reachable), so the card
     keeps the designer's density without losing the information (`deals.js`).
+24. **Launch metadata.** The export's head says "Direction E — homepage" and nothing else.
+    For launch (2 November) the title is the site's, with a description and the sharing tags
+    for tuition-plus.com, under the lock; the React pages get the same through
+    `metadataBase`, and robots and sitemap routes name the domain.
+25. **General tips are back.** The owner found the saving section thin without them
+    (2 November). The designer's four tiles return, reworded to hold for any campus: no
+    Boston neighbourhoods, no 1 September. Same markup, same stagger; the copy is in the
+    lock entry. City-specific tips can follow as data once a city has its deals.
+26. **The bar keeps one row down to 1040 px.** The owner prefers the one-row bar to the
+    stacked one (2 November). Between 1040 and 1439 px the bar keeps its desktop shape,
+    fluid up to 1160 px. Superseded the same evening by the final decision 22: the desktop
+    layout keeps the one-row bar down to 1100 px, and the designer's stacked bar applies below.
+27. **No scroll-drawn line in the fluid layout.** The line through the sources table's Type
+    column is drawn between the type marks, which only stand apart on the 1440 canvas; in
+    the stacked rows it ran through the text (owner's screenshot, 2 November). Hidden below
+    1100 px (the stacked layout), as the designer hides it under reduced motion.
+28. **Tips written by Claude, unreviewed.** The owner's call for the design challenge
+    (2 November): "ignore the review rule for now, people won't be using it." `/api/tips`
+    asks Claude for two housing tips, one living-costs tip and one moving-money tip for the
+    student's country, school and city (`lib/server/tips.ts`), cached per place for a day;
+    `tips.js` fills the four tiles once a result is shown. The prompt forbids prices, dates,
+    laws and named companies, and the tiles keep their hand-written text in demo mode, with
+    no key, or on any failure. This is the one place the site shows text no person checked;
+    it should go back behind a review file before real students use it (ADR 014).
+29. **The sticky nav on laptops and tablets.** The designer's stacked layout sets
+    `overflow-x: hidden` on html and body, which makes the body a scroll container and stops
+    `position: sticky` working; the 1220 to 1439 px range had copied the rule. Both are
+    `overflow-x: clip` now (2 November), which clips without creating a scroll container.
+30. **Nav spacing.** The running total never wraps; a 20 px gap separates the nav's columns
+    so the total never touches the links; in the stacked layout the link row is centred and
+    hugs its links instead of stretching across the page (3 November, owner's screenshots).
+31. **Deals in two rows.** The grid shows eight cards and a "Show N more deals" button for
+    the rest; a filter chip applies the same limit to its matches (3 November, `deals.js`).
+32. **The new wordmark.** The designer's "tuition" with three layered plus marks (ink, lime,
+    mint) as an inline SVG replaces the plain plus in the nav, the footer, the share card and
+    the family PDF (3 November, from the designer's `E-homepage-preview (1).html`).
+33. **The hero's dotted background.** A dotted field with sixteen slowly pulsing coloured dots
+    sits behind the hero; `hero-bg.js`, the designer's own, fits it behind the nav and down to
+    the next section, and reduced motion stills the dots (3 November, same file).
+34. **Dots on the whole page, and the tree at every width above a phone.** The owner asked
+    (3 November) why the tree should ever be dropped, and for the dotted field to span the
+    page. The field is now the page background (the designer's 32 px grid), showing through
+    every section without a background of its own; the hero keeps its pulsing coloured dots.
+    From 641 px up the results tree keeps its four cards and branch lines, overriding the
+    designer's tablet rule; the figures already fit themselves to their cards.
+35. **No default country.** The owner did not want India pre-filled (3 November). The
+    "I'm from" field starts empty with its placeholder, the currency chip appears once a
+    country is picked, and "Show me" asks for the country as it asks for the school and the
+    tuition; the tuition keeps its $37,500 default. The example still picks India.
+36. **Three copy cuts** (owner, 3 November): the deal card drops its "Source: … checked …"
+    line, the "Checked … · No paid listings" line under the deals heading goes, and the
+    footer reads "Free. Just an estimate." on the home page and the React pages alike.

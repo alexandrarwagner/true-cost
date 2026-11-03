@@ -22,7 +22,7 @@
       "sourceUrl": "https://www.apple.com/apple-music/",
       "sourceQuote": "Students can choose the Apple Music Student Plan at $6.99 per month. An individual monthly subscription is just $11.99 per month after your free trial. Once your student status with your college or university is verified, you get student membership pricing for up to four years, as long as you remain a student.",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "adobe-creative-cloud-student",
@@ -43,7 +43,7 @@
       "sourceUrl": "https://www.adobe.com/creativecloud/buy/students.html",
       "sourceQuote": "Pay US$19.99/mo the first year and US$39.99/mo after that. Regularly at US$69.99/mo. The Adobe Creative Cloud student discount is available to current students aged 13 and older.",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "hulu-disney-student-bundle",
@@ -64,7 +64,7 @@
       "sourceUrl": "https://www.hulu.com/student",
       "sourceQuote": "Student discount offer for ad-supported Disney+, Hulu Bundle plan only: $6.49/month then $12.99/month or then-current, regular monthly price. Offer valid for students enrolled at a U.S. university. Verification performed through SheerID. Student status must be re-verified annually",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "microsoft-office-365-a1-students",
@@ -76,7 +76,7 @@
       "sourceUrl": "https://www.microsoft.com/en-us/education/products/office",
       "sourceQuote": "Educators and students with an eligible education email address can get Office 365 A1 for free. Includes the web-based versions of core apps (Outlook, Word, Excel, PowerPoint, OneNote). Your eligibility may be re-verified at any time.",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "github-student-developer-pack",
@@ -88,7 +88,7 @@
       "sourceUrl": "https://education.github.com/pack",
       "sourceQuote": "Free GitHub Pro while you are a student. GitHub Copilot Student is available to verified students. Sign up for Student Developer Pack",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "notion-education-plan",
@@ -100,7 +100,7 @@
       "sourceUrl": "https://www.notion.com/product/notion-for-education",
       "sourceQuote": "The Education Plan for individual students is a free plan for a one-member workspace. You're a student or educator at an accredited college or university. You have a school email address. We don't accept student IDs or other documentation to verify.",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "figma-education-plan",
@@ -112,7 +112,7 @@
       "sourceUrl": "https://www.figma.com/education/",
       "sourceQuote": "Figma & FigJam are 100% free for students, educators and schools. No freemium or hidden upgrades, ever. Teachers and students over 13 years old can get started on their own by signing up for our free Education Plan",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     }
   ]
 }

@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getEnv, resetEnvForTests } from "@/lib/server/env";
+import { readFileSync } from "node:fs";
+import { ENV_NAMES, getEnv, resetEnvForTests } from "@/lib/server/env";
 
 const KEYS = [
   "NODE_ENV",
+  "VERCEL_ENV",
   "DEMO_MODE",
   "AI_ENABLED",
   "COMPARE_ENABLED",
@@ -62,6 +64,30 @@ describe("getEnv", () => {
     vi.stubEnv("COMPARE_ENABLED", "true");
     expect(getEnv().ai.enabled).toBe(false);
     expect(getEnv().compareEnabled).toBe(true);
+  });
+
+  it("refuses DEMO_MODE in the production deployment, and allows it in a preview", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("DEMO_MODE", "true");
+    expect(() => getEnv()).toThrow(/DEMO_MODE is on in the production deployment/);
+    resetEnvForTests();
+    vi.stubEnv("VERCEL_ENV", "preview");
+    expect(getEnv().isDemo).toBe(true);
+  });
+
+  it("treats a Vercel production deployment as live even when NODE_ENV is not production", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    expect(() => getEnv()).toThrow(/DATA_GOV_API_KEY/);
+  });
+
+  it("knows every variable in .env.example, and .env.example shows every variable", () => {
+    const example = readFileSync(".env.example", "utf8")
+      .split("\n")
+      .map((l) => l.match(/^([A-Z_]+)=/)?.[1])
+      .filter((n): n is string => Boolean(n));
+    // NODE_ENV and VERCEL_ENV are set by the platform, not by a person.
+    const ours = ENV_NAMES.filter((n) => n !== "NODE_ENV" && n !== "VERCEL_ENV");
+    expect([...example].sort()).toEqual([...ours].sort());
   });
 
   it("fails fast in production without the Scorecard key or a rate-limit backend", () => {

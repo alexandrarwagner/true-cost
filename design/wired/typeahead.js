@@ -36,7 +36,7 @@ function combo(inp,items,opts){
  inp.addEventListener('blur',()=>setTimeout(()=>open(false),100));
 }
 const CAL={'United States':[],'United Kingdom':['uk','britain','england','scotland','wales'],'United Arab Emirates':['uae','emirates','dubai'],'South Korea':['korea'],'Türkiye':['turkey'],'Côte d’Ivoire':['ivory'],'Czechia':['czech']};
-combo(document.getElementById('from'),C,{text:c=>c[0],alias:c=>[norm(c[1])].concat(CAL[c[0]]||[]).filter(a=>a),row:(c,q)=>`<span>${hi(c[0],q)}</span><span class="code">${c[1]}${c[2]?' '+c[2]:''}</span>`,onPick:c=>{document.getElementById('cur').textContent=c[1]+(c[2]?' '+c[2]:'');
+combo(document.getElementById('from'),C,{text:c=>c[0],alias:c=>[norm(c[1])].concat(CAL[c[0]]||[]).filter(a=>a),row:(c,q)=>`<span>${hi(c[0],q)}</span><span class="code">${c[1]}${c[2]?' '+c[2]:''}</span>`,onPick:c=>{const cur=document.getElementById('cur');cur.textContent=c[1]+(c[2]?' '+c[2]:'');cur.hidden=false;
  const E=window.TPEngine,err=document.getElementById('calc-err'),from=document.getElementById('from');
  const ok=!E||!E.currencies||E.currencies().includes(c[1]);
  if(err)err.textContent=ok?'':`We can’t work it out in ${c[1]} yet. Pick another country, or a US dollar account.`;

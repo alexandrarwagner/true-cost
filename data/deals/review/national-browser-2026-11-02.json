@@ -1,20 +1,28 @@
 {
-  "target": { "kind": "national" },
+  "target": {
+    "kind": "national"
+  },
   "deals": [
     {
       "id": "amazon-prime-young-adults",
       "title": "Amazon Prime for Young Adults",
       "scope": "national",
       "category": "subscriptions",
-      "studentPrice": { "amount": 749, "currency": "USD" },
-      "regularPrice": { "amount": 1499, "currency": "USD" },
+      "studentPrice": {
+        "amount": 749,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 1499,
+        "currency": "USD"
+      },
       "period": "month",
       "eligibility": "Anyone aged 18 to 24, or a student, in the United States.",
       "howToGet": "Start the six-month free trial on Amazon's Prime for Young Adults page and confirm your age or enrolment. After the trial it renews at $7.49 a month, or $69 a year. Cancel any time.",
       "sourceUrl": "https://www.amazon.com/amazonprime?primeCampaignId=studentWlpPrimeRedir",
       "sourceQuote": "Enjoy a 6-month trial of Prime for Young Adults. Then get Prime at half the price, just $14.99 $7.49 per month. Cancel anytime.",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "amtrak-student-discount",
@@ -26,7 +34,7 @@
       "sourceUrl": "https://www.amtrak.com/deals-discounts/everyday-discounts/student-discounts",
       "sourceQuote": "Amtrak is offering students between ages 17-24 the chance to save 15% on purchases made one (1) day in advance with our national student discount",
       "checkedOn": "2026-11-02",
-      "status": "pending"
+      "status": "approved"
     }
   ]
 }

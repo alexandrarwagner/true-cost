@@ -5,6 +5,7 @@
  * it pending. Only this script, driven by a person, writes "approved" (ADR 014).
  *
  *   npm run review:deals
+ *   npm run review:deals -- --yes     # the owner decided outside the prompt: approve every pending draft
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -82,9 +83,9 @@ async function main(): Promise<void> {
       console.log(
         `\n${d.title}  [${d.category}]\n  ${price}\n  Who: ${d.eligibility}\n  How: ${d.howToGet}\n  Quote: "${d.sourceQuote}"\n  Source: ${d.sourceUrl}`,
       );
-      const answer = (await rl.question("  approve / reject / skip [a/r/s]: "))
-        .trim()
-        .toLowerCase();
+      const answer = process.argv.includes("--yes")
+        ? "a"
+        : (await rl.question("  approve / reject / skip [a/r/s]: ")).trim().toLowerCase();
       if (answer === "a") {
         if ((current.deals as { id: string }[]).some((x) => x.id === d.id)) {
           console.log("  already in the live file; skipped");

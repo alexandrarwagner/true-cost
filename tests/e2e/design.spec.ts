@@ -18,6 +18,8 @@ const SECTIONS = ["results", "where", "fx", "save", "how", "share"] as const;
 
 /** The designer's sample: India, $37,500 a year, two years, and a school (v2 requires one). Typed in, so the example can change. */
 async function showMe(page: Page) {
+  await page.locator("#from").fill("India");
+  await page.getByRole("option", { name: /^India/ }).click();
   await page.locator("#school").fill("Boston University");
   await page.locator("#tuition").fill("$37,500");
   await page.locator("#years").fill("2");
@@ -122,6 +124,9 @@ test.describe("the designer's page, as served", () => {
     await showMe(page);
     await expect(page.locator("#r-total")).not.toHaveText("");
     await page.evaluate(() => document.fonts.ready);
+    // The sticky nav overlaps whichever section is captured, at a position that drifts by a
+    // few pixels between runs; it has its own test, so it is hidden for the section shots.
+    const hideNav = await page.addStyleTag({ content: "#topnav{visibility:hidden}" });
     for (const id of SECTIONS) {
       const section = page.locator(`#${id}`);
       await section.scrollIntoViewIfNeeded();
@@ -129,6 +134,7 @@ test.describe("the designer's page, as served", () => {
         maxDiffPixelRatio: RATIO,
       });
     }
+    await hideNav.evaluate((el) => el.parentNode?.removeChild(el));
     await page.evaluate(() => window.scrollTo(0, 0));
     expect.soft(await page.screenshot({ fullPage: true })).toMatchSnapshot("results-full.png", {
       maxDiffPixelRatio: RATIO,

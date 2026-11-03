@@ -5,14 +5,164 @@
       "title": "Spotify Premium Student",
       "scope": "national",
       "category": "subscriptions",
-      "studentPrice": { "amount": 699, "currency": "USD" },
-      "regularPrice": { "amount": 1299, "currency": "USD" },
+      "studentPrice": {
+        "amount": 699,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 1299,
+        "currency": "USD"
+      },
       "period": "month",
       "eligibility": "Students at an accredited US college or university, verified through Spotify; re-verify each year, up to four years.",
       "howToGet": "Sign up on Spotify's student page and verify your enrolment. The first month is free. The price covers Spotify Premium and Hulu (With Ads).",
       "sourceUrl": "https://www.spotify.com/us/student/",
       "sourceQuote": "just $6.99/month after. Save up to $17.99/month. Cancel anytime. Spotify Premium Normally $12.99/month",
       "checkedOn": "2026-10-31",
+      "status": "approved"
+    },
+    {
+      "id": "apple-music-student",
+      "title": "Apple Music Student Plan",
+      "scope": "national",
+      "category": "subscriptions",
+      "studentPrice": {
+        "amount": 699,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 1199,
+        "currency": "USD"
+      },
+      "period": "month",
+      "eligibility": "College students only; verification required. Student pricing lasts up to four years while you remain a student, and does not extend to a Family Sharing group.",
+      "howToGet": "Choose the Student plan on Apple Music and verify your college or university enrolment. The first month is free for new subscribers.",
+      "sourceUrl": "https://www.apple.com/apple-music/",
+      "sourceQuote": "Students can choose the Apple Music Student Plan at $6.99 per month. An individual monthly subscription is just $11.99 per month after your free trial. Once your student status with your college or university is verified, you get student membership pricing for up to four years, as long as you remain a student.",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "adobe-creative-cloud-student",
+      "title": "Adobe Creative Cloud Pro for students",
+      "scope": "national",
+      "category": "software",
+      "studentPrice": {
+        "amount": 1999,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 6999,
+        "currency": "USD"
+      },
+      "period": "month",
+      "eligibility": "Current students aged 13 and older, enrolled at an accredited educational institution; the subscription must be bought by someone aged 18 or over. Adobe may ask for a school-issued email address to verify.",
+      "howToGet": "On the Creative Cloud plans page choose the Pro plan for students and teachers and verify your status. US$19.99 a month is the first-year price; it is US$39.99 a month after that, still below the regular US$69.99.",
+      "sourceUrl": "https://www.adobe.com/creativecloud/buy/students.html",
+      "sourceQuote": "Pay US$19.99/mo the first year and US$39.99/mo after that. Regularly at US$69.99/mo. The Adobe Creative Cloud student discount is available to current students aged 13 and older.",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "hulu-disney-student-bundle",
+      "title": "Disney+ and Hulu student bundle (with ads)",
+      "scope": "national",
+      "category": "subscriptions",
+      "studentPrice": {
+        "amount": 649,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 1299,
+        "currency": "USD"
+      },
+      "period": "month",
+      "eligibility": "Students enrolled at a U.S. university, U.S. residents aged 18 or over; verified through SheerID and re-verified every year.",
+      "howToGet": "Open the Hulu student page, press Get this deal, verify your student status with SheerID using your school name and email address, and create your account.",
+      "sourceUrl": "https://www.hulu.com/student",
+      "sourceQuote": "Student discount offer for ad-supported Disney+, Hulu Bundle plan only: $6.49/month then $12.99/month or then-current, regular monthly price. Offer valid for students enrolled at a U.S. university. Verification performed through SheerID. Student status must be re-verified annually",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "microsoft-office-365-a1-students",
+      "title": "Microsoft Office 365 for students, free",
+      "scope": "national",
+      "category": "software",
+      "eligibility": "Students with an eligible education email address, as long as you are enrolled in a qualified educational organization. Eligibility may be re-verified at any time.",
+      "howToGet": "Enter your school email address on Microsoft's education page. Verification is often instant. You get the web versions of Outlook, Word, Excel, PowerPoint and OneNote.",
+      "sourceUrl": "https://www.microsoft.com/en-us/education/products/office",
+      "sourceQuote": "Educators and students with an eligible education email address can get Office 365 A1 for free. Includes the web-based versions of core apps (Outlook, Word, Excel, PowerPoint, OneNote). Your eligibility may be re-verified at any time.",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "github-student-developer-pack",
+      "title": "GitHub Student Developer Pack",
+      "scope": "national",
+      "category": "software",
+      "eligibility": "Verified students; there are separate sign-up paths for students aged 13 to 17 and 18 and over.",
+      "howToGet": "Sign up for the Student Developer Pack on GitHub Education and verify your student status. It includes a free GitHub Pro plan while you are a student and GitHub Copilot for verified students.",
+      "sourceUrl": "https://education.github.com/pack",
+      "sourceQuote": "Free GitHub Pro while you are a student. GitHub Copilot Student is available to verified students. Sign up for Student Developer Pack",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "notion-education-plan",
+      "title": "Notion Education Plan, free",
+      "scope": "national",
+      "category": "software",
+      "eligibility": "Students or educators at an accredited college or university, signed in with a school email address; student IDs are not accepted. Status is verified once a year.",
+      "howToGet": "In Notion go to Settings, choose Upgrade plan, then Get free education plan. If your school is recognised you are upgraded automatically.",
+      "sourceUrl": "https://www.notion.com/product/notion-for-education",
+      "sourceQuote": "The Education Plan for individual students is a free plan for a one-member workspace. You're a student or educator at an accredited college or university. You have a school email address. We don't accept student IDs or other documentation to verify.",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "figma-education-plan",
+      "title": "Figma Education Plan, free",
+      "scope": "national",
+      "category": "software",
+      "eligibility": "Students and educators over 13 in a structured classroom, virtual or in person, who verify their education status.",
+      "howToGet": "Sign up for the free Education Plan on Figma's education page, verify your education status and create an Education team. It gives free access to the Professional tier of Figma and FigJam.",
+      "sourceUrl": "https://www.figma.com/education/",
+      "sourceQuote": "Figma & FigJam are 100% free for students, educators and schools. No freemium or hidden upgrades, ever. Teachers and students over 13 years old can get started on their own by signing up for our free Education Plan",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "amazon-prime-young-adults",
+      "title": "Amazon Prime for Young Adults",
+      "scope": "national",
+      "category": "subscriptions",
+      "studentPrice": {
+        "amount": 749,
+        "currency": "USD"
+      },
+      "regularPrice": {
+        "amount": 1499,
+        "currency": "USD"
+      },
+      "period": "month",
+      "eligibility": "Anyone aged 18 to 24, or a student, in the United States.",
+      "howToGet": "Start the six-month free trial on Amazon's Prime for Young Adults page and confirm your age or enrolment. After the trial it renews at $7.49 a month, or $69 a year. Cancel any time.",
+      "sourceUrl": "https://www.amazon.com/amazonprime?primeCampaignId=studentWlpPrimeRedir",
+      "sourceQuote": "Enjoy a 6-month trial of Prime for Young Adults. Then get Prime at half the price, just $14.99 $7.49 per month. Cancel anytime.",
+      "checkedOn": "2026-11-03",
+      "status": "approved"
+    },
+    {
+      "id": "amtrak-student-discount",
+      "title": "Amtrak student discount, 15% off",
+      "scope": "national",
+      "category": "transport",
+      "eligibility": "Students aged 17 to 24 with a valid student ID.",
+      "howToGet": "Book on Amtrak.com at least one day ahead; the discount applies automatically to qualifying travel, or enter code V814 in the Amtrak app. Coach and Acela Business Class only; some routes are excluded.",
+      "sourceUrl": "https://www.amtrak.com/deals-discounts/everyday-discounts/student-discounts",
+      "sourceQuote": "Amtrak is offering students between ages 17-24 the chance to save 15% on purchases made one (1) day in advance with our national student discount",
+      "checkedOn": "2026-11-03",
       "status": "approved"
     }
   ]

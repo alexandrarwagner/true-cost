@@ -59,6 +59,8 @@ test.describe("the designer's page: school search", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.locator("#from").fill("India");
+    await page.getByRole("option", { name: /^India/ }).click();
     await page.locator("#school").fill("purdue");
     await page.getByRole("option", { name: /Purdue University-Main Campus/ }).click();
     await page.locator("#years").fill("2");
@@ -161,20 +163,20 @@ test.describe("the designer's page: school search", () => {
     await page.locator("#example").click();
     await page.waitForFunction(() => "TP" in window, null, { timeout: 10_000 });
     const grid = page.locator("#deals");
-    await expect(grid.locator(".deal")).toHaveCount(2);
+    // Ten approved national deals plus NYU's museum deal (2 November).
+    await expect(grid.locator(".deal")).toHaveCount(11);
     await expect(grid).toContainText("Spotify Premium Student");
     await expect(grid).toContainText("Free entry to New York museums");
-    await expect(grid).toContainText("checked Oct 2026");
     // How to get it and who qualifies sit behind a disclosure (decision 23).
     const details = grid.locator(".deal").first().locator("details");
     await expect(details).toHaveJSProperty("open", false);
     await details.locator("summary").click();
     await expect(details).toHaveJSProperty("open", true);
     await expect(details).toContainText("Who:");
-    await expect(page.locator("#deals-checked")).toHaveText("Checked Oct 2026 · No paid listings");
     await expect(page.locator("#save-city")).toHaveText("New York");
     // No generic tips, no Boston cards.
-    await expect(page.getByText("General tips")).toHaveCount(0);
+    // The four general tips are back, campus-neutral (decision 25); the Boston cards are not.
+    await expect(page.getByText("General tips")).toHaveCount(1);
     await expect(page.getByText("Orangetheory")).toHaveCount(0);
     // The "Check before you go" line is gone (decision 19).
     await expect(page.locator("#save")).not.toContainText("Check before you go");
@@ -183,7 +185,13 @@ test.describe("the designer's page: school search", () => {
     await page.locator("#deal-chips .dchip", { hasText: "Museums and culture" }).click();
     await expect(grid.locator(".deal:visible")).toHaveCount(1);
     await page.locator("#deal-chips .dchip", { hasText: "All" }).click();
-    await expect(grid.locator(".deal:visible")).toHaveCount(2);
+    // Two rows of four, then the rest behind "Show more" (decision 31).
+    await expect(grid.locator(".deal:visible")).toHaveCount(8);
+    const more = page.locator("#deals-more");
+    await expect(more).toHaveText("Show 3 more deals");
+    await more.click();
+    await expect(grid.locator(".deal:visible")).toHaveCount(11);
+    await expect(more).toBeHidden();
     // The copy fixes.
     await expect(page.locator("#fx")).toContainText(
       "Frankfurter (European Central Bank reference rates)",
@@ -328,9 +336,13 @@ test.describe("the designer's page: school search", () => {
   }) => {
     await page.goto("/");
     // No country in the list is unsupported any more, so stand in for one through the chip.
+    await page.locator("#from").fill("Atlantis");
     await page.evaluate(() => {
       const chip = document.getElementById("cur");
-      if (chip) chip.textContent = "XXX";
+      if (chip) {
+        chip.textContent = "XXX";
+        chip.hidden = false;
+      }
     });
     await page.locator("#school").fill("Boston University");
     await page.locator("#tuition").fill("$30,000");

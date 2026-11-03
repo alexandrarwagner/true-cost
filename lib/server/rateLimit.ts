@@ -6,7 +6,9 @@ import { getEnv } from "./env";
 // Two tiers: "general" for data routes, "ai" (stricter) for anything that spends on the model.
 export type Tier = "general" | "ai";
 export const LIMITS: Record<Tier, { perMinute: number; perDay: number }> = {
-  general: { perMinute: 30, perDay: 300 },
+  // The school typeahead sends a request at every pause while typing, and a result loads four
+  // or five data routes, so a person testing the site reached 300 a day (2 November).
+  general: { perMinute: 120, perDay: 2000 },
   ai: { perMinute: 5, perDay: 30 },
 };
 

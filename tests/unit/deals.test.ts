@@ -136,7 +136,11 @@ describe("the checked-in deal files", () => {
       "2026-11-01",
     );
     expect(nyu.schoolChecked).toBe(true);
-    expect(nyu.deals.map((d) => d.id)).toEqual(["nyu-museum-gateway", "spotify-premium-student"]);
+    // The school's own deal first, then every approved national deal (ten since 2 November).
+    const ids = nyu.deals.map((d) => d.id);
+    expect(ids[0]).toBe("nyu-museum-gateway");
+    expect(ids.slice(1)).toEqual(files.national.map((d) => d.id));
+    expect(ids).toContain("spotify-premium-student");
     const purdue = dealsFor(baseInput().school, "2026-11-01");
     expect(purdue).toEqual({ deals: files.national, schoolChecked: false });
     // Checks age out after 90 days.

@@ -26,6 +26,8 @@ const tokens = JSON.parse(readFileSync("design/reference-v2/motion-tokens.json",
 
 /** The designer's sample, typed in. v2 requires a school; the prototype engine ignores it. */
 async function showMe(page: Page) {
+  await page.locator("#from").fill("India");
+  await page.getByRole("option", { name: /^India/ }).click();
   await page.locator("#school").fill("Boston University");
   await page.locator("#tuition").fill("$37,500");
   await page.locator("#years").fill("2");
@@ -153,7 +155,8 @@ for (const width of [1440, 390]) {
       await page.locator("#calc button[type=submit]").click();
       const err = page.locator("#calc-err");
       await expect(err).toHaveAttribute("role", "alert");
-      await expect(err).toContainText("Add your school");
+      // The tuition has a default, so only the country and the school are missing.
+      await expect(err).toContainText("Add where you’re from and your school to work it out.");
       await expect(page.locator("#school")).toHaveAttribute("aria-invalid", "true");
       await settled(page, "#calc-err"); // its 300 ms fade-in
       expect((await axe().analyze()).violations).toEqual([]);

@@ -5,10 +5,8 @@
 // school, its city and the national list; the chips filter by category as before.
 (function(){
 const $=id=>document.getElementById(id);
-const grid=$('deals'),chips=$('deal-chips'),checked=$('deals-checked');if(!grid||!chips)return;
+const grid=$('deals'),chips=$('deal-chips');if(!grid||!chips)return;
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const monthYear=iso=>MON[+iso.slice(5,7)-1]+' '+iso.slice(0,4);
 const LABEL={transport:'Getting around',fitness:'Fitness',culture:'Museums and culture',software:'Software',subscriptions:'Subscriptions',phone:'Phone',food:'Food and coffee',other:'Other'};
 const TILE={transport:['#9FEADA','<circle cx="7" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><circle cx="17" cy="16" r="3.5" stroke="#14151F" stroke-width="2"/><path d="M7 16L10 9H14L17 16M12 9V6H15" stroke="#14151F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
  fitness:['#DDFF7A','<path d="M4 9V15M7 7V17M17 7V17M20 9V15M7 12H17" stroke="#14151F" stroke-width="2" stroke-linecap="round"/>'],
@@ -27,20 +25,28 @@ function headline(d){const t=window.TP;
 function sub(d){if(d.savingUsd!=null)return 'could save about '+headline(d)+' over your degree';
   if(d.studentPrice&&d.regularPrice)return money(d.studentPrice)+' instead of '+money(d.regularPrice)+(d.period?' '+(PERIOD[d.period]||''):'');
   return 'The source doesn’t list a regular price, so we don’t show a figure.'}
-const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return 'source'}};
 function card(d){return `<article class="deal" data-cat="${esc(LABEL[d.category]||LABEL.other)}" style="border-radius: 24px; background: #FFFFFF; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 10px">
 <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #4A4B63">${tile(d.category)}${esc(LABEL[d.category]||LABEL.other)}</span>
 <span class="d" style="margin-top: 10px; font-size: 32px; line-height: 1">${esc(headline(d))}</span>
 <span style="font-size: 17px; font-weight: 600; line-height: 1.3">${esc(d.title)}</span>
 <span style="font-size: 14px; line-height: 1.5; color: #4A4B63">${esc(sub(d))}</span>
 <details style="font-size: 14px; line-height: 1.5; color: #4A4B63"><summary style="cursor: pointer; font-weight: 600; color: var(--ink); min-height: 28px; display: list-item">How to get it</summary><span style="display: block; margin-top: 6px">${esc(d.howToGet)}</span><span style="display: block; margin-top: 6px">Who: ${esc(d.eligibility)}</span></details>
-<a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="margin-top: auto; padding-top: 14px; font-size: 13px; color: #4A4B63">Source: ${esc(host(d.sourceUrl))}, checked ${esc(monthYear(d.checkedOn))}</a>
 </article>`}
 const chip=(cat,on)=>`<button type="button" class="dchip" data-cat="${esc(cat)}" aria-pressed="${on}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 1.5px solid ${on?'var(--dark)':'#DCDDE3'}; background: ${on?'var(--dark)':'#FFFFFF'}; color: ${on?'#FFFFFF':'var(--ink)'}; font: inherit; font-size: 15px; cursor: pointer">${esc(cat)}</button>`;
-function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];
- cs.forEach(ch=>ch.addEventListener('click',()=>{const c=ch.dataset.cat;
+// Two rows of cards (eight at full width) and a "Show N more" button for the rest (decision 31).
+const LIMIT=8;let expanded=false;
+const more=document.createElement('button');more.type='button';more.id='deals-more';more.hidden=true;
+more.style.cssText='align-self: center; height: 48px; padding: 0 22px; border: 1.5px solid var(--ink); border-radius: 24px; background: transparent; color: var(--ink); font: inherit; font-size: 16px; font-weight: 600; cursor: pointer';
+grid.insertAdjacentElement('afterend',more);
+function show(cards,cat){const vis=cards.filter(k=>cat==='All'||k.dataset.cat===cat);
+ cards.forEach(k=>{k.style.display='none'});vis.forEach((k,i)=>{k.style.display=(expanded||i<LIMIT)?'flex':'none'});
+ const rest=vis.length-LIMIT;more.hidden=expanded||rest<=0;more.textContent=`Show ${rest} more deal${rest===1?'':'s'}`;more.setAttribute('aria-expanded',String(expanded))}
+function wire(){const cs=[...chips.querySelectorAll('.dchip')];const cards=[...grid.querySelectorAll('.deal')];let cat='All';
+ cs.forEach(ch=>ch.addEventListener('click',()=>{cat=ch.dataset.cat;
   cs.forEach(x=>{const on=x===ch;x.setAttribute('aria-pressed',on);x.style.background=on?'var(--dark)':'#FFFFFF';x.style.color=on?'#FFFFFF':'var(--ink)';x.style.borderColor=on?'var(--dark)':'#DCDDE3'});
-  cards.forEach(k=>{k.style.display=(c==='All'||k.dataset.cat===c)?'flex':'none';k.classList.remove('pre');k.classList.add('seen')})}))}
+  cards.forEach(k=>{k.classList.remove('pre');k.classList.add('seen')});show(cards,cat)}));
+ more.onclick=()=>{expanded=true;show(cards,cat);const first=cards.filter(k=>k.style.display==='flex')[LIMIT];if(first)first.querySelector('a,summary,button')?.focus({preventScroll:true})};
+ expanded=false;show(cards,cat)}
 function render(deals){
  const cats=[...new Set(deals.map(d=>LABEL[d.category]||LABEL.other))];
  chips.innerHTML=chip('All',true)+cats.map(c=>chip(c,false)).join('');
@@ -48,7 +54,6 @@ function render(deals){
  // The designer's staggered landing (v2): cards wait as .pre and land as .seen when scrolled
  // into view, with the same observer settings as the page's own tiles.
  if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('pre');e.target.classList.add('seen');io.unobserve(e.target)}}),{threshold:.3,rootMargin:'0px 0px -10% 0px'});grid.querySelectorAll('.deal').forEach(c=>{c.classList.add('pre');io.observe(c)})}
- const latest=deals.map(d=>d.checkedOn).sort().pop();if(checked)checked.textContent=latest?`Checked ${monthYear(latest)} · No paid listings`:'No paid listings';
  wire()}
 let last='';
 function refresh(){const s=window.TPSchool||{};const t=window.TP||{};const q=new URLSearchParams({unitId:String(s.unitId||0),city:s.city||'',state:s.state||'',years:String(t.Y||4)});

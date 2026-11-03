@@ -51,20 +51,23 @@ describe("scorecard adapter", () => {
         return ok([purdue]);
       }),
     );
+    // A name that is in no school of the snapshot, so the search has to ask the API.
     const src = scorecardSource("k-test");
-    const first = await src.search("purdue", sig());
-    const second = await src.search("Purdue ", sig());
+    const first = await src.search("zzqx", sig());
+    const second = await src.search("ZZQX ", sig());
     expect(first[0]?.unitId).toBe(243780);
     expect(second).toEqual(first);
     expect(calls).toBe(1);
     const u = new URL(seen?.url ?? "");
-    expect(u.searchParams.get("school.name")).toBe("purdue");
+    expect(u.searchParams.get("school.name")).toBe("zzqx");
     expect(u.searchParams.has("api_key")).toBe(false);
     expect(seen?.headers.get("x-api-key")).toBe("k-test");
   });
 
   it("throws without a key and on a 429, and returns null for an unknown school", async () => {
-    await expect(scorecardSource(undefined).search("x", sig())).rejects.toMatchObject({
+    // The snapshot still answers without a key; only a name it lacks needs the API.
+    expect(await scorecardSource(undefined).search("university", sig())).toHaveLength(10);
+    await expect(scorecardSource(undefined).search("zzqx", sig())).rejects.toMatchObject({
       kind: "blocked_host",
     });
     server.use(
@@ -74,17 +77,31 @@ describe("scorecard adapter", () => {
           : new HttpResponse(null, { status: 429 }),
       ),
     );
-    await expect(scorecardSource("k").search("rate", sig())).rejects.toMatchObject({
+    await expect(scorecardSource("k").search("zzqx rate", sig())).rejects.toMatchObject({
       kind: "http",
       status: 429,
     });
     expect(await scorecardSource("k").costs(1, sig())).toBeNull();
   });
 
+  it("finds a school in the snapshot before asking the API, ranked by how the name matches", async () => {
+    // One local match, so the API is asked to fill the list; it has nothing to add.
+    server.use(http.get(SCORECARD_URL, () => ok([])));
+    const one = await scorecardSource("k").search("washington and lee", sig());
+    expect(one[0]?.name).toBe("Washington and Lee University");
+    // Ten or more local matches: the API is not asked at all.
+    server.use(http.get(SCORECARD_URL, () => new HttpResponse(null, { status: 500 })));
+    const many = await scorecardSource("k").search("university", sig());
+    expect(many).toHaveLength(10);
+    expect(many.every((s) => /university/i.test(s.name))).toBe(true);
+  });
+
   it("fetches costs live when the school is not in the snapshot", async () => {
+    // 243780 (Purdue) is in data/snapshots/scorecard-costs.json since 2 November; an id that
+    // is not forces the live call, which the mock answers with Purdue's record.
     server.use(http.get(SCORECARD_URL, () => ok([purdue])));
     const r = await scorecardSource("k", { now: () => new Date("2026-10-30T00:00:00Z") }).costs(
-      243780,
+      999999,
       sig(),
     );
     expect(r?.summary.name).toBe("Purdue University-Main Campus");

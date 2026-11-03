@@ -54,9 +54,11 @@ const btn=document.querySelector('#calc button[type=submit]');
 function run(ex){
   const T=parseT(),Y=clampY(yrs.value);yrs.value=Y;const sc=$('school'),fr=$('from');
   // The designer's checks (v2): the field, its label and the message are marked together.
-  const missing=[];if(!ex&&!sc.value.trim())missing.push('school');if(!T)missing.push('tuition');
-  setInvalid(sc,missing.includes('school'));setInvalid(tu,missing.includes('tuition'));setInvalid(fr,false);
-  if(missing.length){showErr(missing.length===2?'Add your school and your tuition per year to work it out.':missing[0]==='school'?'Add your school to work it out.':'Add your tuition per year to work it out.');(missing[0]==='school'?sc:tu).focus();return}
+  // The country, the school and the tuition are all needed (decision 35: no default country).
+  const missing=[];if(!ex&&(!fr.value.trim()||$('cur').hidden))missing.push('country');if(!ex&&!sc.value.trim())missing.push('school');if(!T)missing.push('tuition');
+  setInvalid(fr,missing.includes('country'));setInvalid(sc,missing.includes('school'));setInvalid(tu,missing.includes('tuition'));
+  if(missing.length){const names={country:'where you’re from',school:'your school',tuition:'your tuition per year'};const list=missing.map(k=>names[k]);
+    showErr(`Add ${list.length>1?list.slice(0,-1).join(', ')+' and '+list[list.length-1]:list[0]} to work it out.`);({country:fr,school:sc,tuition:tu})[missing[0]].focus();return}
   clearErr();
   CUR=curCode();
   // A currency the engine cannot calculate in stops here with a message, instead of dollars.
@@ -127,11 +129,12 @@ function reveal(T,Y,c,tot,K,Q){
   const sem=T/2+1500*6;const n=2*Y;
   // exchange rate: replay past moves on your payments (INR only)
   const fxSec=$('fx');let lo=null,hi=null,buf=null;
+  // The heading and the chart's title name the chosen currency (the markup says rupees),
+  // whether or not the rate history is there.
+  if(window.TPEngine.currencyName){const h=fxSec.querySelector('h2');if(h)h.textContent=`If the ${window.TPEngine.currencyName(CUR)} moves.`;
+    const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
   if(K.fx){fxSec.querySelectorAll(':scope > div').forEach(x=>x.classList.remove('fxhide'));const nn=fxSec.querySelector('.fx-none');if(nn)nn.remove();
     const F=K.fx;drawFan(F,Y,!Q);
-    // The heading and the chart's title name the chosen currency (the markup says rupees).
-    if(window.TPEngine.currencyName){const h=fxSec.querySelector('h2');if(h)h.textContent=`If the ${window.TPEngine.currencyName(CUR)} moves.`;
-      const ct=fxSec.querySelector(':scope > div > div:last-child > span:first-child');if(ct)ct.textContent=CUR==='INR'?'What you’ll have spent, in rupees':`What you’ll have spent, in ${CUR}`}
     lo=F.lo/RATE.INR;hi=F.hi/RATE.INR;buf=F.buf/RATE.INR;
     const loT=fmt(lo,'big'),hiT=fmt(hi,'big');$('fx-lo').textContent=(loT.endsWith('crore')&&hiT.endsWith('crore'))?loT.replace(' crore',''):loT;$('fx-hi').textContent=hiT;
     $('r-buf').textContent=fmt(buf,'big');$('fx-len').textContent=Y+'-year';$('fx-n').textContent=F.n;
@@ -197,12 +200,12 @@ function drawFan(F,Y,anim){const box=$('fx-fan');const bw=box.clientWidth||780;F
 document.getElementById('calc').addEventListener('submit',e=>{e.preventDefault();run()});
 // The example is a real school with its published tuition: New York University, two years.
 const EXAMPLE_SCHOOL={unitId:193900,name:'New York University',city:'New York',state:'NY',zip:'10012'};
-const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';window.TPSchool=EXAMPLE_SCHOOL;$('school').value=EXAMPLE_SCHOOL.name;tu.value='$65,622';window.TPTuitionSource='school';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
+const runExample=e=>{e&&e.preventDefault();$('from').value='India';$('cur').textContent='INR ₹';$('cur').hidden=false;window.TPSchool=EXAMPLE_SCHOOL;$('school').value=EXAMPLE_SCHOOL.name;tu.value='$65,622';window.TPTuitionSource='school';yrs.value=2;run()};$('example').addEventListener('click',runExample);document.querySelectorAll('.see-example').forEach(a=>a.addEventListener('click',runExample));
 // A shared link with edit=1 fills the bar and runs, so "Edit the inputs" on the shared page
 // lands on a filled form. Only the bar's fields; added costs and options stay on the shared page.
 (function(){const q=new URLSearchParams(location.search);const E=window.TPEngine;if(q.get('edit')!=='1'||!q.get('c')||!E.countryName)return;
  const cur=(q.get('cur')||'USD').toUpperCase();const s=E.symbol?E.symbol(cur):'';
- $('from').value=E.countryName(q.get('c'))||$('from').value;$('cur').textContent=cur+(s&&s!==cur?' '+s:'');
+ $('from').value=E.countryName(q.get('c'))||$('from').value;$('cur').textContent=cur+(s&&s!==cur?' '+s:'');$('cur').hidden=false;
  const sch={unitId:+(q.get('s')||0),name:q.get('sn')||'',city:q.get('sc')||'',state:q.get('st')||'',zip:q.get('sz')||''};
  if(sch.unitId>0&&sch.name){window.TPSchool=sch;$('school').value=sch.name}
  const t=parseInt(q.get('t')||'',10);if(t>0)tu.value='$'+t.toLocaleString('en-US');
